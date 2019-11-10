@@ -1,5 +1,5 @@
 /**
- * This is an class that holds station objects
+ * This is a class that holds station objects
  * for ease of mapping to id
  * 
  * It also contains a method to parse station objects back into
@@ -25,7 +25,7 @@ public class Station {
 		Integer maintainenceRequestValue,
 		Integer capacityValue,
 		Integer kiosk,
-		String address1){
+		String address1) {
 			this.name = nameValue;
 			this.bikes = bikesValue;
 			this.pedelecs = pedelecsValue;

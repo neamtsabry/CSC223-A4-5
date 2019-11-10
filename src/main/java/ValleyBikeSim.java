@@ -44,7 +44,7 @@ public class ValleyBikeSim {
 		
 		bufferedReader.close();
 		System.out.print("Welcome to the ValleyBike Simulator.");
-				selector();
+		starter();
 	}
 	
 	/**
@@ -53,7 +53,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void selector() throws IOException, ParseException{
+	public static void starter() throws IOException, ParseException{
 		System.out.print("\nPlease choose from one of the following menu options:\n"
 				+ "0. Quit Program.\n"
 				+ "1. View station list.\n" 
@@ -64,8 +64,18 @@ public class ValleyBikeSim {
 				+ "6. Equalize stations.\n");
 		
 		System.out.println("Please enter your selection (0-6):");
-		int number = input.nextInt();
-		selector(number);
+
+		// if input is not a integer
+		while (!input.hasNextInt()){
+			// send selector an invalid selection
+			selector(9);
+			input.next();
+			starter();
+		}
+
+		// get input and send it to selctor
+		Integer value = input.nextInt();
+		selector(value);
 	}
 	
 	/**
@@ -103,7 +113,7 @@ public class ValleyBikeSim {
 				break;
 			default:
 				System.out.println("Not a valid selection");
-				selector();
+				starter();
 			}
 	}
 	
@@ -127,7 +137,7 @@ public class ValleyBikeSim {
 					station.capacity, station.kioskBoolean, 
 					station.name + "-" +station.address);
 		}
-		selector();
+		starter();
 	}
 	
 	/**
@@ -146,7 +156,7 @@ public class ValleyBikeSim {
 					+ stationsMap.get(id).name + " with new data? (y/n):");
 			String response = input.next();
 			if(!response.equalsIgnoreCase("Y")){
-				selector();
+				starter();
 			}
 		}
 		
@@ -181,7 +191,7 @@ public class ValleyBikeSim {
 				address);
 		
 		stationsMap.put(id, stationOb);
-		selector();
+		starter();
 	}
 	
 	/**
@@ -198,17 +208,20 @@ public class ValleyBikeSim {
 	public static void saveList() throws IOException, ParseException{
 		FileWriter stationsWriter = new FileWriter("data-files/station-data.csv");
 		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+
 		stationsWriter.write("ID,Name,Bikes,Pedelecs,Available Docks,"
 				+ "Maintainence Request,Capacity,Kiosk,Address");
+
 		while(keyIterator.hasNext()){
 			Integer key = (Integer) keyIterator.next();
 			Station station = stationsMap.get(key);
 			stationsWriter.write("\n");
 			stationsWriter.write(key.toString() + "," + station.getStationString());
 		}
+
 		stationsWriter.flush();
 		stationsWriter.close();
-		selector();
+		starter();
 	}
 	
 	/**
@@ -261,7 +274,7 @@ public class ValleyBikeSim {
 		} else {
 			System.out.println("At least one station entered does not exist in our system");
 		}
-		selector();
+		starter();
 	}
 	
 	/**
@@ -301,7 +314,7 @@ public class ValleyBikeSim {
 		averageTime = (totalTime/rides)/60000;
 		System.out.println("Number of rides: " + rides);
 		System.out.println("Average ride time in minutes: " + averageTime);
-		selector();
+		starter();
 	}
 	
 	/**
@@ -334,7 +347,7 @@ public class ValleyBikeSim {
 		reassignHighPercentage(stationsCapacity, idealPercentage, extras);
 		reassignLowPercentage(stationsCapacity, idealPercentage, extras);
 		
-		selector();	
+		starter();
 	}
 	
 	/**
@@ -367,8 +380,7 @@ public class ValleyBikeSim {
 	 * 
 	 * @param stationsCapacity - Map of stations to actual percentages
 	 * @param idealPercentage - Percentage stations should ideally have
-	 * @param extraBikes - Bikes taken from high percentage stations
-	 * @param extraPedelecs - Pedelecs taken from high percentage stations
+	 * @param extras - Bikes/peds taken from high percentage stations
 	 */
 	private static void reassignHighPercentage(Map<Integer, Integer> stationsCapacity, 
 			int idealPercentage, ArrayList<Integer> extras){
@@ -440,7 +452,7 @@ public class ValleyBikeSim {
 	private static Integer getResponse(String request){
 		System.out.println("Please enter number of "+ request + ": ");
 		while (!input.hasNextInt()){
-			System.out.println("That is not a number");
+			System.out.println("That is not a valid number");
 			System.out.println("Please enter number of "+ request + ": ");
 			input.next();
 		}
