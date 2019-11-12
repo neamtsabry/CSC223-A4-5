@@ -16,9 +16,14 @@ import java.text.SimpleDateFormat;
  * Class that contains menu options and implementation for Simulator
  */
 public class ValleyBikeSim {
-	static Map<Integer, Station> stationsMap = new TreeMap<>();
-	static Scanner input = new Scanner(System.in);
-	
+	// data structure for keeping track of stations
+	private static Map<Integer, Station> stationsMap = new TreeMap<>();
+
+	// data structure for keeping track of bikes
+	public static Map<Integer, Bike> bikesMap = new TreeMap<>();
+
+	private static Scanner input = new Scanner(System.in);
+
 	/** 
 	 * Reads in the stations csv file data and parses it into station objects
 	 * mapped by id for easy access and manipulation throughout program
@@ -26,7 +31,7 @@ public class ValleyBikeSim {
 	 * Then outputs welcome message and menu selector
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
-
+		// start reading our designated file
 		FileReader fileReader = new FileReader("data-files/station-data.csv");
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		String stationLine;
@@ -34,11 +39,17 @@ public class ValleyBikeSim {
 				
 		while((stationLine = bufferedReader.readLine()) != null){
 			String[] values = stationLine.split(",");
+
 			Station stationOb = new Station( 
-					values[1], Integer.parseInt(values[2]), Integer.parseInt(values[3]), 
+					values[1],
+					Integer.parseInt(values[2]),
+					Integer.parseInt(values[3]),
 					Integer.parseInt(values[4]), 
-					Integer.parseInt(values[5]), Integer.parseInt(values[6]), 
-					Integer.parseInt(values[7]), values[8]);
+					Integer.parseInt(values[5]),
+					Integer.parseInt(values[6]),
+					Integer.parseInt(values[7]),
+					values[8]);
+
 			stationsMap.put(Integer.parseInt(values[0]),stationOb);
 		}
 		
@@ -53,7 +64,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void starter() throws IOException, ParseException{
+	private static void starter() throws IOException, ParseException{
 		System.out.print("\nPlease choose from one of the following menu options:\n"
 				+ "0. Quit Program.\n"
 				+ "1. View station list.\n" 
@@ -61,7 +72,8 @@ public class ValleyBikeSim {
 				+ "3. Save station list.\n"
 				+ "4. Record ride.\n"
 				+ "5. Resolve ride data.\n"
-				+ "6. Equalize stations.\n");
+				+ "6. Equalize stations.\n"
+				+ "7. Add bikes.\n");
 		
 		System.out.println("Please enter your selection (0-6):");
 
@@ -73,7 +85,7 @@ public class ValleyBikeSim {
 			starter();
 		}
 
-		// get input and send it to selctor
+		// get input and send it to selector
 		Integer value = input.nextInt();
 		selector(value);
 	}
@@ -111,6 +123,9 @@ public class ValleyBikeSim {
 			case 6:
 				equalizeStations();
 				break;
+			case 7:
+				addBike();
+				break;
 			default:
 				System.out.println("Not a valid selection");
 				starter();
@@ -127,16 +142,19 @@ public class ValleyBikeSim {
 	public static void viewList() throws IOException, ParseException{
 		System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes", "Pedelec", 
 				"AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
+
 		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+
 		while(keyIterator.hasNext()){
 			Integer key = (Integer) keyIterator.next();
 			Station station = stationsMap.get(key);
 			System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
 					key, station.bikes, station.pedelecs,
-					station.availableDocks, station.maintainenceRequest,
+					station.availableDocks, station.maintenanceRequest,
 					station.capacity, station.kioskBoolean, 
 					station.name + "-" +station.address);
 		}
+
 		starter();
 	}
 	
@@ -148,9 +166,10 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	public static void addStation() throws IOException, ParseException{
-		
+
 		Integer id = getResponse("station id");
-		
+
+		// handle if the station already exists
 		if(stationsMap.get(id) != null){
 			System.out.println("Station with this ID already exists. \nWould you like to override "
 					+ stationsMap.get(id).name + " with new data? (y/n):");
@@ -159,38 +178,89 @@ public class ValleyBikeSim {
 				starter();
 			}
 		}
-		
+
 		System.out.println("Please enter station name: ");
 		input.nextLine();
 		String name = input.nextLine();
-		
+
 		Integer bikes = getResponse("bikes");
-		
+
 		Integer pedelecs = getResponse("pedelecs");
-		
+
 		Integer availableDocks = getResponse("available docks");
-		
-		Integer maintainenceRequest = getResponse("maintainence requests");
-		
+
+		Integer maintenanceRequest = getResponse("maintenance requests");
+
 		Integer capacity = getResponse("capacity");
-		
+
 		Integer kiosk = getResponse("kiosk");
-		
+
 		System.out.print("Please enter station address: ");
 		input.nextLine();
 		String address = input.nextLine();
-		
+
 		Station stationOb = new Station(
 				name,
 				bikes,
 				pedelecs,
 				availableDocks,
-				maintainenceRequest,
+				maintenanceRequest,
 				capacity,
 				kiosk,
 				address);
-		
+
 		stationsMap.put(id, stationOb);
+		starter();
+	}
+
+	/**
+	 * This method enables maintenance workers to add new bikes
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	public static void addBike() throws IOException, ParseException{
+		Integer id = getResponse("Bike id");
+
+		// handle if the bike already exists
+		if(bikesMap.get(id) != null){
+			System.out.println("Bike with this ID already exists. \nWould you like to override "
+					+ stationsMap.get(id).name + " with new data? (y/n):");
+			String response = input.next();
+			if(!response.equalsIgnoreCase("Y")){
+				starter();
+			}
+		}
+
+		System.out.println("Does it require maintenance? (y/n): ");
+		input.nextLine();
+		String mnt = input.nextLine();
+
+		while(!mnt.equals('y') || !mnt.equals('n')){
+			System.out.println("Please enter either y (for yes) or n (for no)");
+		}
+
+		System.out.print("Please enter maintenance report. If none, enter none.");
+		input.nextLine();
+		String mntReport = input.nextLine();
+
+		System.out.print("Please pick one of the following choices for the status of the bike: ");
+		System.out.println("0: Docked/available at station");
+		System.out.println("1: Live with customer");
+		System.out.println("2: Docked/out of commission");
+
+		Integer bikeLocation = getResponse("0-2");
+
+		Integer stationId = getResponse("station id");
+
+		Bike bikeOb = new Bike(
+				id,
+				mnt,
+				mntReport,
+				bikeLocation,
+				stationId
+				);
+
+		bikesMap.put(id, bikeOb);
 		starter();
 	}
 	
@@ -210,7 +280,7 @@ public class ValleyBikeSim {
 		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
 
 		stationsWriter.write("ID,Name,Bikes,Pedelecs,Available Docks,"
-				+ "Maintainence Request,Capacity,Kiosk,Address");
+				+ "Maintenance Request,Capacity,Kiosk,Address");
 
 		while(keyIterator.hasNext()){
 			Integer key = (Integer) keyIterator.next();
@@ -240,40 +310,47 @@ public class ValleyBikeSim {
 	public static void recordRide() throws IOException, ParseException{
 		System.out.println("Enter b for Bike or p for Pedelec: ");
 		String rideType = input.next();
+
 		System.out.println("From (Station ID): ");
 		String from = input.next();
+
 		System.out.println("To (Station ID): ");
 		String to = input.next();
-		
-		Station stationFrom = stationsMap.get(Integer.parseInt(from));
-		Station stationTo = stationsMap.get(Integer.parseInt(to));
-		
-		if(stationFrom != null && stationTo != null){
-			switch(rideType.toUpperCase()){
-			case("B"):
-				if (stationFrom.bikes > 0 && stationTo.availableDocks > 0){
-				stationFrom.bikes = stationFrom.bikes-1;
-				stationTo.bikes = stationTo.bikes+1;
-				stationTo.availableDocks = stationTo.availableDocks - 1;
-				} else {
-					System.out.println("Ride not valid");
+
+		try{
+			Station stationFrom = stationsMap.get(Integer.parseInt(from));
+			Station stationTo = stationsMap.get(Integer.parseInt(to));
+
+			if(stationFrom != null && stationTo != null){
+				switch(rideType.toUpperCase()){
+					case("B"):
+						if (stationFrom.bikes > 0 && stationTo.availableDocks > 0){
+							stationFrom.bikes = stationFrom.bikes-1;
+							stationTo.bikes = stationTo.bikes+1;
+							stationTo.availableDocks = stationTo.availableDocks - 1;
+						} else {
+							System.out.println("Ride not valid");
+						}
+						break;
+					case("P"):
+						if (stationFrom.pedelecs > 0 && stationTo.availableDocks > 0){
+							stationFrom.pedelecs = stationFrom.pedelecs-1;
+							stationTo.pedelecs = stationTo.pedelecs+1;
+							stationTo.availableDocks = stationTo.availableDocks - 1;
+						} else {
+							System.out.println("Ride not valid");
+						}
+						break;
+					default:
+						System.out.println("Invalid vehicle type");
 				}
-				break;
-			case("P"):
-				if (stationFrom.pedelecs > 0 && stationTo.availableDocks > 0){
-				stationFrom.pedelecs = stationFrom.pedelecs-1;
-				stationTo.pedelecs = stationTo.pedelecs+1;
-				stationTo.availableDocks = stationTo.availableDocks - 1;
-				} else {
-					System.out.println("Ride not valid");
-				}
-				break;
-			default:
-				System.out.println("Invalid vehicle type");
+			} else {
+				System.out.println("At least one station entered does not exist in our system");
 			}
-		} else {
-			System.out.println("At least one station entered does not exist in our system");
+		} catch(NumberFormatException e){
+			System.out.println("Your input is invalid! Please input a number for the station ID next time.");
 		}
+
 		starter();
 	}
 	
@@ -288,28 +365,34 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	public static void resolveData() throws IOException, ParseException{
-		//Scanner input = new Scanner(System.in);
 		System.out.println("Enter the file name (including extension) of the file located"
 				+ "in data-files: ");
 		String dataFile = input.next();
 		FileReader fileReader = new FileReader("data-files/"+ dataFile);
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		String rideLine;
+
 		int rides = 0;
 		long totalTime = 0;
 		long averageTime = 0;
+
 		bufferedReader.readLine();
+
 		while((rideLine = bufferedReader.readLine()) != null){
 			rides = rides + 1;
 			String[] values = rideLine.split(",");
+
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		    Date startDate = dateFormat.parse(values[3]);
+
+			Date startDate = dateFormat.parse(values[3]);
 		    Timestamp startTime = new Timestamp(startDate.getTime());
 		    Date endDate = dateFormat.parse(values[4]);
 		    Timestamp endTime = new Timestamp(endDate.getTime());
 		    totalTime = totalTime + (endTime.getTime() - startTime.getTime());
 		}
+
 		bufferedReader.close();
+
 		//Just averaging to the closest number of minutes here for simplicity
 		averageTime = (totalTime/rides)/60000;
 		System.out.println("Number of rides: " + rides);
@@ -360,16 +443,22 @@ public class ValleyBikeSim {
 	private static int getPercentageData(Map<Integer, Integer> stationsCapacity){
 		int totalVehicles = 0;
 		int totalCapacity = 0;
+
 		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+
 		while(keyIterator.hasNext()){
 			Integer key = (Integer) keyIterator.next();
+
 			Station station = stationsMap.get(key);
+
 			int percentage = (int) (((float) (station.pedelecs + station.bikes) / station.capacity) * 100);
 			totalVehicles = totalVehicles + station.pedelecs + station.bikes;
 			totalCapacity = totalCapacity + station.capacity;
+
 			stationsCapacity.put(key, percentage);
 		}
 		int idealPercentage = (int) (((float) totalVehicles/totalCapacity) * 100);
+
 		return idealPercentage;
 	}
 	
@@ -420,18 +509,22 @@ public class ValleyBikeSim {
 	 */
 	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity,
 			int idealPercentage, ArrayList<Integer> extras){
+
 		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
 		while (capacityIterator.hasNext()){
 			Integer key = (Integer) capacityIterator.next();
 			Station station = stationsMap.get(key);
+
 			int newPercentage = stationsCapacity.get(key);
-			//continues to add vehicles as long as adding a vehicle
-			//moves the percentage closer to ideal percentage
-			//and there are still extra vehicles to add
-			while((Math.abs(newPercentage - idealPercentage) > 
-			Math.abs((int) (((float) (station.pedelecs + station.bikes + 1) / station.capacity) * 100)) 
-					- idealPercentage)
+
+			// continues to add vehicles as long as adding a vehicle
+			// moves the percentage closer to ideal percentage
+			// and there are still extra vehicles to add
+			while((Math.abs(newPercentage - idealPercentage) >
+					Math.abs((int) (((float) (station.pedelecs + station.bikes + 1) /
+							station.capacity) * 100)) - idealPercentage)
 					&& Integer.sum(extras.get(0), extras.get(1))>0){
+
 				if(extras.get(0) > 0){
 						station.bikes = station.bikes + 1;
 						extras.set(0, extras.get(0)-1);
@@ -439,6 +532,7 @@ public class ValleyBikeSim {
 						station.pedelecs = station.pedelecs + 1;
 						extras.set(1, extras.get(1)-1);
 					}
+
 					newPercentage = (int) (((float) (station.pedelecs + station.bikes) / station.capacity) * 100);
 			}
 		}
