@@ -18,7 +18,7 @@ public class Bike {
     // if bike not available, station is set to -1
     int station;
 
-    public Bike(int bikeId, String maintenance, String maintenanceReport, int bikeLocation, int stationId){
+    public Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport){
         this.id = bikeId;
         if(maintenance.equals('y')){
             this.mnt = true;

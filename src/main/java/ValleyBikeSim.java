@@ -1,13 +1,5 @@
-import java.util.Scanner;
-import java.util.TreeMap;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Date;
-import java.util.Iterator;
+import java.io.*;
+import java.util.*;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +14,10 @@ public class ValleyBikeSim {
 	// data structure for keeping track of bikes
 	public static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
+	// list for storing bike ids of bikes that require maintenance
+	public static ArrayList<String> mntReqs = new ArrayList<>();
+
+	// scanner object to take user's input
 	private static Scanner input = new Scanner(System.in);
 
 	/** 
@@ -31,40 +27,86 @@ public class ValleyBikeSim {
 	 * Then outputs welcome message and menu selector
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
-		// start reading our designated file
-		FileReader fileReader = new FileReader("data-files/station-data.csv");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		String stationLine;
-		bufferedReader.readLine();
-				
-		while((stationLine = bufferedReader.readLine()) != null){
-			String[] values = stationLine.split(",");
+		readStationData();
 
-			Station stationOb = new Station( 
-					values[1],
-					Integer.parseInt(values[2]),
-					Integer.parseInt(values[3]),
-					Integer.parseInt(values[4]), 
-					Integer.parseInt(values[5]),
-					Integer.parseInt(values[6]),
-					Integer.parseInt(values[7]),
-					values[8]);
-
-			stationsMap.put(Integer.parseInt(values[0]),stationOb);
-		}
-		
-		bufferedReader.close();
+        readBikeData();
+		// welcome user!
 		System.out.print("Welcome to the ValleyBike Simulator.");
 		starter();
 	}
+
+	public static void readStationData() throws IOException {
+        // start reading our designated file
+        FileReader fileReader = new FileReader("data-files/station-data.csv");
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        bufferedReader.readLine();
+
+        // initialize string for station data
+        String line;
+
+        // while there's more lines to read in the file
+        while((line = bufferedReader.readLine()) != null){
+            // store comma separated values in string array
+            String[] values = line.split(",");
+
+            // start a new station with all the individual values we got
+            Station stationOb = new Station(
+                    values[1],
+                    Integer.parseInt(values[2]),
+                    Integer.parseInt(values[3]),
+                    Integer.parseInt(values[4]),
+                    Integer.parseInt(values[5]),
+                    Integer.parseInt(values[6]),
+                    Integer.parseInt(values[7]),
+                    values[8]);
+
+            // add to the station tree
+            stationsMap.put(Integer.parseInt(values[0]),stationOb);
+        }
+
+        // close our reader
+        bufferedReader.close();
+    }
+
+    public static void readBikeData() throws IOException {
+        // start reading our designated file
+        FileReader fileReader = new FileReader("data-files/bike-data.csv");
+        BufferedReader bufferedReader = new BufferedReader(fileReader);
+        bufferedReader.readLine();
+
+        // initialize string for station data
+        String line;
+
+        // while there's more lines to read in the file
+        while((line = bufferedReader.readLine()) != null){
+            // store comma separated values in string array
+            String[] values = line.split(",");
+
+            // start a new station with all the individual values we got
+            Bike bikeOb = new Bike(
+                    Integer.parseInt(values[1]),
+                    Integer.parseInt(values[1]),
+                    Integer.parseInt(values[2]),
+                    values[3],
+                    values[4]);
+
+            // add to the station tree
+            bikesMap.put(Integer.parseInt(values[0]), bikeOb);
+        }
+
+        // close our reader
+        bufferedReader.close();
+    }
 	
 	/**
 	 * Selector() allows the user to see and choose from menu options
 	 * Is called at the successful completion of every method
+	 *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
 	private static void starter() throws IOException, ParseException{
+		// print the menu options to the user
 		System.out.print("\nPlease choose from one of the following menu options:\n"
 				+ "0. Quit Program.\n"
 				+ "1. View station list.\n" 
@@ -74,10 +116,10 @@ public class ValleyBikeSim {
 				+ "5. Resolve ride data.\n"
 				+ "6. Equalize stations.\n"
 				+ "7. Add bikes.\n");
-		
+
 		System.out.println("Please enter your selection (0-6):");
 
-		// if input is not a integer
+		// while input is not an integer
 		while (!input.hasNextInt()){
 			// send selector an invalid selection
 			selector(9);
@@ -101,19 +143,24 @@ public class ValleyBikeSim {
 	 */
 	public static void selector(int num) throws IOException, ParseException{
 		switch(num){
+			// if it's 0, exit the program!
 			case 0:
 				input.close();
 				System.exit(0);
 				break;
+			// views the already existing list of station
 			case 1:
 				viewList();
 				break;
+			// adds a new station to that list
 			case 2:
 				addStation();
 				break;
+			// save our changes to the original list
 			case 3:
 				saveList();
 				break;
+			// record the ride a user makes
 			case 4:
 				recordRide();
 				break;
@@ -123,10 +170,13 @@ public class ValleyBikeSim {
 			case 6:
 				equalizeStations();
 				break;
+			// adds a new bike to the list of bikes
 			case 7:
 				addBike();
 				break;
+			// in case we got a selection outside of the options
 			default:
+				// let the user know and go back to starter
 				System.out.println("Not a valid selection");
 				starter();
 			}
@@ -139,24 +189,49 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void viewList() throws IOException, ParseException{
-		System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes", "Pedelec", 
-				"AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
+	public static void viewBike() throws IOException, ParseException{
+		System.out.format("%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Location", "Station ID",
+				"Main. Req", "Main. Report");
 
-		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+		// is there a better/more efficient way to loop through the tree?
+		Iterator<Integer> keyIterator1 = bikesMap.keySet().iterator();
 
-		while(keyIterator.hasNext()){
-			Integer key = (Integer) keyIterator.next();
-			Station station = stationsMap.get(key);
+		while(keyIterator1.hasNext()){
+			Integer key = (Integer) keyIterator1.next();
+			Bike bike = bikesMap.get(key);
 			System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
-					key, station.bikes, station.pedelecs,
-					station.availableDocks, station.maintenanceRequest,
-					station.capacity, station.kioskBoolean, 
-					station.name + "-" +station.address);
+					key, bike.id,
+					bike.location,
+					bike.station,
+					bike.mnt,
+					bike.mntReport);
 		}
 
 		starter();
 	}
+
+    public static void viewList() throws IOException, ParseException{
+        System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes", "Pedelec",
+                "AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
+
+        // is there a better/more efficient way to loop through the tree?
+        Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
+
+        while(keyIterator2.hasNext()){
+            Integer key = (Integer) keyIterator2.next();
+            Station station = stationsMap.get(key);
+            System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
+                    key, station.bikes,
+                    station.pedelecs,
+                    station.availableDocks,
+                    station.maintenanceRequest,
+                    station.capacity,
+                    station.kioskBoolean,
+                    station.name + "-" +station.address);
+        }
+
+        starter();
+    }
 	
 	/**
 	 * Prompts user for all station data and then creates a new station
@@ -166,13 +241,16 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	public static void addStation() throws IOException, ParseException{
-
+		// use helper function to check input is valid and save it
 		Integer id = getResponse("station id");
 
 		// handle if the station already exists
 		if(stationsMap.get(id) != null){
+			// let user know
 			System.out.println("Station with this ID already exists. \nWould you like to override "
 					+ stationsMap.get(id).name + " with new data? (y/n):");
+
+			// take their input
 			String response = input.next();
 			if(!response.equalsIgnoreCase("Y")){
 				starter();
@@ -226,6 +304,7 @@ public class ValleyBikeSim {
 			System.out.println("Bike with this ID already exists. \nWould you like to override "
 					+ stationsMap.get(id).name + " with new data? (y/n):");
 			String response = input.next();
+
 			if(!response.equalsIgnoreCase("Y")){
 				starter();
 			}
@@ -235,18 +314,22 @@ public class ValleyBikeSim {
 		input.nextLine();
 		String mnt = input.nextLine();
 
-		while(!mnt.equals('y') || !mnt.equals('n')){
-			System.out.println("Please enter either y (for yes) or n (for no)");
+		String mntReport;
+
+		if(!mnt.equalsIgnoreCase("Y")){
+			mntReport = "none";
+		} else {
+			System.out.print("Please enter maintenance report.");
+			input.nextLine();
+			mntReport = input.nextLine();
 		}
 
-		System.out.print("Please enter maintenance report. If none, enter none.");
-		input.nextLine();
-		String mntReport = input.nextLine();
-
-		System.out.print("Please pick one of the following choices for the status of the bike: ");
-		System.out.println("0: Docked/available at station");
-		System.out.println("1: Live with customer");
-		System.out.println("2: Docked/out of commission");
+		// give appropriate choices for bike's location
+		System.out.println("Please pick one of the following choices for the " +
+				"status of the bike:\n" +
+				"0: Docked/available at station\n" +
+				"1: Live with customer\n" +
+				"2: Docked/out of commission\n");
 
 		Integer bikeLocation = getResponse("0-2");
 
