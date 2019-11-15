@@ -55,7 +55,7 @@ public class ValleyBikeSim {
 		
 		bufferedReader.close();
 		System.out.print("Welcome to the ValleyBike Simulator.");
-		starter();
+		ValleyBikeController.initialMenu();
 	}
 	
 	/**
@@ -63,7 +63,7 @@ public class ValleyBikeSim {
 	 * Is called at the successful completion of every method
 	 * @throws IOException
 	 * @throws ParseException
-	 */
+	 *//*
 	private static void starter() throws IOException, ParseException{
 		System.out.print("\nPlease choose from one of the following menu options:\n"
 				+ "0. Quit Program.\n"
@@ -90,7 +90,7 @@ public class ValleyBikeSim {
 		selector(value);
 	}
 	
-	/**
+	*//**
 	 * selector(num) takes the menu option entered by the user 
 	 * and calls the associated method.
 	 *  
@@ -98,7 +98,7 @@ public class ValleyBikeSim {
 	 * If num is not a valid selection it will reprint the original selector()
 	 * @throws IOException
 	 * @throws ParseException
-	 */
+	 *//*
 	public static void selector(int num) throws IOException, ParseException{
 		switch(num){
 			case 0:
@@ -106,7 +106,7 @@ public class ValleyBikeSim {
 				System.exit(0);
 				break;
 			case 1:
-				viewList();
+				viewStationList();
 				break;
 			case 2:
 				addStation();
@@ -130,7 +130,7 @@ public class ValleyBikeSim {
 				System.out.println("Not a valid selection");
 				starter();
 			}
-	}
+	}*/
 	
 	/**
 	 * Iterates through tree map and outputs station data by ID order
@@ -139,7 +139,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void viewList() throws IOException, ParseException{
+	public static void viewStationList() throws IOException, ParseException{
 		System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes", "Pedelec", 
 				"AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
 
@@ -155,7 +155,6 @@ public class ValleyBikeSim {
 					station.name + "-" +station.address);
 		}
 
-		starter();
 	}
 	
 	/**
@@ -175,7 +174,7 @@ public class ValleyBikeSim {
 					+ stationsMap.get(id).name + " with new data? (y/n):");
 			String response = input.next();
 			if(!response.equalsIgnoreCase("Y")){
-				starter();
+				ValleyBikeController.internalAccount();
 			}
 		}
 
@@ -210,7 +209,6 @@ public class ValleyBikeSim {
 				address);
 
 		stationsMap.put(id, stationOb);
-		starter();
 	}
 
 	/**
@@ -227,7 +225,7 @@ public class ValleyBikeSim {
 					+ stationsMap.get(id).name + " with new data? (y/n):");
 			String response = input.next();
 			if(!response.equalsIgnoreCase("Y")){
-				starter();
+				ValleyBikeController.internalAccount();
 			}
 		}
 
@@ -261,7 +259,6 @@ public class ValleyBikeSim {
 				);
 
 		bikesMap.put(id, bikeOb);
-		starter();
 	}
 	
 	/**
@@ -291,7 +288,6 @@ public class ValleyBikeSim {
 
 		stationsWriter.flush();
 		stationsWriter.close();
-		starter();
 	}
 	
 	/**
@@ -350,8 +346,6 @@ public class ValleyBikeSim {
 		} catch(NumberFormatException e){
 			System.out.println("Your input is invalid! Please input a number for the station ID next time.");
 		}
-
-		starter();
 	}
 	
 	/**
@@ -397,7 +391,6 @@ public class ValleyBikeSim {
 		averageTime = (totalTime/rides)/60000;
 		System.out.println("Number of rides: " + rides);
 		System.out.println("Average ride time in minutes: " + averageTime);
-		starter();
 	}
 	
 	/**
@@ -430,7 +423,6 @@ public class ValleyBikeSim {
 		reassignHighPercentage(stationsCapacity, idealPercentage, extras);
 		reassignLowPercentage(stationsCapacity, idealPercentage, extras);
 		
-		starter();
 	}
 	
 	/**
