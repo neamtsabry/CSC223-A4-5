@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public abstract class ValleyBikeController {
 
@@ -54,9 +55,38 @@ public abstract class ValleyBikeController {
         //TODO get email, authenticate, store
         //TODO get credit card, authenticate, store
 
+        System.out.println("Enter username:");
+        String userName = input.nextLine();
+        System.out.println("Enter password:");
+        String password = input.nextLine();
+        System.out.println("Enter email address:");
+        String emailAddress = input.nextLine();
+        if (!isValidEmail(emailAddress)){
+            System.out.println("Email address is not valid");
+            return;
+        }
+        Account account = new Account(userName, password, emailAddress);
+
         //go to account menu
         int userID = 0;
         userAccount(userID);
+    }
+
+    /**
+     * This method checks if the email address input by the user is valid
+     * @param emailAddress is the email address input by the user
+     * @return returns boolean true if email address is valid and false otherwise
+     */
+    public static boolean isValidEmail(String emailAddress) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (emailAddress == null)
+            return false;
+        return pat.matcher(emailAddress).matches();
     }
 
     /**
