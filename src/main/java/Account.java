@@ -1,8 +1,6 @@
 import java.util.Random;
 
-public class Account {
-    /** This field is the unique user id for the customer */
-    private int userId;
+public abstract class Account {
 
     /** This field is the username for the customer */
     private String username;
@@ -20,24 +18,9 @@ public class Account {
      * @param emailAddress
      */
     public Account(String username, String password, String emailAddress) {
-        this.userId = getRandomInteger();
         this.username = username;
         this.password = password;
         this.emailAddress = emailAddress;
-    }
-
-    /**
-     * This method generates a random 6 digit integer
-     * @return the random 6 digit integer generated
-     */
-    private Integer getRandomInteger() {
-        // It will generate 6 digit random Number.
-        // from 0 to 999999
-        Random rnd = new Random();
-        int number = rnd.nextInt(999999);
-
-        // this will convert any number sequence into 6 character.
-        return Integer.parseInt(String.format("%06d", number));
     }
 
     /**
@@ -68,5 +51,9 @@ public class Account {
      */
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }
