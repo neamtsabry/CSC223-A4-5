@@ -332,6 +332,14 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	public static void recordRide() throws IOException, ParseException{
+		//TODO get bike ID and validate
+
+		// View stations
+		// choose station to rent from
+		// view available bike ids at station
+		// choose bike to rent
+		// confirm? Y/N (timestamps the rent out) --> check date and time now
+
 		System.out.println("Enter b for Bike or p for Pedelec: ");
 		String rideType = input.next();
 

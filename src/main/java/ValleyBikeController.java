@@ -139,12 +139,7 @@ public abstract class ValleyBikeController {
      * @param: userID- the unique id associated with the user
      */
     private static void rentBike(int userID) throws IOException, ParseException {
-        //TODO do we want to use rent bike-return bike or preexisting RecordRide function?
-        ValleyBikeSim.viewStationList();
-        //input station id
-        //view available bikes at station
-        //input bike id
-        //confirm? Y/N (timestamps the rent out)
+        ValleyBikeSim.recordRide();
 
         //bike is now checked out
         int bikeID = 0;
@@ -201,8 +196,6 @@ public abstract class ValleyBikeController {
         //TODO confirm? Y/N (timestamps the check back in)
         //TODO save ride to file/data structure
         //TODO charge user $$
-
-
 
         //return to user menu
         userAccount(userID);
