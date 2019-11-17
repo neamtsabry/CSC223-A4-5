@@ -22,6 +22,8 @@ public class Bike {
         this.id = bikeId;
         if(maintenance.equals('y')){
             this.mnt = true;
+        } else{
+            this.mnt = false;
         }
 
         this.mntReport = maintenanceReport;
@@ -33,6 +35,12 @@ public class Bike {
             this.station = -1;
         }
 
+    }
+
+    public String getBikeString() {
+        String fileLine = this.location + "," + this.station + ","
+                + this.mnt + "," + this.mntReport;
+        return fileLine;
     }
 
     public int getId(){
