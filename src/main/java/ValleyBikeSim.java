@@ -8,16 +8,23 @@ import java.text.SimpleDateFormat;
  * Class that contains menu options and implementation for Simulator
  */
 public class ValleyBikeSim {
-	// data structure for keeping track of stations
+
+	/** data structure for keeping track of stations */
 	public static Map<Integer, Station> stationsMap = new TreeMap<>();
 
-	// data structure for keeping track of bikes
+	/** data structure for keeping track of bikes */
 	public static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
-	// list for storing bike ids of bikes that require maintenance
+	/** list for storing bike ids of bikes that require maintenance */
 	public static ArrayList<Integer> mntReqs = new ArrayList<>();
 
-	// scanner object to take user's input
+	/** data structure for keeping track of customer accounts */
+	public static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
+
+	/** data structure for keeping track of internal accounts */
+	public static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
+
+	/** scanner object to take user's input */
 	private static Scanner input = new Scanner(System.in);
 
 	/** 
@@ -31,9 +38,88 @@ public class ValleyBikeSim {
 
         readBikeData();
 
+        readCustomerAccountData();
+
+        readInternalAccountData();
+
 		ValleyBikeController.initialMenu();
 	}
 
+	/**
+	 *
+	 * @throws IOException
+	 */
+	public static void readCustomerAccountData() throws IOException {
+		// start reading our designated file
+		FileReader fileReader = new FileReader("data-files/customer-account-data.csv");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		bufferedReader.readLine();
+
+		// initialize string for station data
+		String line;
+
+		// while there's more lines to read in the file
+		while((line = bufferedReader.readLine()) != null){
+			// store comma separated values in string array
+			String[] values = line.split(",");
+
+
+			// start a new customer account with all the individual values we got
+			CustomerAccount accountObj = new CustomerAccount(
+					values[0],
+					values[1],
+					values[2],
+					values[3],
+					values[4],
+					Integer.parseInt(values[5]));
+
+
+			// add to the station tree
+			customerAccountMap.put(values[0],accountObj);
+		}
+
+		// close our reader
+		bufferedReader.close();
+	}
+
+	/**
+	 *
+	 * @throws IOException
+	 */
+	public static void readInternalAccountData() throws IOException {
+		// start reading our designated file
+		FileReader fileReader = new FileReader("data-files/internal-account-data.csv");
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		bufferedReader.readLine();
+
+		// initialize string for station data
+		String line;
+
+		// while there's more lines to read in the file
+		while((line = bufferedReader.readLine()) != null){
+			// store comma separated values in string array
+			String[] values = line.split(",");
+
+
+			// start a new customer account with all the individual values we got
+			InternalAccount accountObj = new InternalAccount(
+					values[0],
+					values[1],
+					values[2]);
+
+
+			// add to the station tree
+			internalAccountMap.put(values[0],accountObj);
+		}
+
+		// close our reader
+		bufferedReader.close();
+	}
+
+	/**
+	 *
+	 * @throws IOException
+	 */
 	public static void readStationData() throws IOException {
         // start reading our designated file
         FileReader fileReader = new FileReader("data-files/station-data.csv");
@@ -67,7 +153,14 @@ public class ValleyBikeSim {
         bufferedReader.close();
     }
 
-    public static void readBikeData() throws IOException {
+	/**
+	 *
+	 * @throws IOException
+	 */
+	public static void readBikeData() throws IOException {
+		//TODO skip the first line of file reading
+		//TODO why are they not using values[0]
+
         // start reading our designated file
         FileReader fileReader = new FileReader("data-files/bike-data.csv");
         BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -124,6 +217,11 @@ public class ValleyBikeSim {
 
 	}
 
+	/**
+	 *
+	 * @throws IOException
+	 * @throws ParseException
+	 */
     public static void viewStationList() throws IOException, ParseException{
         System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes", "Pedelec",
                 "AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
@@ -299,6 +397,11 @@ public class ValleyBikeSim {
 		stationsWriter.close();
 	}
 
+	/**
+	 *
+	 * @throws IOException
+	 * @throws ParseException
+	 */
 	public static void saveBikeList() throws IOException, ParseException{
 		FileWriter bikesWriter = new FileWriter("data-files/bike-data.csv");
 		Iterator<Integer> keyIterator = bikesMap.keySet().iterator();
@@ -580,6 +683,9 @@ public class ValleyBikeSim {
 		return value;
 	}
 
+	/**
+	 *
+	 */
 	public static void resolveMntReqs(){
 		if(mntReqs != null) {
 			// automatically resolve all mnt reqs

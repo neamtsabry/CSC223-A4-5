@@ -1,5 +1,3 @@
-import java.util.Random;
-
 public abstract class Account {
 
     /** This field is the username for the customer */
