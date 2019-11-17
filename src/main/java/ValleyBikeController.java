@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public abstract class ValleyBikeController {
 
@@ -49,14 +50,85 @@ public abstract class ValleyBikeController {
      * Method for a customer to create an account
      */
     private static void createAccount() throws IOException, ParseException {
-        //TODO get username, authenticate, store
-        //TODO get password, authenticate, store
-        //TODO get email, authenticate, store
-        //TODO get credit card, authenticate, store
+        //TODO store account
+        //TODO membership types
+        //TODO check for unique username
+
+        System.out.println("Enter username (must be between 6-14 characters):");
+        String username = input.nextLine();
+        if (!isValidUsername(username)){
+            System.out.println("Username is not valid.");
+            return;
+        }
+
+        System.out.println("Enter password (must be between 6-14 characters):");
+        String password = input.nextLine();
+        if (!isValidPassword(password)){
+            System.out.println("Password is not valid.");
+            return;
+        }
+
+        System.out.println("Enter email address:");
+        String emailAddress = input.nextLine();
+        if (!isValidEmail(emailAddress)){
+            System.out.println("Email address is not valid.");
+            return;
+        }
+
+        String creditCard = input.nextLine();
+        System.out.println("Enter credit card number:");
+        if (!isValidCreditCard(creditCard)){
+            System.out.println("Credit card is not valid.");
+            return;
+        }
+
+        String membership = input.nextLine();
+        System.out.println("Enter membership type:");
+
+        //create new customer account
+        Account account = new CustomerAccount(username, password, emailAddress, creditCard, membership);
 
         //go to account menu
-        int userID = 0;
-        userAccount(userID);
+        String user = account.getUsername();
+        userAccount(user);
+    }
+
+    private static boolean isValidUsername(String username){
+        if (username.length() >= 6 && username.length() <= 14){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isValidPassword(String password){
+        if (password.length() >= 6 && password.length() <= 14){
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isValidCreditCard(String creditCard){
+        if(Math.random() <= 0.95) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * This method checks if the email address input by the user is valid
+     * @param emailAddress is the email address input by the user
+     * @return returns boolean true if email address is valid and false otherwise
+     */
+    private static boolean isValidEmail(String emailAddress) {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        if (emailAddress == null)
+            return false;
+        return pat.matcher(emailAddress).matches();
     }
 
     /**
@@ -67,8 +139,13 @@ public abstract class ValleyBikeController {
         //TODO input password, authenticate
         //TODO figure out if account is customer or internal
         //if account is user, go to user menu:
-        int userID = 0;
-        userAccount(userID);
+        System.out.println("Enter username:");
+        String username = input.nextLine();
+
+        System.out.println("Enter password:");
+        String password = input.nextLine();
+
+        userAccount(username);
         //if account is employee, go to employee menu:
         internalAccount();
     }
@@ -76,9 +153,9 @@ public abstract class ValleyBikeController {
 
     /**
      * Standard menu page for a user after logging in
-     * @param userID: integer representing unique userID of account
+     * @param username: integer representing unique userID of account
      */
-    private static void userAccount(int userID) throws IOException, ParseException {
+    private static void userAccount(String username) throws IOException, ParseException {
         System.out.print("\n Please choose from one of the following menu options: \n"
                 + "1. Edit account info"
                 + "2. View account balance"
@@ -92,7 +169,7 @@ public abstract class ValleyBikeController {
         if (!input.hasNextInt()){
             //keep asking for input until valid
             System.out.println("Not a valid input");
-            userAccount(userID);
+            userAccount(username);
         }
         Integer num = input.nextInt();
         switch(num) {
@@ -102,7 +179,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view account balance
-                viewAccountBalance(userID);
+                viewAccountBalance(username);
                 break;
             case 3:
                 ValleyBikeSim.viewStationList();
@@ -114,7 +191,7 @@ public abstract class ValleyBikeController {
                 break;
             case 5:
                 //report a problem
-                reportProblem(userID);
+                reportProblem(username);
                 break;
             case 6:
                 //log out, return to homepage
@@ -122,14 +199,14 @@ public abstract class ValleyBikeController {
                 break;
         }
         //if function call finished and returned to this page, keep calling menu again until log out/exit
-        userAccount(userID);
+        userAccount(username);
     }
 
     /**
      * @param: userID- the unique id associated with the user
      * View the account balance associated with a user's account
      */
-    private static void viewAccountBalance(int userID) {
+    private static void viewAccountBalance(String username) {
         //TODO view user account balance
         //when done, returns to userAccountMenu
     }
@@ -138,12 +215,12 @@ public abstract class ValleyBikeController {
      * user checks out a specific bike from a specific station
      * @param: userID- the unique id associated with the user
      */
-    private static void rentBike(int userID) throws IOException, ParseException {
+    private static void rentBike(String username) throws IOException, ParseException {
         ValleyBikeSim.recordRide();
 
         //bike is now checked out
         int bikeID = 0;
-        bikeRented(userID, bikeID);
+        bikeRented(username, bikeID);
     }
 
 
@@ -152,7 +229,7 @@ public abstract class ValleyBikeController {
      * @param: int userID- the unique id associated with the user
      * @param: bikeID- unique ID associated with the bike that the user has checked out
      */
-    private static void bikeRented(int userID, int bikeID) throws IOException, ParseException {
+    private static void bikeRented(String username, int bikeID) throws IOException, ParseException {
         //TODO same question- only use this if bike rent/return not RecordRide
         System.out.print("\n Enjoy your bike ride! \n"
                 + "1. Return bike"
@@ -162,17 +239,17 @@ public abstract class ValleyBikeController {
         if (!input.hasNextInt()){
             //keep asking for input until valid
             System.out.println("Not a valid input \n");
-            bikeRented(userID, bikeID);
+            bikeRented(username, bikeID);
         }
         Integer num = input.nextInt();
         switch(num) {
             case 1:
                 //return bike
-                returnBike(userID, bikeID);
+                returnBike(username, bikeID);
                 break;
             case 2:
                 //report a problem
-                reportProblem(userID);
+                reportProblem(username);
                 break;
             case 0:
                 input.close();
@@ -188,7 +265,7 @@ public abstract class ValleyBikeController {
      * @param: bikeID- unique ID associated with the bike that the user has checked out
      *
      */
-    private static void returnBike(int userID, int bikeID) throws IOException, ParseException {
+    private static void returnBike(String username, int bikeID) throws IOException, ParseException {
         // why view all stations?
         ValleyBikeSim.viewStationList();
         //TODO input station id
@@ -198,7 +275,7 @@ public abstract class ValleyBikeController {
         //TODO charge user $$
 
         //return to user menu
-        userAccount(userID);
+        userAccount(username);
     }
 
     /**
@@ -206,7 +283,7 @@ public abstract class ValleyBikeController {
      * param: userID
      * user reports a problem with the bike they checked out
      */
-    private static void reportProblem(int userID) throws IOException, ParseException {
+    private static void reportProblem(String username) throws IOException, ParseException {
         ValleyBikeSim.viewStationList();
         //TODO view list of bike ids at station (?)
 

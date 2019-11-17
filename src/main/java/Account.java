@@ -1,23 +1,26 @@
-public class UserAccount {
+import java.util.Random;
+
+public abstract class Account {
+
     /** This field is the username for the customer */
     private String username;
 
     /** This field is the password for the customer */
     private String password;
 
-    /** This field is the credit card number of the customer */
-    private String creditcard;
+    /** This field is the email address of the customer */
+    private String emailAddress;
 
     /**
-     * This is the constructor to create a user account
-     * @param username is the username input by the user
-     * @param password is the password input by the user
-     * @param creditcard is the credit card number input by the user
+     *
+     * @param username
+     * @param password
+     * @param emailAddress
      */
-    public UserAccount(String username, String password, String creditcard) {
+    public Account(String username, String password, String emailAddress) {
         this.username = username;
         this.password = password;
-        this.creditcard = creditcard;
+        this.emailAddress = emailAddress;
     }
 
     /**
@@ -43,12 +46,14 @@ public class UserAccount {
     }
 
     /**
-     * This is the setter method to update credit card numner.
-     * @param creditcard is the new credit card number entered by the user.
+     *
+     * @param emailAddress
      */
-    public void setCreditcard(String creditcard) {
-        this.creditcard = creditcard;
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
-
+    public String getUsername() {
+        return username;
+    }
 }

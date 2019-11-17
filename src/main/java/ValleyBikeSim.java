@@ -31,8 +31,6 @@ public class ValleyBikeSim {
 
         readBikeData();
 
-        // welcome user!
-		System.out.print("Welcome to the ValleyBike Simulator.");
 		ValleyBikeController.initialMenu();
 	}
 
