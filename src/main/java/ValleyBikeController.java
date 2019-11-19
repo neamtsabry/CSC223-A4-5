@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Iterator;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -12,6 +11,8 @@ public abstract class ValleyBikeController {
      * Basic option menu that shows at start of program and when no one is logged in
      */
     static void initialMenu() throws IOException, ParseException {
+        //TODO back menu on all menus
+        //TODO exit option on all menus
         System.out.print("\n Welcome to ValleyBike Share! \n"
                 + "1. Create User Account\n"
                 + "2. Log In\n"
@@ -26,6 +27,7 @@ public abstract class ValleyBikeController {
         }
 
         Integer num = input.nextInt();
+        input.nextLine();
         switch(num) {
             case 1:
                 createAccount();
@@ -53,6 +55,7 @@ public abstract class ValleyBikeController {
         //TODO store account
         //TODO membership types
         //TODO check for unique username
+        //TODO while loop to try again
 
         System.out.println("Enter username (must be between 6-14 characters):");
         String username = input.nextLine();
@@ -75,22 +78,21 @@ public abstract class ValleyBikeController {
             return;
         }
 
-        String creditCard = input.nextLine();
         System.out.println("Enter credit card number:");
+        String creditCard = input.nextLine();
         if (!isValidCreditCard(creditCard)){
             System.out.println("Credit card is not valid.");
             return;
         }
 
-        String membership = input.nextLine();
         System.out.println("Enter membership type:");
-
+        String membership = input.nextLine();
         //create new customer account
         Account account = new CustomerAccount(username, password, emailAddress, creditCard, membership);
 
         //go to account menu
         String user = account.getUsername();
-        userAccount(user);
+        userAccountHome(user);
     }
 
     private static boolean isValidUsername(String username){
@@ -145,9 +147,9 @@ public abstract class ValleyBikeController {
         System.out.println("Enter password:");
         String password = input.nextLine();
 
-        userAccount(username);
+        userAccountHome(username);
         //if account is employee, go to employee menu:
-        internalAccount();
+        internalAccountHome();
     }
 
 
@@ -155,13 +157,13 @@ public abstract class ValleyBikeController {
      * Standard menu page for a user after logging in
      * @param username: integer representing unique userID of account
      */
-    private static void userAccount(String username) throws IOException, ParseException {
-        System.out.print("\n Please choose from one of the following menu options: \n"
-                + "1. Edit account info"
-                + "2. View account balance"
-                + "3. View station list"
-                + "4. Record a ride"
-                + "5. Report a problem"
+    private static void userAccountHome(String username) throws IOException, ParseException {
+        System.out.print("\nPlease choose from one of the following menu options: \n"
+                + "1. Edit account info \n"
+                + "2. View account balance \n"
+                + "3. View station list \n"
+                + "4. Record a ride \n"
+                + "5. Report a problem \n"
                 + "6. Log out \n");
         System.out.println("Please enter your selection (1-6):");
 
@@ -169,7 +171,7 @@ public abstract class ValleyBikeController {
         if (!input.hasNextInt()){
             //keep asking for input until valid
             System.out.println("Not a valid input");
-            userAccount(username);
+            userAccountHome(username);
         }
         Integer num = input.nextInt();
         switch(num) {
@@ -199,7 +201,7 @@ public abstract class ValleyBikeController {
                 break;
         }
         //if function call finished and returned to this page, keep calling menu again until log out/exit
-        userAccount(username);
+        userAccountHome(username);
     }
 
     /**
@@ -275,7 +277,7 @@ public abstract class ValleyBikeController {
         //TODO charge user $$
 
         //return to user menu
-        userAccount(username);
+        userAccountHome(username);
     }
 
     /**
@@ -325,7 +327,7 @@ public abstract class ValleyBikeController {
      * Homescreen for internal company employees
      *
      */
-    static void internalAccount() throws IOException, ParseException {
+    static void internalAccountHome() throws IOException, ParseException {
         System.out.print("\n Choose from the following: \n"
                 + "1. View customer balances"
                 + "2. View customer activity"
@@ -337,7 +339,7 @@ public abstract class ValleyBikeController {
         if (!input.hasNextInt()){
             //keep asking for input until valid
             System.out.println("Not a valid input \n");
-            internalAccount();
+            internalAccountHome();
         }
         Integer num = input.nextInt();
         switch(num) {
@@ -362,7 +364,7 @@ public abstract class ValleyBikeController {
         }
         //if function call finishes and returns to internal account menu
         //call account menu again
-        internalAccount();
+        internalAccountHome();
     }
 
 

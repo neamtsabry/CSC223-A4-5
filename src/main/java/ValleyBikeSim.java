@@ -10,19 +10,19 @@ import java.text.SimpleDateFormat;
 public class ValleyBikeSim {
 
 	/** data structure for keeping track of stations */
-	public static Map<Integer, Station> stationsMap = new TreeMap<>();
+	protected static Map<Integer, Station> stationsMap = new TreeMap<>();
 
 	/** data structure for keeping track of bikes */
-	public static Map<Integer, Bike> bikesMap = new TreeMap<>();
+	protected static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
 	/** list for storing bike ids of bikes that require maintenance */
-	public static ArrayList<Integer> mntReqs = new ArrayList<>();
+	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
 
 	/** data structure for keeping track of customer accounts */
-	public static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
+	protected static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
 
 	/** data structure for keeping track of internal accounts */
-	public static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
+	protected static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
 
 	/** scanner object to take user's input */
 	private static Scanner input = new Scanner(System.in);
@@ -265,7 +265,7 @@ public class ValleyBikeSim {
 			// take their input
 			String response = input.next();
 			if(!response.equalsIgnoreCase("Y")){
-				ValleyBikeController.internalAccount();
+				ValleyBikeController.internalAccountHome();
 			}
 		}
 
@@ -317,7 +317,7 @@ public class ValleyBikeSim {
 			String response = input.next();
 
 			if(!response.equalsIgnoreCase("Y")){
-				ValleyBikeController.internalAccount();
+				ValleyBikeController.internalAccountHome();
 			}
 		}
 
@@ -353,7 +353,7 @@ public class ValleyBikeSim {
 			String response = input.next();
 
 			if(!response.equalsIgnoreCase("Y")){
-				ValleyBikeController.internalAccount();
+				ValleyBikeController.internalAccountHome();
 			}
 		}
 
