@@ -90,7 +90,7 @@ public abstract class ValleyBikeController {
 
         //go to account menu
         String user = account.getUsername();
-        userAccount(user);
+        userAccountHome(user);
     }
 
     private static boolean isValidUsername(String username){
@@ -145,7 +145,7 @@ public abstract class ValleyBikeController {
         System.out.println("Enter password:");
         String password = input.nextLine();
 
-        userAccount(username);
+        userAccountHome(username);
         //if account is employee, go to employee menu:
         internalAccount();
     }
@@ -155,21 +155,22 @@ public abstract class ValleyBikeController {
      * Standard menu page for a user after logging in
      * @param username: integer representing unique userID of account
      */
-    private static void userAccount(String username) throws IOException, ParseException {
-        System.out.print("\n Please choose from one of the following menu options: \n"
-                + "1. Edit account info"
-                + "2. View account balance"
-                + "3. View station list"
-                + "4. Record a ride"
-                + "5. Report a problem"
-                + "6. Log out \n");
+    private static void userAccountHome(String username) throws IOException, ParseException {
+        System.out.println("Please choose from one of the following menu options: \n"
+                + "1. Edit account info\n"
+                + "2. View account balance\n"
+                + "3. View station list\n"
+                + "4. Rent a bike\n"
+                + "5. Return a bike\n"
+                + "6. Report a problem\n"
+                + "7. Log out \n");
         System.out.println("Please enter your selection (1-6):");
 
         // if input is not a integer
         if (!input.hasNextInt()){
             //keep asking for input until valid
             System.out.println("Not a valid input");
-            userAccount(username);
+            userAccountHome(username);
         }
         Integer num = input.nextInt();
         switch(num) {
@@ -185,9 +186,10 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.viewStationList();
                 break;
             case 4:
-                //user records a ride
+                // user records a ride
                 //TODO currently doesnt account for bike id or user id
-                ValleyBikeSim.recordRide();
+
+                // ValleyBikeSim.recordRide();
                 break;
             case 5:
                 //report a problem
@@ -199,7 +201,7 @@ public abstract class ValleyBikeController {
                 break;
         }
         //if function call finished and returned to this page, keep calling menu again until log out/exit
-        userAccount(username);
+        userAccountHome(username);
     }
 
     /**
@@ -216,7 +218,8 @@ public abstract class ValleyBikeController {
      * @param: userID- the unique id associated with the user
      */
     private static void rentBike(String username) throws IOException, ParseException {
-        ValleyBikeSim.recordRide();
+
+        // ValleyBikeSim.recordRide();
 
         //bike is now checked out
         int bikeID = 0;
@@ -275,7 +278,7 @@ public abstract class ValleyBikeController {
         //TODO charge user $$
 
         //return to user menu
-        userAccount(username);
+        userAccountHome(username);
     }
 
     /**
@@ -285,7 +288,9 @@ public abstract class ValleyBikeController {
      */
     private static void reportProblem(String username) throws IOException, ParseException {
         ValleyBikeSim.viewStationList();
-        //TODO view list of bike ids at station (?)
+        // DONT VIEW BIKE IDS LIST
+
+        // but do viewing for everything else
 
         // get station id from user
         Integer stationId = ValleyBikeSim.getResponse("station id");
@@ -364,7 +369,5 @@ public abstract class ValleyBikeController {
         //call account menu again
         internalAccount();
     }
-
-
 }
 

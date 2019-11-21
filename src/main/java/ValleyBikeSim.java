@@ -9,16 +9,16 @@ import java.text.SimpleDateFormat;
  */
 public class ValleyBikeSim {
 	// data structure for keeping track of stations
-	public static Map<Integer, Station> stationsMap = new TreeMap<>();
+	protected static Map<Integer, Station> stationsMap = new TreeMap<>();
 
 	// data structure for keeping track of bikes
-	public static Map<Integer, Bike> bikesMap = new TreeMap<>();
+	protected static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
 	// list for storing bike ids of bikes that require maintenance
-	public static ArrayList<Integer> mntReqs = new ArrayList<>();
+	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
 
 	// scanner object to take user's input
-	private static Scanner input = new Scanner(System.in);
+	protected static Scanner input = new Scanner(System.in);
 
 	/** 
 	 * Reads in the stations csv file data and parses it into station objects
@@ -167,6 +167,7 @@ public class ValleyBikeSim {
 			// take their input
 			String response = input.next();
 			if(!response.equalsIgnoreCase("Y")){
+				// why send user to internal account?
 				ValleyBikeController.internalAccount();
 			}
 		}
@@ -329,58 +330,82 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void recordRide() throws IOException, ParseException{
-		//TODO get bike ID and validate
-
+	public static void rentBike(String dest, String action, Boolean isReturned) throws IOException, ParseException{
 		// View stations
+		System.out.format("%-15s%-15s%\n", "ID", "Name");
+
+		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+
+		while(keyIterator.hasNext()){
+			Integer key = (Integer) keyIterator.next();
+			Station station = stationsMap.get(key);
+			System.out.format("%-15d%-15s%", key, station.name);
+		}
+
 		// choose station to rent from
-		// view available bike ids at station
-		// choose bike to rent
-		// confirm? Y/N (timestamps the rent out) --> check date and time now
+		System.out.println("Please enter station id to" + action + dest + ": ");
+		String fromTo = input.next();
 
-		System.out.println("Enter b for Bike or p for Pedelec: ");
-		String rideType = input.next();
+		Station stationFromTo = stationsMap.get(Integer.parseInt(fromTo));
 
-		System.out.println("From (Station ID): ");
-		String from = input.next();
+		while(stationFromTo == null) {
+			System.out.println("The station entered does not exist in our system.");
+		}
 
-		System.out.println("To (Station ID): ");
-		String to = input.next();
-
-		try{
-			Station stationFrom = stationsMap.get(Integer.parseInt(from));
-			Station stationTo = stationsMap.get(Integer.parseInt(to));
-
-			if(stationFrom != null && stationTo != null){
-				switch(rideType.toUpperCase()){
-					case("B"):
-						if (stationFrom.bikes > 0 && stationTo.availableDocks > 0){
-							stationFrom.bikes = stationFrom.bikes-1;
-							stationTo.bikes = stationTo.bikes+1;
-							stationTo.availableDocks = stationTo.availableDocks - 1;
-						} else {
-							System.out.println("Ride not valid");
-						}
-						break;
-					case("P"):
-						if (stationFrom.pedelecs > 0 && stationTo.availableDocks > 0){
-							stationFrom.pedelecs = stationFrom.pedelecs-1;
-							stationTo.pedelecs = stationTo.pedelecs+1;
-							stationTo.availableDocks = stationTo.availableDocks - 1;
-						} else {
-							System.out.println("Ride not valid");
-						}
-						break;
-					default:
-						System.out.println("Invalid vehicle type");
-				}
+		if(stationFromTo != null){
+			if (stationFromTo.bikes > 1){
+				stationFromTo.bikes = stationFromTo.bikes-1;
 			} else {
-				System.out.println("At least one station entered does not exist in our system");
+				System.out.println("Maintenance worker is being notified that the station is empty");
 			}
-		} catch(NumberFormatException e){
-			System.out.println("Your input is invalid! Please input a number for the station ID next time.");
+		}
+
+		// view available bike ids at station
+		Iterator<Integer> keyIterator2 = bikesMap.keySet().iterator();
+
+		while(keyIterator2.hasNext()){
+			Integer key = (Integer) keyIterator2.next();
+			if(! stationFromTo.equals(bikesMap.get(key)) ) {
+				System.out.format("%-15d%", key);
+			}
+
+		}
+
+		// choose bike to rent
+		System.out.println("Please enter which bike id you would like to" + action +": ");
+
+		String b = input.next();
+
+		Station bID = stationsMap.get(Integer.parseInt(fromTo));
+
+		while(bID == null) {
+			System.out.println("The bike ID entered does not exist in our system.");
+		}
+
+		// TODO confirm bikeID
+
+		// time stamp recorded
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+		String formattedDate = sdf.format(date);
+
+		if(isReturned){
+			System.out.println("Does it require maintenance? (y/n): ");
+			input.nextLine();
+			String mnt = input.nextLine();
+
+			String mntReport;
+
+			if(!mnt.equalsIgnoreCase("Y")){
+				mntReport = "none";
+			} else {
+				System.out.print("Please enter maintenance report.");
+				input.nextLine();
+				mntReport = input.nextLine();
+			}
 		}
 	}
+
 	
 	/**
 	 * Takes in a ride data file name from user
