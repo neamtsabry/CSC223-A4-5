@@ -51,12 +51,11 @@ public abstract class ValleyBikeController {
     /**
      * Method for a customer to create an account
      */
-    private static void createAccount() throws IOException, ParseException {
-        //TODO store account
+    public static void createAccount() throws IOException, ParseException {
         //TODO membership types
         //TODO check for unique username
         //TODO while loop to try again
-
+        //TODO talk to Annika about the flow from model to controller
         System.out.println("Enter username (must be between 6-14 characters):");
         String username = input.nextLine();
         if (!isValidUsername(username)){
@@ -89,10 +88,11 @@ public abstract class ValleyBikeController {
         System.out.println("Enter membership type:");
         String membership = input.nextLine();
         //create new customer account
-        Account account = new CustomerAccount(username, password, emailAddress, creditCard, membership);
-
+        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership);
+        //add customer account to customer account map
+        ValleyBikeSim.addCustomerAccount(customerAccount);
         //go to account menu
-        String user = account.getUsername();
+        String user = customerAccount.getUsername();
         userAccountHome(user);
     }
 
@@ -180,13 +180,14 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //edit account info- return to create account or have separate method?
-                //TODO editAccount(userID);
+                //TODO editAccount(username);
                 break;
             case 2:
                 //view account balance
-                viewAccountBalance(username);
+                ValleyBikeSim.viewAccountBalance(username);
                 break;
             case 3:
+                //view station list
                 ValleyBikeSim.viewStationList();
                 break;
             case 4:
@@ -211,6 +212,12 @@ public abstract class ValleyBikeController {
         userAccountHome(username);
     }
 
+    private static void editAccount(String username) throws IOException, ParseException {
+        System.out.println("\nDo you want to edit your username (y/n)?");
+        String edit = input.nextLine();
+        //TODO complete function
+    }
+
     /**
      * @param: userID- the unique id associated with the user
      * View the account balance associated with a user's account
@@ -233,7 +240,6 @@ public abstract class ValleyBikeController {
         bikeRented(username, bikeID);
     }
 
-
     /**
      * User has bike checked out and can either return bike or report a problem with the bike
      * @param: int userID- the unique id associated with the user
@@ -255,7 +261,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //return bike
-                returnBike(username, bikeID);
+               // returnBike(username, bikeID);
                 break;
             case 2:
                 //report a problem
@@ -282,7 +288,7 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * reportProblem()
+     *
      * param: userID
      * user reports a problem with the bike they checked out
      */
