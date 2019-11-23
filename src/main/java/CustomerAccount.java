@@ -1,5 +1,3 @@
-import java.util.LinkedList;
-
 public class CustomerAccount extends Account{
 
     /** This field is the credit card number of the customer */

@@ -121,18 +121,6 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * user checks out a specific bike from a specific station
-	 * @param: userID- the unique id associated with the user
-	 */
-	private static void rentBike(String username) throws IOException, ParseException {
-		ValleyBikeSim.recordRide();
-
-		//bike is now checked out
-		int bikeID = 0;
-		//bikeRented(username, bikeID);
-	}
-
-	/**
 	 * user checks back in a rented bike
 	 * @param: int userID- the unique id associated with the user
 	 * @param: bikeID- unique ID associated with the bike that the user has checked out
