@@ -1,5 +1,9 @@
 # ValleyBikeSim
-Smith College / CSC223 / A1 Starter Code
+Smith College / CSC223 / A4/5
+
+## Group Members 
+
+Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 
 ## Preconditions:
 
