@@ -8,24 +8,23 @@ import java.text.SimpleDateFormat;
  * Class that contains menu options and implementation for Simulator
  */
 public class ValleyBikeSim {
-
-	/** data structure for keeping track of stations */
+	// data structure for keeping track of stations
 	protected static Map<Integer, Station> stationsMap = new TreeMap<>();
 
-	/** data structure for keeping track of bikes */
+	// data structure for keeping track of bikes
 	protected static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
-	/** list for storing bike ids of bikes that require maintenance */
+	// list for storing bike ids of bikes that require maintenance
 	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
+
+	// scanner object to take user's input
+	protected static Scanner input = new Scanner(System.in);
 
 	/** data structure for keeping track of customer accounts */
 	protected static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
 
 	/** data structure for keeping track of internal accounts */
 	protected static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
-
-	/** scanner object to take user's input */
-	private static Scanner input = new Scanner(System.in);
 
 	/** 
 	 * Reads in the stations csv file data and parses it into station objects
@@ -34,14 +33,13 @@ public class ValleyBikeSim {
 	 * Then outputs welcome message and menu selector
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
+		// read all required files
 		readStationData();
-
         readBikeData();
-
         readCustomerAccountData();
-
         readInternalAccountData();
 
+        // start the initial menu
 		ValleyBikeController.initialMenu();
 	}
 
@@ -100,13 +98,11 @@ public class ValleyBikeSim {
 			// store comma separated values in string array
 			String[] values = line.split(",");
 
-
 			// start a new customer account with all the individual values we got
 			InternalAccount accountObj = new InternalAccount(
 					values[0],
 					values[1],
 					values[2]);
-
 
 			// add to the station tree
 			internalAccountMap.put(values[0],accountObj);
@@ -156,6 +152,7 @@ public class ValleyBikeSim {
 	}
 
 	/**
+	 * Reads external csv file with station data
 	 *
 	 * @throws IOException
 	 */
@@ -181,7 +178,6 @@ public class ValleyBikeSim {
                     Integer.parseInt(values[4]),
                     Integer.parseInt(values[5]),
                     Integer.parseInt(values[6]),
-                    Integer.parseInt(values[7]),
                     values[8]);
 
             // add to the station tree
@@ -193,19 +189,17 @@ public class ValleyBikeSim {
     }
 
 	/**
+	 * Reads external csv file with bike data
 	 *
 	 * @throws IOException
 	 */
 	public static void readBikeData() throws IOException {
-		//TODO skip the first line of file reading
-		//TODO why are they not using values[0]
-
-        // start reading our designated file
-        FileReader fileReader = new FileReader("data-files/bike-data.csv");
+		// start reading our designated file
+        FileReader fileReader = new FileReader("data-files/bikeData.csv");
         BufferedReader bufferedReader = new BufferedReader(fileReader);
         bufferedReader.readLine();
 
-        // initialize string for station data
+        // initialize string for bike data
         String line;
 
         // while there's more lines to read in the file
@@ -215,13 +209,13 @@ public class ValleyBikeSim {
 
             // start a new station with all the individual values we got
             Bike bikeOb = new Bike(
-                    Integer.parseInt(values[1]),
+                    Integer.parseInt(values[0]),
                     Integer.parseInt(values[1]),
                     Integer.parseInt(values[2]),
                     values[3],
                     values[4]);
 
-            // add to the station tree
+            // add to the bike tree
             bikesMap.put(Integer.parseInt(values[0]), bikeOb);
         }
 
@@ -230,28 +224,36 @@ public class ValleyBikeSim {
     }
 	
 	/**
-	 * Iterates through tree map and outputs station data by ID order
+	 * Iterates through tree map and outputs bike data by ID order
 	 * in a nicely formatted table
 	 * 
 	 * @throws IOException
 	 * @throws ParseException
 	 */
 	public static void viewBikeList() throws IOException, ParseException{
-		System.out.format("%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Location", "Station ID",
+		// format table view
+		System.out.format("%-15s%-15s%-15s%-15s%-15s\n", "ID", "Location", "Station ID",
 				"Main. Req", "Main. Report");
 
-		// is there a better/more efficient way to loop through the tree?
+		// initiate iterator
 		Iterator<Integer> keyIterator1 = bikesMap.keySet().iterator();
 
+		// while the iterator has a next value
 		while(keyIterator1.hasNext()){
+			// initiate key for iterator
 			Integer key = (Integer) keyIterator1.next();
+
+			// use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
-			System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
-					key, bike.id,
+
+			// format the view of the bike object values
+			System.out.format("%-15d%-15d%-15d%-15s%-15s\n",
+					key,
 					bike.location,
 					bike.station,
 					bike.mnt,
-					bike.mntReport);
+					bike.mntReport
+			);
 		}
 
 	}
@@ -262,26 +264,30 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
     public static void viewStationList() throws IOException, ParseException{
-        System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes", "Pedelec",
+		// format table view
+    	System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes",
                 "AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
 
-        // is there a better/more efficient way to loop through the tree?
-        Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
+		// initiate iterator
+		Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
 
-        while(keyIterator2.hasNext()){
-            Integer key = (Integer) keyIterator2.next();
-            Station station = stationsMap.get(key);
-            System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
-                    key, station.bikes,
-                    station.pedelecs,
-                    station.availableDocks,
-                    station.maintenanceRequest,
-                    station.capacity,
-                    station.kioskBoolean,
-                    station.name + "-" +station.address);
-        }
+		// while the iterator has a next value
+		while(keyIterator2.hasNext()) {
+			// initiate key for iterator
+			Integer key = (Integer) keyIterator2.next();
 
-//        starter();
+			// use that key to find station object in station tree
+			Station station = stationsMap.get(key);
+
+			// format the view values of station object
+			System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
+					key, station.bikes,
+					station.availableDocks,
+					station.maintenanceRequest,
+					station.capacity,
+					station.kioskBoolean,
+					station.name + "-" + station.address);
+		}
     }
 
 	/**
@@ -310,8 +316,7 @@ public class ValleyBikeSim {
 	public static void addStation() throws IOException, ParseException{
 		// use helper function to check input is valid and save it
 		//TODO this seems to have controller/view things in it
-		Integer id = getResponse("station id");
-
+		Integer id = getResponse("Please enter the ID for this station:");
 		// handle if the station already exists
 		if(stationsMap.get(id) != null){
 			// let user know
@@ -320,51 +325,61 @@ public class ValleyBikeSim {
 
 			// take their input
 			String response = input.next();
-			if(!response.equalsIgnoreCase("Y")){
+
+			// if yes, then take user to the maintenance worker account
+			if(response.toLowerCase().equalsIgnoreCase("y")){
 				ValleyBikeController.internalAccountHome();
 			}
 		}
 
+		// prompt user for station name
 		System.out.println("Please enter station name: ");
 		input.nextLine();
 		String name = input.nextLine();
 
-		Integer bikes = getResponse("bikes");
+		// prompt user for number of bikes
+		Integer bikes = getResponse("How many bikes?");
 
-		Integer pedelecs = getResponse("pedelecs");
+		// prompt for number of available docks at station
+		Integer availableDocks = getResponse("How many available docks?");
 
-		Integer availableDocks = getResponse("available docks");
+		// number of maintenance requests
+		Integer maintenanceRequest = getResponse("How many maintenance requests?");
 
-		Integer maintenanceRequest = getResponse("maintenance requests");
+		// prompt capacity for station
+		Integer capacity = getResponse("What is the station's capacity?");
 
-		Integer capacity = getResponse("capacity");
+		// number of kiosks
+		Integer kiosk = getResponse("How many kiosks?");
 
-		Integer kiosk = getResponse("kiosk");
-
+		// prompt for the station's address
 		System.out.print("Please enter station address: ");
 		input.nextLine();
 		String address = input.nextLine();
 
+		// create new station object with received data from user
 		Station stationOb = new Station(
 				name,
 				bikes,
-				pedelecs,
 				availableDocks,
 				maintenanceRequest,
 				capacity,
 				kiosk,
 				address);
 
+		// add to the station tree
 		stationsMap.put(id, stationOb);
 	}
 
 	/**
 	 * This method enables maintenance workers to add new bikes
+	 *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
 	public static void addBike() throws IOException, ParseException{
-		Integer id = getResponse("Bike id");
+		// get new bike's id
+		Integer id = getResponse("Please enter the bike's ID");
 
 		// handle if the bike already exists
 		if(bikesMap.get(id) != null){
@@ -372,23 +387,48 @@ public class ValleyBikeSim {
 					+ bikesMap.get(id) + " with new data? (y/n):");
 			String response = input.next();
 
-			if(!response.equalsIgnoreCase("Y")){
+			// if yes, take user back to the internal account home
+			// so they edit bike instead
+			if(response.equalsIgnoreCase("Y")){
 				ValleyBikeController.internalAccountHome();
 			}
 		}
 
+		// prompt for the station id bike will be located in
+		Integer stationId = getResponse("Please enter the ID for the station the bike is located at:");
+
+		// get station object with that id
+		Station myStation = stationsMap.get(stationId);;
+
+		// check if station doesn't exist
+		while(myStation == null){
+			System.out.println("Station with this ID doesn't exist. \nWould you like to add  "
+					+ stationsMap.get(id) + " as a new station? (y/n):");
+			String response = input.next();
+
+			// if yes, then redirect to add station
+			if(response.toLowerCase().equalsIgnoreCase("y")){
+				addStation();
+			}
+		}
+
+		// prompt user if it requires maintenance
 		System.out.println("Does it require maintenance? (y/n): ");
 		input.nextLine();
 		String mnt = input.nextLine();
 
-		String mntReport;
+		// initiate maintenance report string
+		String mntReport = "";
 
-		if(!mnt.equalsIgnoreCase("Y")){
-			mntReport = "none";
-		} else {
-			System.out.print("Please enter maintenance report.");
+		// if it does require maintenance
+		if(mnt.toLowerCase().equalsIgnoreCase("y")){
+			// prompt user to enter maintenance report
+			System.out.println("Please enter maintenance report:");
 			input.nextLine();
 			mntReport = input.nextLine();
+
+			// this increases the bike's station maintenance requests
+			myStation.maintenanceRequest ++;
 		}
 
 		// give appropriate choices for bike's location
@@ -398,21 +438,24 @@ public class ValleyBikeSim {
 				"1: Live with customer\n" +
 				"2: Docked/out of commission\n");
 
-		Integer bikeLocation = getResponse("0-2");
+		// prompt user to select an option
+		Integer bikeLocation = getResponse("Please enter one of the above options:");
 
-		Integer stationId = getResponse("station id");
-
-		// make sure it's a station that already exists too
-		if(stationsMap.get(stationId) != null){
-			System.out.println("Station with this ID already exists. \nWould you like to override "
-					+ stationsMap.get(id) + " with new data? (y/n):");
-			String response = input.next();
-
-			if(!response.equalsIgnoreCase("Y")){
-				ValleyBikeController.internalAccountHome();
-			}
+		// while the answer is not between the options, keep prompting user
+		while(!(bikeLocation == 0 | bikeLocation == 1 || bikeLocation ==2)){
+			System.out.println("Your answer has to be between 0 and 2");
+			bikeLocation = getResponse("Please enter one of the above options:");
 		}
 
+		// increase number of bikes and available docks
+		// if location of bike is available and docked
+		if(bikeLocation == 0){
+			// increase number of bikes for station
+			myStation.bikes ++;
+			myStation.availableDocks ++;
+		}
+
+		// create new bike object based on user's inputs
 		Bike bikeOb = new Bike(
 				id,
 				bikeLocation,
@@ -421,13 +464,14 @@ public class ValleyBikeSim {
 				mntReport
 		);
 
+		// add to bike tree structure
 		bikesMap.put(id, bikeOb);
 	}
 	
 	/**
 	 * Overwrites old station data in csv with updated data from stationMap
 	 * 
-	 * The choice to overwite all data instead of simply adding new stations
+	 * The choice to overwrite all data instead of simply adding new stations
 	 * to existing file was made because recording rides can update information
 	 * in both old and added stations, and it was important to make sure those updates
 	 * were reflected in the new saved list as well
@@ -436,12 +480,16 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	public static void saveStationList() throws IOException, ParseException{
+		// initiate fileWriter and iterator
 		FileWriter stationsWriter = new FileWriter("data-files/station-data.csv");
 		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
 
-		stationsWriter.write("ID,Name,Bikes,Pedelecs,Available Docks,"
+		// write the labels at the beginning of the file
+		stationsWriter.write("ID,Name,Bikes,Available Docks,"
 				+ "Maintenance Request,Capacity,Kiosk,Address");
 
+		// loop through station tree and transform station object
+		// to comma separated values for every row
 		while(keyIterator.hasNext()){
 			Integer key = (Integer) keyIterator.next();
 			Station station = stationsMap.get(key);
@@ -449,28 +497,41 @@ public class ValleyBikeSim {
 			stationsWriter.write(key.toString() + "," + station.getStationString());
 		}
 
+		// then end the fileWriter
 		stationsWriter.flush();
 		stationsWriter.close();
 	}
 
 	/**
+	 * Overwrites old bike data in external csv file with updated data from
+	 * bike tree map
+	 *
+	 * The choice to overwrite all data instead of simply adding new bikes
+	 * to existing file was made because recording rides can update information
+	 * in both old and added bikes, and it was important to make sure those updates
+	 * were reflected in the new saved list as well
 	 *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
 	public static void saveBikeList() throws IOException, ParseException{
-		FileWriter bikesWriter = new FileWriter("data-files/bike-data.csv");
+		// initiate fileWriter and iterator
+		FileWriter bikesWriter = new FileWriter("data-files/bikeData.csv");
 		Iterator<Integer> keyIterator = bikesMap.keySet().iterator();
 
+		// write the labels at the beginning of the file
 		bikesWriter.write("ID,Location,StationId,Req_Mnt,Mnt_Report");
 
+		// loop through bike tree and transform bike object
+		// to comma separated values for every row
 		while(keyIterator.hasNext()){
 			Integer key = (Integer) keyIterator.next();
 			Bike bike = bikesMap.get(key);
 			bikesWriter.write("\n");
-			bikesWriter.write(key.toString() + "," + bike.getBikeString());
+			bikesWriter.write(bike.getBikeString());
 		}
 
+		// then end the fileWriter
 		bikesWriter.flush();
 		bikesWriter.close();
 	}
@@ -481,65 +542,114 @@ public class ValleyBikeSim {
 	 * Then if they are it checks for vehicle type and space
 	 * If ride is valid it updates station info and creates ride object
 	 * Else if ride is invalid it prints an error message
-	 * 
-	 * Chose to include bikes because new stations with bikes
-	 * Could be added in future
-	 * 
+	 *
+	 * @param - destination whether
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void recordRide() throws IOException, ParseException{
-		//TODO get bike ID and validate
-
+	public static void recordRide(String dest, String action, Boolean isReturned) throws IOException, ParseException{
 		// View stations
+		System.out.println("Here's a list of station IDs and their names");
+		System.out.format("%-10s%-10s\n", "ID", "Name");
+
+		// initiate iterator
+		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+
+		// while it has a next value
+		while(keyIterator.hasNext()){
+			Integer key = (Integer) keyIterator.next();
+			Station station = stationsMap.get(key);
+			System.out.format("%-10d%-10s\n", key, station.name);
+		}
+
 		// choose station to rent from
+		System.out.println("Please enter station id to " + action +
+				" " + dest + ": ");
+		String fromTo = input.next();
+
+		// designated station, whether bike returned to or bike rented from
+		Station stationFromTo = stationsMap.get(Integer.parseInt(fromTo));
+
+		// keep prompting user until the station obj is not null
+		while(stationFromTo == null) {
+			System.out.println("The station entered does not exist in our system.");
+			fromTo = input.next();
+			stationFromTo = stationsMap.get(Integer.parseInt(fromTo));
+		}
+
+		// if there's more than one bike at station
+		if (stationFromTo.bikes > 1){
+			// station now has one less bike
+			stationFromTo.bikes --;
+			// and one more available dock
+			stationFromTo.availableDocks ++;
+		} else {
+			// if there's less, notify maintenance worker to resolve data
+			System.out.println("Station is almost empty!");
+			System.out.println("Notifying maintenance worker to resolve this...");
+			equalizeStations();
+			System.out.println("All done!");
+		}
+
 		// view available bike ids at station
-		// choose bike to rent
-		// confirm? Y/N (timestamps the rent out) --> check date and time now
+		System.out.println("Here's a list of bike IDs at this station");
+		System.out.format("%-10s%-10s\n", "Station", "Bike ID");
 
-		System.out.println("Enter b for Bike or p for Pedelec: ");
-		String rideType = input.next();
+		Iterator<Integer> keyIterator2 = bikesMap.keySet().iterator();
 
-		System.out.println("From (Station ID): ");
-		String from = input.next();
-
-		System.out.println("To (Station ID): ");
-		String to = input.next();
-
-		try{
-			Station stationFrom = stationsMap.get(Integer.parseInt(from));
-			Station stationTo = stationsMap.get(Integer.parseInt(to));
-
-			if(stationFrom != null && stationTo != null){
-				switch(rideType.toUpperCase()){
-					case("B"):
-						if (stationFrom.bikes > 0 && stationTo.availableDocks > 0){
-							stationFrom.bikes = stationFrom.bikes-1;
-							stationTo.bikes = stationTo.bikes+1;
-							stationTo.availableDocks = stationTo.availableDocks - 1;
-						} else {
-							System.out.println("Ride not valid");
-						}
-						break;
-					case("P"):
-						if (stationFrom.pedelecs > 0 && stationTo.availableDocks > 0){
-							stationFrom.pedelecs = stationFrom.pedelecs-1;
-							stationTo.pedelecs = stationTo.pedelecs+1;
-							stationTo.availableDocks = stationTo.availableDocks - 1;
-						} else {
-							System.out.println("Ride not valid");
-						}
-						break;
-					default:
-						System.out.println("Invalid vehicle type");
-				}
-			} else {
-				System.out.println("At least one station entered does not exist in our system");
+		while(keyIterator2.hasNext()){
+			Integer key = (Integer) keyIterator2.next();
+			Bike bike = bikesMap.get(key);
+			if(Integer.parseInt(fromTo) == bike.getStation()) {
+				System.out.format("%-10s%-10d\n", fromTo, key);
 			}
-		} catch(NumberFormatException e){
-			System.out.println("Your input is invalid! Please input a number for the station ID next time.");
+
+		}
+
+		// choose bike to rent
+		int b = getResponse("bike id");
+		Bike someBike = bikesMap.get(b);
+
+		while(someBike == null) {
+			System.out.println("The bike ID entered does not exist in our system.");
+			b = getResponse("bike id");
+			someBike = bikesMap.get(b);
+		}
+
+		// time stamp recorded
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
+		String formattedDate = sdf.format(date);
+
+		// make following adjustments if bike is to be returned
+		if(isReturned){
+			// if returned, then bike location is available and docked
+			someBike.location = 0;
+
+			// prompt user if it needs maintenance
+			System.out.println("Does it require maintenance? (y/n): ");
+			input.nextLine();
+			String mnt = input.nextLine();
+
+			String mntReport;
+
+			// if it does require maintenance
+			if(mnt.equalsIgnoreCase("Y")){
+				// add to maintenance requests
+				mntReqs.add(b);
+
+				// prompt user for maintenance report
+				System.out.print("Please enter maintenance report.");
+				input.nextLine();
+				mntReport = input.nextLine();
+			}
+
+		} else{
+			// change bike location to live with customer
+			someBike.location = 1;
 		}
 	}
+
 	
 	/**
 	 * Takes in a ride data file name from user
@@ -636,8 +746,8 @@ public class ValleyBikeSim {
 
 			Station station = stationsMap.get(key);
 
-			int percentage = (int) (((float) (station.pedelecs + station.bikes) / station.capacity) * 100);
-			totalVehicles = totalVehicles + station.pedelecs + station.bikes;
+			int percentage = (int) (((float) (station.bikes) / station.capacity) * 100);
+			totalVehicles = totalVehicles + station.bikes;
 			totalCapacity = totalCapacity + station.capacity;
 
 			stationsCapacity.put(key, percentage);
@@ -668,16 +778,15 @@ public class ValleyBikeSim {
 					//continues to remove vehicles as long as removing a vehicle
 					//moves the percentage closer to ideal percentage
 					while(Math.abs(newPercentage - idealPercentage) > 
-					Math.abs(((int) (((float) (station.pedelecs + station.bikes - 1) / station.capacity) * 100)) 
+					Math.abs(((int) (((float) (station.bikes - 1) / station.capacity) * 100))
 							- idealPercentage)){
 						if(station.bikes > 0){
 							station.bikes = station.bikes - 1;
 							extras.set(0, extras.get(0)+1);
 						} else {
-							station.pedelecs = station.pedelecs - 1;
 							extras.set(1, extras.get(1)+1);
 						}
-						newPercentage = (int) (((float) (station.pedelecs + station.bikes) / station.capacity) * 100);
+						newPercentage = (int) (((float) (station.bikes) / station.capacity) * 100);
 					}
 				}
 		}
@@ -706,7 +815,7 @@ public class ValleyBikeSim {
 			// moves the percentage closer to ideal percentage
 			// and there are still extra vehicles to add
 			while((Math.abs(newPercentage - idealPercentage) >
-					Math.abs((int) (((float) (station.pedelecs + station.bikes + 1) /
+					Math.abs((int) (((float) (station.bikes + 1) /
 							station.capacity) * 100)) - idealPercentage)
 					&& Integer.sum(extras.get(0), extras.get(1))>0){
 
@@ -714,25 +823,24 @@ public class ValleyBikeSim {
 						station.bikes = station.bikes + 1;
 						extras.set(0, extras.get(0)-1);
 					} else{
-						station.pedelecs = station.pedelecs + 1;
 						extras.set(1, extras.get(1)-1);
 					}
 
-					newPercentage = (int) (((float) (station.pedelecs + station.bikes) / station.capacity) * 100);
+					newPercentage = (int) (((float) (station.bikes) / station.capacity) * 100);
 			}
 		}
 	}
 	
 	/**
-	 * Helper method to validate integer input for adding stations
+	 * Helper method to validate integer input
 	 * @param request - the input being requested
 	 * @return the validated integer inputed by user
 	 */
 	public static Integer getResponse(String request){
-		System.out.println("Please enter number of "+ request + ": ");
+		System.out.println(request);
 		while (!input.hasNextInt()){
 			System.out.println("That is not a valid number");
-			System.out.println("Please enter number of "+ request + ": ");
+			System.out.println(request);
 			input.next();
 		}
 		Integer value = input.nextInt();

@@ -70,6 +70,7 @@ public abstract class ValleyBikeController {
             return;
         }
 
+        // TODO let user know how to make valid email address
         System.out.println("Enter email address:");
         String emailAddress = input.nextLine();
         if (!isValidEmail(emailAddress)){
@@ -158,13 +159,15 @@ public abstract class ValleyBikeController {
      * @param username: integer representing unique userID of account
      */
     private static void userAccountHome(String username) throws IOException, ParseException {
-        System.out.print("\nPlease choose from one of the following menu options: \n"
-                + "1. Edit account info \n"
-                + "2. View account balance \n"
-                + "3. View station list \n"
-                + "4. Record a ride \n"
-                + "5. Report a problem \n"
-                + "6. Log out \n");
+        System.out.println("Please choose from one of the following menu options: \n"
+                + "1. Edit account info\n"
+                + "2. View account balance\n"
+                + "3. View station list\n"
+                + "4. Rent a bike\n"
+                + "5. Return a bike\n"
+                + "6. Report a problem\n"
+                + "7. Log out \n");
+
         System.out.println("Please enter your selection (1-6):");
 
         // if input is not a integer
@@ -188,11 +191,13 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.viewStationList();
                 break;
             case 4:
-                //user records a ride
+                // user records a ride
                 //TODO currently doesnt account for bike id or user id
-                ValleyBikeSim.recordRide();
+
+                ValleyBikeSim.recordRide("from", "rent", false);
                 break;
             case 5:
+
                 //report a problem
                 reportProblem(username);
                 break;
@@ -200,6 +205,8 @@ public abstract class ValleyBikeController {
                 //log out, return to homepage
                 initialMenu();
                 break;
+            case 7:
+                ValleyBikeSim.viewBikeList();
         }
         //if function call finished and returned to this page, keep calling menu again until log out/exit
         userAccountHome(username);
@@ -209,6 +216,28 @@ public abstract class ValleyBikeController {
         System.out.println("\nDo you want to edit your username (y/n)?");
         String edit = input.nextLine();
         //TODO complete function
+    }
+
+    /**
+     * @param: userID- the unique id associated with the user
+     * View the account balance associated with a user's account
+     */
+    private static void viewAccountBalance(String username) {
+        //TODO view user account balance
+        //when done, returns to userAccountMenu
+    }
+
+    /**
+     * user checks out a specific bike from a specific station
+     * @param: userID- the unique id associated with the user
+     */
+    private static void rentBike(String username) throws IOException, ParseException {
+
+        // ValleyBikeSim.recordRide();
+
+        //bike is now checked out
+        int bikeID = 0;
+        bikeRented(username, bikeID);
     }
 
     /**
@@ -247,13 +276,27 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * reportProblem()
+     * user checks back in a rented bike
+     * @param: int userID- the unique id associated with the user
+     * @param: bikeID- unique ID associated with the bike that the user has checked out
+     *
+     */
+    private static void returnBike(String username, int bikeID) throws IOException, ParseException {
+
+        //return to user menu
+        userAccountHome(username);
+    }
+
+    /**
+     *
      * param: userID
      * user reports a problem with the bike they checked out
      */
     private static void reportProblem(String username) throws IOException, ParseException {
         ValleyBikeSim.viewStationList();
-        //TODO view list of bike ids at station (?)
+        // DONT VIEW BIKE IDS LIST
+
+        // but do viewing for everything else
 
         // get station id from user
         Integer stationId = ValleyBikeSim.getResponse("station id");
@@ -332,7 +375,5 @@ public abstract class ValleyBikeController {
         //call account menu again
         internalAccountHome();
     }
-
-
 }
 

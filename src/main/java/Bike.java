@@ -20,6 +20,11 @@ public class Bike {
 
     public Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport){
         this.id = bikeId;
+
+        this.location = bikeLocation;
+
+        this.station = stationId;
+
         if(maintenance.equals('y')){
             this.mnt = true;
         } else{
@@ -27,19 +32,11 @@ public class Bike {
         }
 
         this.mntReport = maintenanceReport;
-        this.location = bikeLocation;
-
-        if(location == 0 || location == 1 || location == 2){
-            this.station = stationId;
-        } else {
-            this.station = -1;
-        }
-
     }
 
     public String getBikeString() {
-        String fileLine = this.location + "," + this.station + ","
-                + this.mnt + "," + this.mntReport;
+        String fileLine = this.id + "," + this.location + "," +
+                this.station + "," + this.mnt + "," + this.mntReport;
         return fileLine;
     }
 
@@ -49,6 +46,22 @@ public class Bike {
 
     public void setId(int newId){
         this.id = newId;
+    }
+
+    public int getStation(){
+        return this.station;
+    }
+
+    public void setStation(int newStationValue){
+        this.station = newStationValue;
+    }
+
+    public int getBikeLocatoin(){
+        return this.location;
+    }
+
+    public void setBikeLocation(int newBikeLocation){
+        this.location = newBikeLocation;
     }
 
     public boolean getMnt(){

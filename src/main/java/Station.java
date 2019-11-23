@@ -8,7 +8,7 @@
 public class Station {
     String name;
     int bikes;
-    int pedelecs;
+//    int pedelecs;
     int availableDocks;
     int maintenanceRequest;
     int capacity;
@@ -17,13 +17,13 @@ public class Station {
     String address;
 
     public Station(String nameValue, Integer bikesValue,
-                   Integer pedelecsValue, Integer availableDocksValue,
+                   Integer availableDocksValue,
                    Integer maintenanceRequestValue,
                    Integer capacityValue,
                    Integer kiosk, String address1) {
         this.name = nameValue;
         this.bikes = bikesValue;
-        this.pedelecs = pedelecsValue;
+//        this.pedelecs = pedelecsValue;
         this.availableDocks = availableDocksValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
@@ -39,8 +39,8 @@ public class Station {
     }
 
     public String getStationString() {
-        String fileInput = this.name + "," + this.bikes + ","
-                + this.pedelecs + "," + this.availableDocks +
+        String fileInput = this.name + "," + this.bikes + "," +
+                + this.availableDocks +
                 "," + this.maintenanceRequest + ","
                 + this.capacity + "," + this.kioskNumber + "," + this.address;
         return fileInput;
@@ -62,13 +62,13 @@ public class Station {
         this.bikes = newNumBikes;
     }
 
-    public int getPeds() {
-        return this.pedelecs;
-    }
-
-    public void setPeds(int newNumPeds) {
-        this.pedelecs = newNumPeds;
-    }
+//    public int getPeds() {
+//        return this.pedelecs;
+//    }
+//
+//    public void setPeds(int newNumPeds) {
+//        this.pedelecs = newNumPeds;
+//    }
 
     public int getAvailableDocks() {
         return this.availableDocks;
