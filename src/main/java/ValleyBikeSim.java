@@ -117,6 +117,45 @@ public class ValleyBikeSim {
 	}
 
 	/**
+	 * @param: userID- the unique id associated with the user
+	 * View the account balance associated with a user's account
+	 */
+	public static int viewAccountBalance(String username) {
+		return customerAccountMap.get(username).getBalance();
+	}
+
+	/**
+	 * user checks out a specific bike from a specific station
+	 * @param: userID- the unique id associated with the user
+	 */
+	private static void rentBike(String username) throws IOException, ParseException {
+		ValleyBikeSim.recordRide();
+
+		//bike is now checked out
+		int bikeID = 0;
+		//bikeRented(username, bikeID);
+	}
+
+	/**
+	 * user checks back in a rented bike
+	 * @param: int userID- the unique id associated with the user
+	 * @param: bikeID- unique ID associated with the bike that the user has checked out
+	 *
+	 */
+	private static void returnBike(String username, int bikeID) throws IOException, ParseException {
+		// why view all stations?
+		ValleyBikeSim.viewStationList();
+		//TODO input station id
+		//TODO bike id from input
+		//TODO confirm? Y/N (timestamps the check back in)
+		//TODO save ride to file/data structure
+		//TODO charge user $$
+
+		//return to user menu
+		//userAccountHome(username);
+	}
+
+	/**
 	 *
 	 * @throws IOException
 	 */
@@ -244,6 +283,22 @@ public class ValleyBikeSim {
 
 //        starter();
     }
+
+	/**
+	 *
+	 * @param customerAccount
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException{
+    	if (customerAccountMap.get(customerAccount.getUsername()) != null){
+			System.out.println("Customer account with this username already exists. \nPlease try again with another username or log in.");
+
+			ValleyBikeController.createAccount();
+		} else {
+    		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
+		}
+	}
 	
 	/**
 	 * Prompts user for all station data and then creates a new station
@@ -254,6 +309,7 @@ public class ValleyBikeSim {
 	 */
 	public static void addStation() throws IOException, ParseException{
 		// use helper function to check input is valid and save it
+		//TODO this seems to have controller/view things in it
 		Integer id = getResponse("station id");
 
 		// handle if the station already exists

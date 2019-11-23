@@ -57,4 +57,12 @@ public class CustomerAccount extends Account{
     public void setBalance(int balance) {
         this.balance = balance;
     }
+
+    public String getMembership() {
+        return membership;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
 }
