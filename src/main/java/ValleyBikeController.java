@@ -240,7 +240,6 @@ public abstract class ValleyBikeController {
      * @param: bikeID- unique ID associated with the bike that the user has checked out
      */
     private static void bikeRented(String username, int bikeID) throws IOException, ParseException {
-        //TODO same question- only use this if bike rent/return not RecordRide
         System.out.print("\n Enjoy your bike ride! \n"
                 + "1. Return bike"
                 + "2. Report a problem");
@@ -251,6 +250,7 @@ public abstract class ValleyBikeController {
             System.out.println("Not a valid input \n");
             bikeRented(username, bikeID);
         }
+
         Integer num = input.nextInt();
         switch(num) {
             case 1:
@@ -276,7 +276,7 @@ public abstract class ValleyBikeController {
      *
      */
     private static void returnBike(String username, int bikeID) throws IOException, ParseException {
-
+        ValleyBikeSim.recordRide("to", "return", true);
         //return to user menu
         userAccountHome(username);
     }
@@ -288,21 +288,18 @@ public abstract class ValleyBikeController {
      */
     private static void reportProblem(String username) throws IOException, ParseException {
         ValleyBikeSim.viewStationList();
-        // DONT VIEW BIKE IDS LIST
-
-        // but do viewing for everything else
 
         // get station id from user
-        Integer stationId = ValleyBikeSim.getResponse("station id");
+        Integer stationId = ValleyBikeSim.getResponse("Please input the bike's station ID:");
 
         // check station actually exists
         if(ValleyBikeSim.stationsMap.get(stationId) == null){
-            System.out.println("Station with this ID doesn't exist. Please reenter ID.\n");
+            System.out.println("Station with this ID doesn't exist. Please reenter ID:\n");
             String response = input.next();
         }
 
         // get bike id from user
-        Integer bikeId = ValleyBikeSim.getResponse("bike id");
+        Integer bikeId = ValleyBikeSim.getResponse("Please input the bike's ID:");
 
         // check station actually exists
         if(ValleyBikeSim.bikesMap.get(bikeId) == null){
@@ -321,8 +318,17 @@ public abstract class ValleyBikeController {
         bike.setMntReport(report);
         bike.setMnt(true);
 
+        // increase maintenance requests for the station
+        Station statObj = ValleyBikeSim.stationsMap.get(stationId);
+        statObj.maintenanceRequest ++;
+
         // add to list of bikes that require maintenance
         ValleyBikeSim.mntReqs.add(bikeId);
+
+        System.out.println("Maintenance report has been successfully!\n");
+        System.out.println("Now let's help you return your bike");
+
+        returnBike(username, bikeId);
     }
 
     //should there be option to add bike/station
