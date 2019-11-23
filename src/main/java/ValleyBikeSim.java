@@ -125,20 +125,6 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * user checks back in a rented bike
-	 * @param: int userID- the unique id associated with the user
-	 * @param: bikeID- unique ID associated with the bike that the user has checked out
-	 *
-	 */
-	private static void returnBike(String username, int bikeID) throws IOException, ParseException {
-		// why view all stations?
-		ValleyBikeSim.viewStationList();
-
-		//return to user menu
-		//userAccountHome(username);
-	}
-
-	/**
 	 * Reads external csv file with station data
 	 *
 	 * @throws IOException
@@ -292,169 +278,7 @@ public class ValleyBikeSim {
     		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
-	
-	/**
-	 * Prompts user for all station data and then creates a new station
-	 * object which is added to the stationMap
-	 * 
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public static void addStation() throws IOException, ParseException{
-		// use helper function to check input is valid and save it
-		//TODO this seems to have controller/view things in it
-		Integer id = getResponse("Please enter the ID for this station:");
-		// handle if the station already exists
-		if(stationsMap.get(id) != null){
-			// let user know
-			System.out.println("Station with this ID already exists. \nWould you like to override "
-					+ stationsMap.get(id).name + " with new data? (y/n):");
 
-			// take their input
-			String response = input.next();
-
-			// if yes, then take user to the maintenance worker account
-			if(response.toLowerCase().equalsIgnoreCase("y")){
-				ValleyBikeController.internalAccountHome();
-			}
-		}
-
-		// prompt user for station name
-		System.out.println("Please enter station name: ");
-		input.nextLine();
-		String name = input.nextLine();
-
-		// prompt user for number of bikes
-		Integer bikes = getResponse("How many bikes?");
-
-		// prompt for number of available docks at station
-		Integer availableDocks = getResponse("How many available docks?");
-
-		// number of maintenance requests
-		Integer maintenanceRequest = getResponse("How many maintenance requests?");
-
-		// prompt capacity for station
-		Integer capacity = getResponse("What is the station's capacity?");
-
-		// number of kiosks
-		Integer kiosk = getResponse("How many kiosks?");
-
-		// prompt for the station's address
-		System.out.print("Please enter station address: ");
-		input.nextLine();
-		String address = input.nextLine();
-
-		// create new station object with received data from user
-		Station stationOb = new Station(
-				name,
-				bikes,
-				availableDocks,
-				maintenanceRequest,
-				capacity,
-				kiosk,
-				address);
-
-		// add to the station tree
-		stationsMap.put(id, stationOb);
-	}
-
-	/**
-	 * This method enables maintenance workers to add new bikes
-	 *
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public static void addBike() throws IOException, ParseException{
-		// get new bike's id
-		Integer id = getResponse("Please enter the bike's ID");
-
-		// handle if the bike already exists
-		if(bikesMap.get(id) != null){
-			System.out.println("Bike with this ID already exists. \nWould you like to override bike "
-					+ bikesMap.get(id) + " with new data? (y/n):");
-			String response = input.next();
-
-			// if yes, take user back to the internal account home
-			// so they edit bike instead
-			if(response.equalsIgnoreCase("Y")){
-				ValleyBikeController.internalAccountHome();
-			}
-		}
-
-		// prompt for the station id bike will be located in
-		Integer stationId = getResponse("Please enter the ID for the station the bike is located at:");
-
-		// get station object with that id
-		Station myStation = stationsMap.get(stationId);;
-
-		// check if station doesn't exist
-		while(myStation == null){
-			System.out.println("Station with this ID doesn't exist. \nWould you like to add  "
-					+ stationsMap.get(id) + " as a new station? (y/n):");
-			String response = input.next();
-
-			// if yes, then redirect to add station
-			if(response.toLowerCase().equalsIgnoreCase("y")){
-				addStation();
-			}
-		}
-
-		// prompt user if it requires maintenance
-		System.out.println("Does it require maintenance? (y/n): ");
-		input.nextLine();
-		String mnt = input.nextLine();
-
-		// initiate maintenance report string
-		String mntReport = "";
-
-		// if it does require maintenance
-		if(mnt.toLowerCase().equalsIgnoreCase("y")){
-			// prompt user to enter maintenance report
-			System.out.println("Please enter maintenance report:");
-			input.nextLine();
-			mntReport = input.nextLine();
-
-			// this increases the bike's station maintenance requests
-			myStation.maintenanceRequest ++;
-		}
-
-		// give appropriate choices for bike's location
-		System.out.println("Please pick one of the following choices for the " +
-				"status of the bike:\n" +
-				"0: Docked/available at station\n" +
-				"1: Live with customer\n" +
-				"2: Docked/out of commission\n");
-
-		// prompt user to select an option
-		Integer bikeLocation = getResponse("Please enter one of the above options:");
-
-		// while the answer is not between the options, keep prompting user
-		while(!(bikeLocation == 0 | bikeLocation == 1 || bikeLocation ==2)){
-			System.out.println("Your answer has to be between 0 and 2");
-			bikeLocation = getResponse("Please enter one of the above options:");
-		}
-
-		// increase number of bikes and available docks
-		// if location of bike is available and docked
-		if(bikeLocation == 0){
-			// increase number of bikes for station
-			myStation.bikes ++;
-			myStation.availableDocks ++;
-		}
-
-		// create new bike object based on user's inputs
-		Bike bikeOb = new Bike(
-				id,
-				bikeLocation,
-				stationId,
-				mnt,
-				mntReport
-		);
-
-		// add to bike tree structure
-		bikesMap.put(id, bikeOb);
-	}
-	
 	/**
 	 * Overwrites old station data in csv with updated data from stationMap
 	 * 
@@ -523,121 +347,6 @@ public class ValleyBikeSim {
 		bikesWriter.close();
 	}
 
-	/**
-	 * Takes in ride data from user
-	 * Checks to see if stations are valid
-	 * Then if they are it checks for vehicle type and space
-	 * If ride is valid it updates station info and creates ride object
-	 * Else if ride is invalid it prints an error message
-	 *
-	 * @param - destination whether
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public static void recordRide(String dest, String action, Boolean isReturned) throws IOException, ParseException{
-		// View stations
-		System.out.println("Here's a list of station IDs and their names");
-		System.out.format("%-10s%-10s\n", "ID", "Name");
-
-		// initiate iterator
-		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
-
-		// while it has a next value
-		while(keyIterator.hasNext()){
-			Integer key = (Integer) keyIterator.next();
-			Station station = stationsMap.get(key);
-			System.out.format("%-10d%-10s\n", key, station.name);
-		}
-
-		// choose station to rent from
-		System.out.println("Please enter station id to " + action +
-				" " + dest + ": ");
-		String fromTo = input.next();
-
-		// designated station, whether bike returned to or bike rented from
-		Station stationFromTo = stationsMap.get(Integer.parseInt(fromTo));
-
-		// keep prompting user until the station obj is not null
-		while(stationFromTo == null) {
-			System.out.println("The station entered does not exist in our system.");
-			fromTo = input.next();
-			stationFromTo = stationsMap.get(Integer.parseInt(fromTo));
-		}
-
-		// if there's more than one bike at station
-		if (stationFromTo.bikes > 1){
-			// station now has one less bike
-			stationFromTo.bikes --;
-			// and one more available dock
-			stationFromTo.availableDocks ++;
-		} else {
-			// if there's less, notify maintenance worker to resolve data
-			System.out.println("Station is almost empty!");
-			System.out.println("Notifying maintenance worker to resolve this...");
-			equalizeStations();
-			System.out.println("All done!");
-		}
-
-		// view available bike ids at station
-		System.out.println("Here's a list of bike IDs at this station");
-		System.out.format("%-10s%-10s\n", "Station", "Bike ID");
-
-		Iterator<Integer> keyIterator2 = bikesMap.keySet().iterator();
-
-		while(keyIterator2.hasNext()){
-			Integer key = (Integer) keyIterator2.next();
-			Bike bike = bikesMap.get(key);
-			if(Integer.parseInt(fromTo) == bike.getStation()) {
-				System.out.format("%-10s%-10d\n", fromTo, key);
-			}
-
-		}
-
-		// choose bike to rent
-		int b = getResponse("bike id");
-		Bike someBike = bikesMap.get(b);
-
-		while(someBike == null) {
-			System.out.println("The bike ID entered does not exist in our system.");
-			b = getResponse("bike id");
-			someBike = bikesMap.get(b);
-		}
-
-		// time stamp recorded
-		Date date = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-		String formattedDate = sdf.format(date);
-
-		// make following adjustments if bike is to be returned
-		if(isReturned){
-			// if returned, then bike location is available and docked
-			someBike.location = 0;
-
-			// prompt user if it needs maintenance
-			System.out.println("Does it require maintenance? (y/n): ");
-			input.nextLine();
-			String mnt = input.nextLine();
-
-			String mntReport;
-
-			// if it does require maintenance
-			if(mnt.equalsIgnoreCase("Y")){
-				// add to maintenance requests
-				mntReqs.add(b);
-
-				// prompt user for maintenance report
-				System.out.print("Please enter maintenance report.");
-				input.nextLine();
-				mntReport = input.nextLine();
-			}
-
-		} else{
-			// change bike location to live with customer
-			someBike.location = 1;
-		}
-	}
-
-	
 	/**
 	 * Takes in a ride data file name from user
 	 * Parses and iterates through file and uses ride timestamps 
@@ -817,40 +526,109 @@ public class ValleyBikeSim {
 			}
 		}
 	}
-	
-	/**
-	 * Helper method to validate integer input
-	 * @param request - the input being requested
-	 * @return the validated integer inputed by user
-	 */
-	public static Integer getResponse(String request){
-		System.out.println(request);
-		while (!input.hasNextInt()){
-			System.out.println("That is not a valid number");
-			System.out.println(request);
-			input.next();
-		}
-		Integer value = input.nextInt();
-		return value;
-	}
 
 	/**
-	 *
+	 * Resolve all maintenance requests by viewing bike ids
+	 * in need of maintenance then setting them to not require
+	 * maintenance anymore
 	 */
 	public static void resolveMntReqs(){
+		// if there are maintenance requests
 		if(mntReqs != null) {
-			// automatically resolve all mnt reqs
-			for(int req : mntReqs){
-				System.out.println(req +" ");
-				Bike bike = bikesMap.get(req);
+			System.out.println("Here's a list of bike iDs in need of maintenance");
+			// loop through all the bike ids in need of maintenance
+			for(int bikeId : mntReqs){
+				// view each id
+				System.out.format("%-5d\n", bikeId);
+
+				// get bike object
+				Bike bike = bikesMap.get(bikeId);
+
+				// set bike maintenance values to none
 				bike.setMnt(false);
 				bike.setMntReport("");
 			}
 
+			// done resolving, so clear the list
 			mntReqs.clear();
+
 			System.out.println("All maintenance requests have been resolved");
 		} else{
 			System.out.println("There are no maintenance requests at the moment.");
 		}
+	}
+
+	/**
+	 * Helper method for controller class to get station object by
+	 * finding it in the stations tree data structure and using station
+	 * ID
+	 *
+	 * @param key station id
+	 * @return station object
+	 */
+	public static Station getStationObj(int key){
+		return stationsMap.get(key);
+	}
+
+	/**
+	 * Helper method for controller class to add new station object
+	 * to stations tree data structure
+	 *
+	 * @param id station id
+	 * @param stationOb station object
+	 */
+	public static void addNewStation(int id, Station stationOb){
+		stationsMap.put(id, stationOb);
+	}
+
+	/**
+	 * Helper method for controller class to get bike object by
+	 * finding it in the bikes tree data structure and using station ID
+	 *
+	 * @param key station id
+	 * @return station object
+	 */
+	public static Bike getBikeObj(int key){
+		return bikesMap.get(key);
+	}
+
+	/**
+	 * Helper method for controller class to add new bike object
+	 * to bikes tree data structure
+	 *
+	 * @param id station id
+	 * @param bikeObj bike object
+	 */
+	public static void addNewBike(int id, Bike bikeObj){
+		bikesMap.put(id, bikeObj);
+	}
+
+	/**
+	 * Helper method for controller class to return a key set
+	 * iterator
+	 *
+	 * @param isBike If true, we're working with a bike object.
+	 *               If not, we're working with a station object.
+	 *
+	 * @return if isBike is true, we're returning a bikesMap iterator.
+	 *         if not, we're returning a stationsMap iterator.
+	 *
+	 */
+	public static Iterator createIterator(Boolean isBike){
+		if(isBike){
+			return bikesMap.keySet().iterator();
+		} else{
+			return stationsMap.keySet().iterator();
+		}
+	}
+
+	/**
+	 * Helper method for controller class to add bike id of a bike that
+	 * requires maintenance to the maintenance requests list
+	 *
+	 * @param bikeID integer UD of bike
+	 */
+	public static void addToMntRqs(int bikeID){
+		mntReqs.add(bikeID);
 	}
 }

@@ -25,11 +25,8 @@ public class Bike {
 
         this.station = stationId;
 
-        if(maintenance.equals('y')){
-            this.mnt = true;
-        } else{
-            this.mnt = false;
-        }
+        if(maintenance.equals('y')) this.mnt = true;
+        else this.mnt = false;
 
         this.mntReport = maintenanceReport;
     }
