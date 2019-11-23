@@ -6,6 +6,10 @@ import java.text.SimpleDateFormat;
 
 /**
  * Class that contains menu options and implementation for Simulator
+ *
+ * We're making the assumption in this bike that our system only has
+ * pedelecs. Every time we use the word bike in this code, we mean
+ * pedelecs/electric bikes.
  */
 public class ValleyBikeSim {
 	// data structure for keeping track of stations
@@ -129,11 +133,6 @@ public class ValleyBikeSim {
 	private static void returnBike(String username, int bikeID) throws IOException, ParseException {
 		// why view all stations?
 		ValleyBikeSim.viewStationList();
-		//TODO input station id
-		//TODO bike id from input
-		//TODO confirm? Y/N (timestamps the check back in)
-		//TODO save ride to file/data structure
-		//TODO charge user $$
 
 		//return to user menu
 		//userAccountHome(username);
