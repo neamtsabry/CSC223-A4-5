@@ -53,47 +53,69 @@ public abstract class ValleyBikeController {
      */
     public static void createAccount() throws IOException, ParseException {
         //TODO membership types
-        //TODO check for unique username
-        //TODO while loop to try again
         //TODO talk to Annika about the flow from model to controller
+        String username = enterUsername();
+        String password = enterPassword();
+        String emailAddress = enterEmail();
+        String creditCard = enterCreditCard();
+        String membership = enterMembership();
+
+        //create new customer account
+        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership);
+        //add customer account to customer account map
+        ValleyBikeSim.addCustomerAccount(customerAccount);
+
+        System.out.println("Customer account successfully created!");
+        //go to account menu
+        String user = customerAccount.getUsername();
+        userAccountHome(user);
+    }
+
+    private static String enterUsername(){
         System.out.println("Enter username (must be between 6-14 characters):");
         String username = input.nextLine();
         if (!isValidUsername(username)){
             System.out.println("Username is not valid.");
-            return;
+            enterUsername();
         }
+        return username;
+    }
 
+    private static String enterPassword(){
         System.out.println("Enter password (must be between 6-14 characters):");
         String password = input.nextLine();
         if (!isValidPassword(password)){
             System.out.println("Password is not valid.");
-            return;
+            enterPassword();
         }
+        return password;
+    }
 
+    private static String enterEmail(){
         // TODO let user know how to make valid email address
         System.out.println("Enter email address:");
         String emailAddress = input.nextLine();
         if (!isValidEmail(emailAddress)){
             System.out.println("Email address is not valid.");
-            return;
+            enterEmail();
         }
+        return emailAddress;
+    }
 
+    private static String enterCreditCard(){
         System.out.println("Enter credit card number:");
         String creditCard = input.nextLine();
         if (!isValidCreditCard(creditCard)){
             System.out.println("Credit card is not valid.");
-            return;
+            enterCreditCard();
         }
+        return creditCard;
+    }
 
+    private static String enterMembership(){
         System.out.println("Enter membership type:");
         String membership = input.nextLine();
-        //create new customer account
-        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership);
-        //add customer account to customer account map
-        ValleyBikeSim.addCustomerAccount(customerAccount);
-        //go to account menu
-        String user = customerAccount.getUsername();
-        userAccountHome(user);
+        return membership;
     }
 
     private static boolean isValidUsername(String username){
@@ -134,23 +156,26 @@ public abstract class ValleyBikeController {
         return pat.matcher(emailAddress).matches();
     }
 
-    /**
-     * Method for both internal and user accounts to log in
-     */
-    private static void logIn() throws IOException, ParseException {
-        //TODO input username, authenticate
-        //TODO input password, authenticate
-        //TODO figure out if account is customer or internal
-        //if account is user, go to user menu:
+
+    public static void logIn() throws IOException, ParseException {
+        System.out.println("Press 1 to log in to customer account. \nPress 2 to log in to internal account.");
+        int logIn = input.nextInt();
+        input.nextLine();
         System.out.println("Enter username:");
         String username = input.nextLine();
-
         System.out.println("Enter password:");
         String password = input.nextLine();
-
-        userAccountHome(username);
-        //if account is employee, go to employee menu:
-        internalAccountHome();
+        switch (logIn){
+            case 1:
+                ValleyBikeSim.customerLogIn(username, password);
+                break;
+            case 2:
+                ValleyBikeSim.internalLogIn(username, password);
+                break;
+            default:
+                System.out.println("Invalid option chosen.");
+                logIn();
+        }
     }
 
 
@@ -158,7 +183,7 @@ public abstract class ValleyBikeController {
      * Standard menu page for a user after logging in
      * @param username: integer representing unique userID of account
      */
-    private static void userAccountHome(String username) throws IOException, ParseException {
+    public static void userAccountHome(String username) throws IOException, ParseException {
         System.out.println("Please choose from one of the following menu options: \n"
                 + "1. Edit account info\n"
                 + "2. View account balance\n"
@@ -180,7 +205,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //edit account info- return to create account or have separate method?
-                //TODO editAccount(username);
+                editAccount(username);
                 break;
             case 2:
                 //view account balance
@@ -213,9 +238,28 @@ public abstract class ValleyBikeController {
     }
 
     private static void editAccount(String username) throws IOException, ParseException {
-        System.out.println("\nDo you want to edit your username (y/n)?");
-        String edit = input.nextLine();
-        //TODO complete function
+        //TODO save edited fields
+        System.out.println("Press 1 to edit username.\nPress 2 to edit password." +
+                "\nPress 3 to edit email address. \nPress 4 to edit credit card number. \nPress 5 to edit membership.");
+        int edit = input.nextInt();
+        input.nextLine();
+        switch (edit){
+            case 1:
+                enterUsername();
+                break;
+            case 2:
+                enterPassword();
+                break;
+            case 3:
+                enterEmail();
+                break;
+            case 4:
+                enterCreditCard();
+                break;
+            case 5:
+                enterMembership();
+                break;
+        }
     }
 
     /**
@@ -223,8 +267,7 @@ public abstract class ValleyBikeController {
      * View the account balance associated with a user's account
      */
     private static void viewAccountBalance(String username) {
-        //TODO view user account balance
-        //when done, returns to userAccountMenu
+        ValleyBikeSim.viewAccountBalance(username);
     }
 
     /**
@@ -337,12 +380,12 @@ public abstract class ValleyBikeController {
      *
      */
     static void internalAccountHome() throws IOException, ParseException {
-        System.out.print("\n Choose from the following: \n"
-                + "1. View customer balances"
-                + "2. View customer activity"
-                + "3. Edit/Resolve maintenance requests"
-                + "4. Equalize stations"
-                + "5. Log out");
+        System.out.print("\nChoose from the following: \n"
+                + "1. View customer balances \n"
+                + "2. View customer activity \n"
+                + "3. Edit/Resolve maintenance requests \n"
+                + "4. Equalize stations \n"
+                + "5. Log out \n");
         System.out.println("Please enter your selection (1-5):");
 
         if (!input.hasNextInt()){

@@ -29,18 +29,8 @@ public abstract class Account {
         this.username = username;
     }
 
-    /**
-     * This is the setter method to update password.
-     * Password cannot be updated without entering the oldPassword correctly.
-     * @param newPassword is the new password the user wants to set.
-     * @param oldPassword is the old password entered by the user for verification.
-     */
-    public void setPassword(String newPassword, String oldPassword) {
-        if (password == oldPassword){
-            password = newPassword;
-        } else {
-            System.out.println("Incorrect password. Cannot change password.");
-        }
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     /**
@@ -55,5 +45,11 @@ public abstract class Account {
         return username;
     }
 
+    public String getPassword() {
+        return password;
+    }
 
+    public String getEmailAddress() {
+        return emailAddress;
+    }
 }
