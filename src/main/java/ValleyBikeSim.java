@@ -22,7 +22,7 @@ public class ValleyBikeSim {
 	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
 
 	// scanner object to take user's input
-	protected static Scanner input = new Scanner(System.in);
+//	protected static Scanner input = new Scanner(System.in);
 
 	/** data structure for keeping track of customer accounts */
 	protected static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
@@ -357,10 +357,10 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void resolveData() throws IOException, ParseException{
+	public static void resolveData(String dataFile) throws IOException, ParseException{
 		System.out.println("Enter the file name (including extension) of the file located"
 				+ "in data-files: ");
-		String dataFile = input.next();
+
 		FileReader fileReader = new FileReader("data-files/"+ dataFile);
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		String rideLine;
