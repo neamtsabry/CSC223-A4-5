@@ -212,7 +212,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view account balance
-                ValleyBikeSim.viewAccountBalance(username);
+                System.out.println("Your account balance is "+ ValleyBikeSim.viewAccountBalance(username));
                 break;
             case 3:
                 //view station list
@@ -264,14 +264,6 @@ public abstract class ValleyBikeController {
                 enterMembership();
                 break;
         }
-    }
-
-    /**
-     * @param: userID- the unique id associated with the user
-     * View the account balance associated with a user's account
-     */
-    private static void viewAccountBalance(String username) {
-        ValleyBikeSim.viewAccountBalance(username);
     }
 
     /**
