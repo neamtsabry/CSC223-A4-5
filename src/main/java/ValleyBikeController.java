@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 public abstract class ValleyBikeController {
 
+    // initiate input of type scanner
     private static Scanner input = new Scanner(System.in);
 
     /**
@@ -154,8 +155,7 @@ public abstract class ValleyBikeController {
                 "A-Z]{2,7}$";
 
         Pattern pat = Pattern.compile(emailRegex);
-        if (emailAddress == null)
-            return false;
+        if (emailAddress == null) return false;
         return pat.matcher(emailAddress).matches();
     }
 
@@ -419,13 +419,6 @@ public abstract class ValleyBikeController {
                 break;
         }
     }
-
-    /**
-     *
-     * @param: int userID- the unique id associated with the user
-     * @param: bikeID- unique ID associated with the bike that the user has checked out
-     *
-     */
 
 
     /**
@@ -721,6 +714,11 @@ public abstract class ValleyBikeController {
         }
         Integer value = input.nextInt();
         return value;
+    }
+
+    public void resolveData() throws IOException, ParseException {
+        String dataFile = input.next();
+        ValleyBikeSim.resolveData(dataFile);
     }
 }
 

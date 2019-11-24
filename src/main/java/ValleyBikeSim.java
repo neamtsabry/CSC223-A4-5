@@ -21,9 +21,6 @@ public class ValleyBikeSim {
 	/** list for storing bike ids of bikes that require maintenance */
 	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
 
-	/** scanner object to take user's input */
-	protected static Scanner input = new Scanner(System.in);
-
 	/** data structure for keeping track of customer accounts */
 	protected static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
 
@@ -332,109 +329,6 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * Prompts user for all station data and then creates a new station
-	 * object which is added to the stationMap
-	 * 
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public static void addStation() throws IOException, ParseException{
-		// use helper function to check input is valid and save it
-		//TODO this seems to have controller/view things in it
-		Integer id = ValleyBikeController.getResponse("Please enter the ID for this station:");
-		// handle if the station already exists
-		if(stationsMap.get(id) != null){
-			// let user know
-			System.out.println("Station with this ID already exists. \nWould you like to override "
-					+ stationsMap.get(id).name + " with new data? (y/n):");
-
-			// take their input
-			String response = input.next();
-
-			// if yes, then take user to the maintenance worker account
-			if(response.toLowerCase().equalsIgnoreCase("y")){
-				ValleyBikeController.internalAccountHome();
-			}
-		}
-
-		// prompt user for station name
-		System.out.println("Please enter station name: ");
-		input.nextLine();
-		String name = input.nextLine();
-
-		// prompt user for number of bikes
-		Integer bikes = ValleyBikeController.getResponse("How many bikes?");
-
-		// prompt for number of available docks at station
-		Integer availableDocks = ValleyBikeController.getResponse("How many available docks?");
-
-		// number of maintenance requests
-		Integer maintenanceRequest = ValleyBikeController.getResponse("How many maintenance requests?");
-
-		// prompt capacity for station
-		Integer capacity = ValleyBikeController.getResponse("What is the station's capacity?");
-
-		// number of kiosks
-		Integer kiosk = ValleyBikeController.getResponse("How many kiosks?");
-
-		// prompt for the station's address
-		System.out.print("Please enter station address: ");
-		input.nextLine();
-		String address = input.nextLine();
-
-		// create new station object with received data from user
-		Station stationOb = new Station(
-				name,
-				bikes,
-				availableDocks,
-				maintenanceRequest,
-				capacity,
-				kiosk,
-				address);
-
-		// add to the station tree
-		stationsMap.put(id, stationOb);
-	}
-
-	/**
-	 * This method enables maintenance workers to add new bikes
-	 *
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	public static void addBike() throws IOException, ParseException {
-		// get new bike's id
-		Integer id = ValleyBikeController.getResponse("Please enter the bike's ID");
-
-		// handle if the bike already exists
-		if (bikesMap.get(id) != null) {
-			System.out.println("Bike with this ID already exists. \nWould you like to override bike "
-					+ bikesMap.get(id) + " with new data? (y/n):");
-			String response = input.next();
-
-			// if yes, take user back to the internal account home
-			// so they edit bike instead
-			if (response.equalsIgnoreCase("Y")) {
-				ValleyBikeController.internalAccountHome();
-			}
-		}
-
-		// prompt for the station id bike will be located in
-		Integer stationId = ValleyBikeController.getResponse("Please enter the ID for the station the bike is located at:");
-
-		// get station object with that id
-		Station myStation = stationsMap.get(stationId);
-		;
-
-		// check if station doesn't exist
-		while (myStation == null) {
-			System.out.println("Station with this ID doesn't exist. \nWould you like to add  "
-					+ stationsMap.get(id) + " as a new station? (y/n):");
-			String response = input.next();
-		}
-	}
-
-	/**
 	 * Overwrites old station data in csv with updated data from stationMap
 	 * 
 	 * The choice to overwrite all data instead of simply adding new stations
@@ -512,10 +406,10 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void resolveData() throws IOException, ParseException{
+	public static void resolveData(String dataFile) throws IOException, ParseException{
 		System.out.println("Enter the file name (including extension) of the file located"
 				+ "in data-files: ");
-		String dataFile = input.next();
+
 		FileReader fileReader = new FileReader("data-files/"+ dataFile);
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		String rideLine;
