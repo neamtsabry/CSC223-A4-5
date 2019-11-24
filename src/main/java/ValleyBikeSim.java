@@ -12,17 +12,14 @@ import java.text.SimpleDateFormat;
  * pedelecs/electric bikes.
  */
 public class ValleyBikeSim {
-	// data structure for keeping track of stations
+	/** data structure for keeping track of stations */
 	protected static Map<Integer, Station> stationsMap = new TreeMap<>();
 
-	// data structure for keeping track of bikes
+	/** data structure for keeping track of bikes */
 	protected static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
-	// list for storing bike ids of bikes that require maintenance
+	/** list for storing bike ids of bikes that require maintenance */
 	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
-
-	// scanner object to take user's input
-//	protected static Scanner input = new Scanner(System.in);
 
 	/** data structure for keeping track of customer accounts */
 	protected static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
@@ -277,6 +274,58 @@ public class ValleyBikeSim {
 		} else {
     		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
+	}
+
+
+	public static void customerLogIn(String username, String password) throws IOException, ParseException{
+    	if (!customerAccountMap.containsKey(username)){
+    		System.out.println("This account does not exist.");
+    		ValleyBikeController.logIn();
+		}
+    	if (!password.equals(customerAccountMap.get(username).getPassword())){
+    		System.out.println("Incorrect password.");
+			ValleyBikeController.logIn();
+		}
+		ValleyBikeController.userAccountHome(username);
+	}
+
+	public static void internalLogIn(String username, String password) throws IOException, ParseException{
+		if (!internalAccountMap.containsKey(username)){
+			System.out.println("This account does not exist.");
+			ValleyBikeController.logIn();
+		}
+		if (!password.equals(internalAccountMap.get(username).getPassword())){
+			System.out.println("Incorrect password.");
+			ValleyBikeController.logIn();
+		}
+		ValleyBikeController.internalAccountHome();
+	}
+
+	/**
+	 * Overwrites old customer account data in csv with updated data from customerAccountMap
+	 *
+	 * @throws IOException
+	 * @throws ParseException
+	 */
+	public static void saveCustomerAccountList() throws IOException, ParseException{
+		// initiate fileWriter and iterator
+		FileWriter customerAccountsWriter = new FileWriter("data-files/customer-account-data.csv");
+		Iterator<String> keyIterator = customerAccountMap.keySet().iterator();
+
+		// write the labels at the beginning of the file
+		customerAccountsWriter.write("Username,Password,Email Address,Credit Card,Membership,Balance");
+
+		// loop through customer accounts and transform customer account object
+		while(keyIterator.hasNext()){
+			String key = keyIterator.next();
+			CustomerAccount customerAccount = customerAccountMap.get(key);
+			customerAccountsWriter.write("\n");
+			customerAccountsWriter.write(customerAccount.getCustomerAccountString());
+		}
+
+		// then end the fileWriter
+		customerAccountsWriter.flush();
+		customerAccountsWriter.close();
 	}
 
 	/**

@@ -63,4 +63,14 @@ public class CustomerAccount extends Account{
     public int getBalance() {
         return balance;
     }
+
+    public String getCreditCard() {
+        return creditCard;
+    }
+
+    public String getCustomerAccountString(){
+        return this.getUsername() + "," + this.getPassword() + "," +
+                 this.getEmailAddress() + "," + this.getCreditCard() + ","
+                + this.getMembership() + "," + this.getBalance();
+    }
 }
