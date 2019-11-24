@@ -30,7 +30,7 @@ public abstract class ValleyBikeController {
             initialMenu();
         }
 
-        Integer num = input.nextInt();
+        int num = input.nextInt();
         input.nextLine();
         switch(num) {
             case 1:
@@ -55,7 +55,7 @@ public abstract class ValleyBikeController {
     /**
      * Method for a customer to create an account
      */
-    public static void createAccount() throws IOException, ParseException {
+    static void createAccount() throws IOException, ParseException {
         //TODO membership types
         //TODO talk to Annika about the flow from model to controller
         String username = enterUsername();
@@ -123,24 +123,15 @@ public abstract class ValleyBikeController {
     }
 
     private static boolean isValidUsername(String username){
-        if (username.length() >= 6 && username.length() <= 14){
-            return true;
-        }
-        return false;
+        return username.length() >= 6 && username.length() <= 14;
     }
 
     private static boolean isValidPassword(String password){
-        if (password.length() >= 6 && password.length() <= 14){
-            return true;
-        }
-        return false;
+        return password.length() >= 6 && password.length() <= 14;
     }
 
     private static boolean isValidCreditCard(String creditCard){
-        if(Math.random() <= 0.95) {
-            return true;
-        }
-        return false;
+        return Math.random() <= 0.95;
     }
 
     /**
@@ -160,7 +151,7 @@ public abstract class ValleyBikeController {
     }
 
 
-    public static void logIn() throws IOException, ParseException {
+    static void logIn() throws IOException, ParseException {
         System.out.println("Press 1 to log in to customer account. \nPress 2 to log in to internal account.");
         int logIn = input.nextInt();
         input.nextLine();
@@ -186,7 +177,7 @@ public abstract class ValleyBikeController {
      * Standard menu page for a user after logging in
      * @param username: integer representing unique userID of account
      */
-    public static void userAccountHome(String username) throws IOException, ParseException {
+    static void userAccountHome(String username) throws IOException, ParseException {
         System.out.println("Please choose from one of the following menu options: \n"
                 + "1. Edit account info\n"
                 + "2. View account balance\n"
@@ -204,7 +195,7 @@ public abstract class ValleyBikeController {
             System.out.println("Not a valid input");
             userAccountHome(username);
         }
-        Integer num = input.nextInt();
+        int num = input.nextInt();
         switch(num) {
             case 1:
                 //edit account info- return to create account or have separate method?
@@ -266,6 +257,7 @@ public abstract class ValleyBikeController {
         }
     }
 
+    //TODO equalize stations if returning bike makes station full
     /**
      * Can be used for both renting and returning bike
      * Prompts the user for info as to achieve those tasks
@@ -276,13 +268,13 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public static void recordRide(String dest, String action, Boolean isReturned, String username) throws IOException, ParseException{
+    private static void recordRide(String dest, String action, Boolean isReturned, String username) throws IOException, ParseException{
         // View stations
         System.out.println("Here's a list of station IDs and their names");
         System.out.format("%-10s%-10s\n", "ID", "Name");
 
         // initiate iterator
-        Iterator<Integer> keyIterator = ValleyBikeSim.createIterator(false);
+        Iterator keyIterator = ValleyBikeSim.createIterator(false);
 
         // while it has a next value
         while(keyIterator.hasNext()){
@@ -323,7 +315,7 @@ public abstract class ValleyBikeController {
         System.out.println("Here's a list of bike IDs at this station");
         System.out.format("%-10s%-10s\n", "Station", "Bike ID");
 
-        Iterator<Integer> keyIterator2 = ValleyBikeSim.createIterator(true);;
+        Iterator keyIterator2 = ValleyBikeSim.createIterator(true);;
 
         while(keyIterator2.hasNext()){
             Integer key = (Integer) keyIterator2.next();
@@ -402,7 +394,7 @@ public abstract class ValleyBikeController {
             bikeRented(username, bikeID);
         }
 
-        Integer num = input.nextInt();
+        int num = input.nextInt();
         switch(num) {
             case 1:
                 //return bike
@@ -420,9 +412,11 @@ public abstract class ValleyBikeController {
         }
     }
 
-
+    //TODO wrapper function that asks for station id and bike id if bike not checked out
+    // if bike is already checked out, pass in bikeid from bikeRented and then
+    // when they return the bike the request would update with stationID
+    // or make them return bike before completing maintReq
     /**
-     *
      * @param username for user
      * user reports a problem with the bike they checked out
      */
@@ -441,7 +435,7 @@ public abstract class ValleyBikeController {
         // get bike id from user
         Integer bikeId = getResponse("Please input the bike's ID:");
 
-        // check station actually exists
+        // check bike actually exists
         if(ValleyBikeSim.bikesMap.get(bikeId) == null){
             System.out.println("Bike with this ID doesn't exist. Please reenter ID.\n");
             String response = input.next();
@@ -465,16 +459,14 @@ public abstract class ValleyBikeController {
         // add to list of bikes that require maintenance
         ValleyBikeSim.mntReqs.add(bikeId);
 
-        System.out.println("Maintenance report has been successfully!");
+        System.out.println("Maintenance report has been successfully filed!");
         System.out.println("Now let's help you return your bike!");
 
         recordRide("to", "return", true, username);
     }
 
-    //should there be option to add bike/station
-    /*
-     * Homescreen for internal company employees
-     *
+    /**
+     * Home screen for internal company employees
      */
     static void internalAccountHome() throws IOException, ParseException {
         System.out.print("\n Choose from the following: \n"
@@ -492,7 +484,7 @@ public abstract class ValleyBikeController {
             System.out.println("Not a valid input \n");
             internalAccountHome();
         }
-        Integer num = input.nextInt();
+        int num = input.nextInt();
         switch(num) {
             case 1:
                 //TODO view customer balances
@@ -508,7 +500,6 @@ public abstract class ValleyBikeController {
                 break;
             case 5:
                 ValleyBikeSim.resolveMntReqs();
-
                 break;
             case 6:
                 //equalize stations
@@ -531,9 +522,9 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public static void addStation() throws IOException, ParseException{
+    private static void addStation() throws IOException, ParseException{
         // use helper function to check input is valid and save it
-        Integer id = getResponse("Please enter the ID for this station:");
+        int id = getResponse("Please enter the ID for this station:");
 
         Station station = ValleyBikeSim.getStationObj(id);
 
@@ -601,9 +592,9 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public static void addBike() throws IOException, ParseException{
+    private static void addBike() throws IOException, ParseException{
         // get new bike's id
-        Integer id = getResponse("Please enter the bike's ID");
+        int id = getResponse("Please enter the bike's ID");
 
         // get bike associated with id if possible
         Bike bike = ValleyBikeSim.getBikeObj(id);
@@ -622,14 +613,14 @@ public abstract class ValleyBikeController {
         }
 
         // prompt for the station id bike will be located in
-        Integer stationId = getResponse("Please enter the ID for the station the bike is located at:");
+        int stationId = getResponse("Please enter the ID for the station the bike is located at:");
 
         Station station = ValleyBikeSim.getStationObj(stationId);
 
         // check if station doesn't exist
         while(station == null){
             System.out.println("Station with this ID doesn't exist. \nWould you like to add  "
-                    + station.name + " as a new station? (y/n):");
+                    + stationId + " as a new station? (y/n):");
 
             // get yes/no response
             String response = input.next();
@@ -671,7 +662,7 @@ public abstract class ValleyBikeController {
                 "2: Docked/out of commission\n");
 
         // prompt user to select an option
-        Integer bikeLocation = getResponse("Please enter one of the above options:");
+        int bikeLocation = getResponse("Please enter one of the above options:");
 
         // while the answer is not between the options, keep prompting user
         while(!(bikeLocation == 0 | bikeLocation == 1 || bikeLocation ==2)){
@@ -705,7 +696,7 @@ public abstract class ValleyBikeController {
      * @param request - the input being requested
      * @return the validated integer inputed by user
      */
-    public static Integer getResponse(String request){
+    private static Integer getResponse(String request){
         System.out.println(request);
         while (!input.hasNextInt()){
             System.out.println("That is not a valid number");
