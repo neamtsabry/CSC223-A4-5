@@ -18,6 +18,7 @@ public class CustomerAccount extends Account{
      * @param membership is the membership type that the customer is paying for
      */
     public CustomerAccount(String username, String password, String emailAddress, String creditCard, String membership) {
+        //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
         this.membership = membership;
@@ -34,6 +35,7 @@ public class CustomerAccount extends Account{
      * @param balance is the money that the customer has available in their account
      */
     public CustomerAccount(String username, String password, String emailAddress, String creditCard, String membership, int balance) {
+        //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
         this.membership = membership;
@@ -41,33 +43,59 @@ public class CustomerAccount extends Account{
     }
 
     /**
-     * This is the setter method to update credit card numner.
-     * @param creditCard is the new credit card number entered by the user.
+     * This is the setter method to update credit card number
+     * @param creditCard is the new credit card number entered by the user
      */
     public void setCreditCard(String creditCard) {
         this.creditCard = creditCard;
     }
 
+    /**
+     * This is the setter method to update membership
+     * @param membership is the new membership type entered by the user
+     */
     public void setMembership(String membership) {
+        //TODO currently the membership is just a string but it will be a class in A5
         this.membership = membership;
     }
 
+    /**
+     * This is the setter method to update balance
+     * @param balance is the new balance of the user
+     */
     public void setBalance(int balance) {
         this.balance = balance;
     }
 
+    /**
+     * This is the getter method to access membership type associated with the customer account
+     * @return the membership type associated with the customer account
+     */
     public String getMembership() {
         return membership;
     }
 
+    /**
+     * This is the getter method to access the balance associated with the customer account
+     * @return the balance associated with the customer account
+     */
     public int getBalance() {
         return balance;
     }
 
+    /**
+     * This is the getter method to access the credit card number associated with the customer account
+     * @return the credit card number associated with the customer account
+     */
     public String getCreditCard() {
         return creditCard;
     }
 
+    /**
+     * This method returns a string with all the fields associated with the customer account
+     * Each field is separated by a comma, in csv format
+     * @return the csv format string with all the fields associated with the customer account
+     */
     public String getCustomerAccountString(){
         return this.getUsername() + "," + this.getPassword() + "," +
                  this.getEmailAddress() + "," + this.getCreditCard() + ","
