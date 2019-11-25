@@ -40,8 +40,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-//                createAccount();
-                rentBike("heyyo");
+                createAccount();
                 break;
             case 2:
                 //log in to existing customer or internal account
