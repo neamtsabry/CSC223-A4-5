@@ -626,7 +626,7 @@ public abstract class ValleyBikeController {
         System.out.println("Now let's help you return your bike!");
 
         // now return bike
-        returnBike(username);
+        returnBike(username, bikeId);
     }
 
     /**
