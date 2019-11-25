@@ -13,19 +13,19 @@ import java.text.SimpleDateFormat;
  */
 public class ValleyBikeSim {
 	/** data structure for keeping track of stations */
-	protected static Map<Integer, Station> stationsMap = new TreeMap<>();
+	static Map<Integer, Station> stationsMap = new TreeMap<>();
 
 	/** data structure for keeping track of bikes */
-	protected static Map<Integer, Bike> bikesMap = new TreeMap<>();
+	static Map<Integer, Bike> bikesMap = new TreeMap<>();
 
 	/** list for storing bike ids of bikes that require maintenance */
-	protected static ArrayList<Integer> mntReqs = new ArrayList<>();
+	static ArrayList<Integer> mntReqs = new ArrayList<>();
 
 	/** data structure for keeping track of customer accounts */
-	protected static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
+	private static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
 
 	/** data structure for keeping track of internal accounts */
-	protected static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
+	private static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
 
 	/** 
 	 * Reads in the stations csv file data and parses it into station objects
@@ -48,7 +48,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void readCustomerAccountData() throws IOException {
+	private static void readCustomerAccountData() throws IOException {
 		// start reading our designated file
 		FileReader fileReader = new FileReader("data-files/customer-account-data.csv");
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -85,7 +85,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void readInternalAccountData() throws IOException {
+	private static void readInternalAccountData() throws IOException {
 		// start reading our designated file
 		FileReader fileReader = new FileReader("data-files/internal-account-data.csv");
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -117,7 +117,7 @@ public class ValleyBikeSim {
 	 * @param: userID- the unique id associated with the user
 	 * View the account balance associated with a user's account
 	 */
-	public static int viewAccountBalance(String username) {
+	static int viewAccountBalance(String username) {
 		return customerAccountMap.get(username).getBalance();
 	}
 
@@ -127,7 +127,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void readStationData() throws IOException {
+	private static void readStationData() throws IOException {
         // start reading our designated file
         FileReader fileReader = new FileReader("data-files/station-data.csv");
         BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -164,7 +164,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void readBikeData() throws IOException {
+	private static void readBikeData() throws IOException {
 		// start reading our designated file
         FileReader fileReader = new FileReader("data-files/bikeData.csv");
         BufferedReader bufferedReader = new BufferedReader(fileReader);
@@ -201,20 +201,19 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void viewBikeList() throws IOException, ParseException{
+	static void viewBikeList() throws IOException, ParseException{
 		// format table view
 		System.out.format("%-15s%-15s%-15s%-15s%-15s\n", "ID", "Location", "Station ID",
 				"Main. Req", "Main. Report");
 
 		// initiate iterator
-		Iterator<Integer> keyIterator1 = bikesMap.keySet().iterator();
+        Iterator<Integer> keyIterator1 = bikesMap.keySet().iterator();
 
 		// while the iterator has a next value
 		while(keyIterator1.hasNext()){
 			// initiate key for iterator
-			Integer key = (Integer) keyIterator1.next();
-
-			// use that key to find bike object in bike tree
+            Integer key = (Integer) keyIterator1.next();
+            // use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
 
 			// format the view of the bike object values
@@ -236,19 +235,18 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-    public static void viewStationList() throws IOException, ParseException{
+    static void viewStationList() throws IOException, ParseException{
 		// format table view
     	System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes",
                 "AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
 
 		// initiate iterator
-		Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
+        Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
 
 		// while the iterator has a next value
 		while(keyIterator2.hasNext()) {
 			// initiate key for iterator
-			Integer key = (Integer) keyIterator2.next();
-
+            Integer key = (Integer) keyIterator2.next();
 			// use that key to find station object in station tree
 			Station station = stationsMap.get(key);
 
@@ -265,11 +263,11 @@ public class ValleyBikeSim {
 
 	/**
 	 *
-	 * @param customerAccount
+	 * @param customerAccount customer account object to be added to map
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException{
+    static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException{
     	if (customerAccountMap.get(customerAccount.getUsername()) != null){
 			System.out.println("Customer account with this username already exists. \nPlease try again with another username or log in.");
 
@@ -280,7 +278,7 @@ public class ValleyBikeSim {
 	}
 
 
-	public static void customerLogIn(String username, String password) throws IOException, ParseException{
+	static void customerLogIn(String username, String password) throws IOException, ParseException{
     	if (!customerAccountMap.containsKey(username)){
     		System.out.println("This account does not exist.");
     		ValleyBikeController.logIn();
@@ -292,7 +290,7 @@ public class ValleyBikeSim {
 		ValleyBikeController.userAccountHome(username);
 	}
 
-	public static void internalLogIn(String username, String password) throws IOException, ParseException{
+	static void internalLogIn(String username, String password) throws IOException, ParseException {
 		if (!internalAccountMap.containsKey(username)){
 			System.out.println("This account does not exist.");
 			ValleyBikeController.logIn();
@@ -308,9 +306,8 @@ public class ValleyBikeSim {
 	 * Overwrites old customer account data in csv with updated data from customerAccountMap
 	 *
 	 * @throws IOException
-	 * @throws ParseException
 	 */
-	public static void saveCustomerAccountList() throws IOException, ParseException{
+	public static void saveCustomerAccountList() throws IOException {
 		// initiate fileWriter and iterator
 		FileWriter customerAccountsWriter = new FileWriter("data-files/customer-account-data.csv");
 		Iterator<String> keyIterator = customerAccountMap.keySet().iterator();
@@ -340,9 +337,8 @@ public class ValleyBikeSim {
 	 * were reflected in the new saved list as well
 	 * 
 	 * @throws IOException
-	 * @throws ParseException
 	 */
-	public static void saveStationList() throws IOException, ParseException{
+	static void saveStationList() throws IOException {
 		// initiate fileWriter and iterator
 		FileWriter stationsWriter = new FileWriter("data-files/station-data.csv");
 		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
@@ -377,7 +373,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void saveBikeList() throws IOException, ParseException{
+	static void saveBikeList() throws IOException, ParseException{
 		// initiate fileWriter and iterator
 		FileWriter bikesWriter = new FileWriter("data-files/bikeData.csv");
 		Iterator<Integer> keyIterator = bikesMap.keySet().iterator();
@@ -409,7 +405,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void resolveData(String dataFile) throws IOException, ParseException{
+	static void resolveData(String dataFile) throws IOException, ParseException{
 		System.out.println("Enter the file name (including extension) of the file located"
 				+ "in data-files: ");
 
@@ -487,11 +483,10 @@ public class ValleyBikeSim {
 		int totalVehicles = 0;
 		int totalCapacity = 0;
 
-		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
+        Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
 
-		while(keyIterator.hasNext()){
-			Integer key = (Integer) keyIterator.next();
-
+        while(keyIterator.hasNext()){
+            Integer key = (Integer) keyIterator.next();
 			Station station = stationsMap.get(key);
 
 			int percentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
@@ -521,22 +516,23 @@ public class ValleyBikeSim {
 			Integer key = (Integer) capacityIterator.next();
 			int percentage = (Integer) stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
-				if((percentage - idealPercentage) > 0){
-					int newPercentage = percentage;
-					//continues to remove vehicles as long as removing a vehicle
-					//moves the percentage closer to ideal percentage
-					while(Math.abs(newPercentage - idealPercentage) > 
-					Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
-							- idealPercentage)){
-						if(station.getBikes() > 0){
-							station.setBikes(station.getBikes() - 1);
-							extras.set(0, extras.get(0)+1);
-						} else {
-							extras.set(1, extras.get(1)+1);
-						}
-						newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
-					}
+
+			if((percentage - idealPercentage) > 0){
+                int newPercentage = percentage;
+                //continues to remove vehicles as long as removing a vehicle
+                //moves the percentage closer to ideal percentage
+                while(Math.abs(newPercentage - idealPercentage) >
+                Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
+                        - idealPercentage)){
+                    if(station.getBikes() > 0){
+                        station.setBikes(station.getBikes() - 1);
+                        extras.set(0, extras.get(0)+1);
+                    } else {
+                        extras.set(1, extras.get(1)+1);
+                    }
+                    newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 				}
+			}
 		}
 	}
 	
@@ -551,7 +547,6 @@ public class ValleyBikeSim {
 	 */
 	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity,
 			int idealPercentage, ArrayList<Integer> extras){
-
 		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
 		while (capacityIterator.hasNext()){
 			Integer key = (Integer) capacityIterator.next();
@@ -562,6 +557,7 @@ public class ValleyBikeSim {
 			// continues to add vehicles as long as adding a vehicle
 			// moves the percentage closer to ideal percentage
 			// and there are still extra vehicles to add
+
 			while((Math.abs(newPercentage - idealPercentage) >
 					Math.abs((int) (((float) (station.getBikes() + 1) /
 							station.getCapacity()) * 100)) - idealPercentage)
@@ -584,7 +580,7 @@ public class ValleyBikeSim {
 	 * in need of maintenance then setting them to not require
 	 * maintenance anymore
 	 */
-	public static void resolveMntReqs(){
+	static void resolveMntReqs(){
 		// if there are maintenance requests
 		if(mntReqs != null) {
 			System.out.println("Here's a list of bike iDs in need of maintenance");
@@ -604,13 +600,13 @@ public class ValleyBikeSim {
 				bike.setBikeLocation(0);
 
                 // get station object as well
-                Station station = stationsMap.get(bike.getStation());
+                Station stat = stationsMap.get(bike.getStation());
 
                 // get how many maintenance requests the station already had
-                int originalMntRqs = station.getMaintenanceRequest();
+                int originalMntRqs = stat.getMaintenanceRequest();
 
                 // decrease it by one
-                station.setMaintenanceRequest(originalMntRqs -1 );
+                stat.setMaintenanceRequest(originalMntRqs -1 );
 			}
 
 			// done resolving, so clear the list
@@ -630,7 +626,7 @@ public class ValleyBikeSim {
 	 * @param key station id
 	 * @return station object
 	 */
-	public static Station getStationObj(int key){
+	static Station getStationObj(int key){
 		return stationsMap.get(key);
 	}
 
@@ -641,43 +637,39 @@ public class ValleyBikeSim {
 	 * @param id station id
 	 * @param stationOb station object
 	 */
-	public static void addNewStation(int id, Station stationOb){
+	static void addNewStation(int id, Station stationOb){
 		stationsMap.put(id, stationOb);
 	}
     /**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
-	 *
 	 * @param key station id
 	 * @return station object
 	 */
-	public static Bike getBikeObj(int key){
+	static Bike getBikeObj(int key){
 		return bikesMap.get(key);
 	}
 
 	/**
 	 * Helper method for controller class to add new bike object
 	 * to bikes tree data structure
-	 *
 	 * @param id station id
 	 * @param bikeObj bike object
 	 */
-	public static void addNewBike(int id, Bike bikeObj){
+	static void addNewBike(int id, Bike bikeObj){
 		bikesMap.put(id, bikeObj);
 	}
 
 	/**
 	 * Helper method for controller class to return a key set
 	 * iterator
-	 *
 	 * @param isBike If true, we're working with a bike object.
 	 *               If not, we're working with a station object.
-	 *
 	 * @return if isBike is true, we're returning a bikesMap iterator.
 	 *         if not, we're returning a stationsMap iterator.
 	 *
 	 */
-	public static Iterator createIterator(Boolean isBike){
+	static Iterator createIterator(Boolean isBike){
 		if(isBike){
 			return bikesMap.keySet().iterator();
 		} else{
@@ -691,7 +683,5 @@ public class ValleyBikeSim {
 	 *
 	 * @param bikeID integer UD of bike
 	 */
-	public static void addToMntRqs(int bikeID){
-		mntReqs.add(bikeID);
-	}
+	static void addToMntRqs(int bikeID){ mntReqs.add(bikeID); }
 }
