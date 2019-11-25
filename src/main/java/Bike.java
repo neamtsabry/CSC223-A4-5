@@ -69,7 +69,7 @@ public class Bike {
         this.station = newStationValue;
     }
 
-    public int getBikeLocatoin(){
+    public int getBikeLocation(){
         return this.location;
     }
 

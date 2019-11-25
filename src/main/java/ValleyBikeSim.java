@@ -45,8 +45,9 @@ public class ValleyBikeSim {
 	}
 
 	/**
+	 * Reads external csv file with customer account data
 	 *
-	 * @throws IOException
+	 * @throws IOException readLine throws IOException
 	 */
 	private static void readCustomerAccountData() throws IOException {
 		// start reading our designated file
@@ -54,7 +55,7 @@ public class ValleyBikeSim {
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		bufferedReader.readLine();
 
-		// initialize string for station data
+		// initialize string for customer account data
 		String line;
 
 		// while there's more lines to read in the file
@@ -73,7 +74,7 @@ public class ValleyBikeSim {
 					Integer.parseInt(values[5]));
 
 
-			// add to the station tree
+			// add to the customer account map
 			customerAccountMap.put(values[0],accountObj);
 		}
 
@@ -82,8 +83,9 @@ public class ValleyBikeSim {
 	}
 
 	/**
+	 * Reads external csv file with internal account data
 	 *
-	 * @throws IOException
+	 * @throws IOException readLine throws IOException
 	 */
 	private static void readInternalAccountData() throws IOException {
 		// start reading our designated file
@@ -91,7 +93,7 @@ public class ValleyBikeSim {
 		BufferedReader bufferedReader = new BufferedReader(fileReader);
 		bufferedReader.readLine();
 
-		// initialize string for station data
+		// initialize string for internal account data
 		String line;
 
 		// while there's more lines to read in the file
@@ -99,13 +101,13 @@ public class ValleyBikeSim {
 			// store comma separated values in string array
 			String[] values = line.split(",");
 
-			// start a new customer account with all the individual values we got
+			// start a new internal account with all the individual values we got
 			InternalAccount accountObj = new InternalAccount(
 					values[0],
 					values[1],
 					values[2]);
 
-			// add to the station tree
+			// add to the internal account map
 			internalAccountMap.put(values[0],accountObj);
 		}
 
@@ -113,9 +115,13 @@ public class ValleyBikeSim {
 		bufferedReader.close();
 	}
 
+
 	/**
-	 * @param: userID- the unique id associated with the user
 	 * View the account balance associated with a user's account
+	 *
+	 * @param username the unique username associated with the customer account
+	 *
+	 * @return the balance associate with the account accessed through the username
 	 */
 	static int viewAccountBalance(String username) {
 		return customerAccountMap.get(username).getBalance();
@@ -125,7 +131,7 @@ public class ValleyBikeSim {
 	 * Reads external csv file with station data and adds it to the
      * tree data structure
 	 *
-	 * @throws IOException
+	 * @throws IOException readLine throws IOException
 	 */
 	private static void readStationData() throws IOException {
         // start reading our designated file
@@ -162,7 +168,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads external csv file with bike data
 	 *
-	 * @throws IOException
+	 * @throws IOException readLine throws IOException
 	 */
 	private static void readBikeData() throws IOException {
 		// start reading our designated file
@@ -178,7 +184,7 @@ public class ValleyBikeSim {
             // store comma separated values in string array
             String[] values = line.split(",");
 
-            // start a new station with all the individual values we got
+            // start a new bike with all the individual values we got
             Bike bikeOb = new Bike(
                     Integer.parseInt(values[0]),
                     Integer.parseInt(values[1]),
@@ -219,7 +225,7 @@ public class ValleyBikeSim {
 			// format the view of the bike object values
 			System.out.format("%-15d%-15d%-15d%-15s%-15s\n",
 					key,
-					bike.getBikeLocatoin(),
+					bike.getBikeLocation(),
 					bike.getStation(),
 					bike.getMnt(),
 					bike.getMntReport()
@@ -262,43 +268,80 @@ public class ValleyBikeSim {
     }
 
 	/**
+	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
 	 *
-	 * @param customerAccount customer account object to be added to map
-	 * @throws IOException
-	 * @throws ParseException
+	 * @param customerAccount this is the new customer account object to be added to the map
+	 *
+	 * @throws IOException the initial menu in the controller throws IOException
+	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-    static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException{
+    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException{
+    	//if the username for the new customer account is already in the customer account map
     	if (customerAccountMap.get(customerAccount.getUsername()) != null){
+    		//print that the username already exists
 			System.out.println("Customer account with this username already exists. \nPlease try again with another username or log in.");
-
-			ValleyBikeController.createAccount();
+			//prompt the user to input new account information again or log in
+			ValleyBikeController.initialMenu();
 		} else {
+    		//if the username does not already exist
+			//add the new customer account object to customer account map
     		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
 
-
-	static void customerLogIn(String username, String password) throws IOException, ParseException{
+	/**
+	 * Verify username and password when a customer logs in to their account
+	 *
+	 * @param username is the username input by the user to log in
+	 * @param password is the password input by the user to log in
+	 *
+	 * @throws IOException the initial menu and user account home method in the controller throw IOException
+	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
+	 */
+	public static void customerLogIn(String username, String password) throws IOException, ParseException{
+		//if the username entered by the user does not exist in the customer account map
     	if (!customerAccountMap.containsKey(username)){
+    		//print that the account does not exist
     		System.out.println("This account does not exist.");
-    		ValleyBikeController.logIn();
+    		//prompt the user to input new account information again or log in
+    		ValleyBikeController.initialMenu();
 		}
+    	//if the username exists but the password entered by the user does not match the password associated with that username
     	if (!password.equals(customerAccountMap.get(username).getPassword())){
+    		//print incorrect password
     		System.out.println("Incorrect password.");
-			ValleyBikeController.logIn();
+			//prompt the user to input new account information again or log in
+			ValleyBikeController.initialMenu();
 		}
-		ValleyBikeController.userAccountHome(username);
+    	//if the username and password both match with associated customer account object, lead the user to user account home
+		ValleyBikeController.customerAccountHome(username);
 	}
 
-	static void internalLogIn(String username, String password) throws IOException, ParseException {
+	/**
+	 * Verify username and password when an internal staff logs in to their account
+	 *
+	 * @param username is the username input by the user to log in
+	 * @param password is the password input by the user to log in
+	 *
+	 * @throws IOException the initial menu and user account home method in the controller throw IOException
+	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
+	 */
+	public static void internalLogIn(String username, String password) throws IOException, ParseException{
+		//if the username entered by the user does not exist in the internal account map
 		if (!internalAccountMap.containsKey(username)){
+			//print that the account does not exist
 			System.out.println("This account does not exist.");
-			ValleyBikeController.logIn();
+			//take the user back to the initial menu
+			ValleyBikeController.initialMenu();
 		}
+		//if the username exists but the password entered by the user does not match the password associated with that username
 		if (!password.equals(internalAccountMap.get(username).getPassword())){
+			//print incorrect password
 			System.out.println("Incorrect password.");
-			ValleyBikeController.logIn();
+			//take the user back to the initial menu
+			ValleyBikeController.initialMenu();
 		}
+		//if the username and password both match with associated customer account object, lead the user to internal account home
 		ValleyBikeController.internalAccountHome();
 	}
 

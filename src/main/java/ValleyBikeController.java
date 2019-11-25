@@ -8,17 +8,21 @@ import java.util.regex.Pattern;
 
 public abstract class ValleyBikeController {
 
-    // initiate input of type scanner
+    /** initialize input of type scanner */
     private static Scanner input = new Scanner(System.in);
 
     /**
      * Basic option menu that shows at start of program and when no one is logged in
+     * Allows user to create a new account or log in or exit
+     *
+     * @throws IOException create account, log in, save bike list and save station list methods throw IOException
+     * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
     static void initialMenu() throws IOException, ParseException {
         //TODO back menu on all menus
         //TODO exit option on all menus
         System.out.print("\n Welcome to ValleyBike Share! \n"
-                + "1. Create User Account\n"
+                + "1. Create Customer Account\n"
                 + "2. Log In\n"
                 + "0. Exit program\n");
         System.out.println("Please enter your selection (0-2):");
@@ -35,14 +39,18 @@ public abstract class ValleyBikeController {
 
         switch(num) {
             case 1:
-                rentBike("hashbsac");
-                //createAccount();
+                //create a new customer account
+                createAccount();
                 break;
             case 2:
+                //log in to existing customer or internal account
                 logIn();
                 break;
             case 0:
+                //exit program
                 input.close();
+
+                //TODO save customer account list and internal account list
 
                 // save bike and station data
                 ValleyBikeSim.saveBikeList();
@@ -53,122 +61,246 @@ public abstract class ValleyBikeController {
         }
     }
 
-    //Do we want a separate method for creating user vs internal accounts? This one is User
     /**
-     * Method for a customer to create an account
+     * Gets all the required field information from the user to create a new customer account object
+     * Calls method to add the new customer account to customer account map
+     * Leads to customer account home after successful log in
+     *
+     * @throws IOException add customer account and user account home methods throw IOException
+     * @throws ParseException add customer account and user account home methods throw ParseException
      */
     static void createAccount() throws IOException, ParseException {
+        //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
+        //i.e. only internal staff can create new internal accounts
+
+        //TODO separate create customer account and create internal account method and implement them in the correct places
         //TODO membership types
-        //TODO talk to Annika about the flow from model to controller
+
+        //each field has its own method which calls itself until a valid input is entered
         String username = enterUsername();
         String password = enterPassword();
         String emailAddress = enterEmail();
         String creditCard = enterCreditCard();
         String membership = enterMembership();
 
-        //create new customer account
+        //once all the required fields have been input by the user, create new customer account
+        //Assumption: initially the balance in customer account is always 0
         CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership);
+
         //add customer account to customer account map
         ValleyBikeSim.addCustomerAccount(customerAccount);
 
+        //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
+
         //go to account menu
         String user = customerAccount.getUsername();
-        userAccountHome(user);
+        customerAccountHome(user);
     }
 
+    /**
+     * Prompts user to input username
+     * Validates if username is between 6-14 characters
+     * Recursively calls itself until valid username input by user
+     *
+     * @return valid username input by user
+     */
     private static String enterUsername(){
+        //prompts user to input username
         System.out.println("Enter username (must be between 6-14 characters):");
         String username = input.nextLine();
+
+        //validates if username is between 6-24 characters
         if (!isValidUsername(username)){
+
+            //recursively calls itself until valid username input by user
             System.out.println("Username is not valid.");
             enterUsername();
         }
+
+        //return valid username input by user
         return username;
     }
 
+    /**
+     * Prompts user to input password
+     * Validates if password is between 6-14 characters
+     * Recursively calls itself until valid password input by user
+     *
+     * @return valid password input by user
+     */
     private static String enterPassword(){
+        //prompts user to input password
         System.out.println("Enter password (must be between 6-14 characters):");
         String password = input.nextLine();
+
+        //validates if password is between 6-24 characters
         if (!isValidPassword(password)){
+
+            //recursively calls itself until valid password input by user
             System.out.println("Password is not valid.");
             enterPassword();
         }
+
+        //return valid password input by user
         return password;
     }
 
+    /**
+     * Prompts user to input email address
+     * Validates if email address is in correct format
+     * Recursively calls itself until valid email address input by user
+     *
+     * @return valid email address input by user
+     */
     private static String enterEmail(){
         // TODO let user know how to make valid email address
+        //prompts user to input email address
         System.out.println("Enter email address:");
         String emailAddress = input.nextLine();
+
+        //validates if email address is in correct format
         if (!isValidEmail(emailAddress)){
+
+            //recursively calls itself until valid email address input by user
             System.out.println("Email address is not valid.");
             enterEmail();
         }
+
+        //return valid email address input by user
         return emailAddress;
     }
 
+    /**
+     * Prompts user to input credit card
+     * Validates if credit card is correct
+     * Recursively calls itself until valid email address input by user
+     *
+     * @return valid credit card input by user
+     */
     private static String enterCreditCard(){
+        //prompts user to input email address
         System.out.println("Enter credit card number:");
         String creditCard = input.nextLine();
+
+        //validates if credit card is correct
         if (!isValidCreditCard(creditCard)){
+
+            //recursively calls itself until valid credit card input by user
             System.out.println("Credit card is not valid.");
             enterCreditCard();
         }
+
+        //return valid credit card input by user
         return creditCard;
     }
 
+    /**
+     * Prompts user to input membership
+     *
+     * @return membership string input by user
+     */
     private static String enterMembership(){
+        //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
         System.out.println("Enter membership type:");
         String membership = input.nextLine();
         return membership;
     }
 
+    /**
+     * Validates if username is between 6 and 14 characters
+     *
+     * @param username is the username input by the user
+     *
+     * @return true if username is valid and false otherwise
+     */
     private static boolean isValidUsername(String username){
         return username.length() >= 6 && username.length() <= 14;
     }
 
+    /**
+     * Validates if password is between 6 and 14 characters
+     *
+     * @param password is the password input by the user
+     *
+     * @return true if password is valid and false otherwise
+     */
     private static boolean isValidPassword(String password){
         return password.length() >= 6 && password.length() <= 14;
     }
 
+    /**
+     * Validates credit card number input by user
+     *
+     * @param creditCard is the credit card number input by user
+     *
+     * @return true if credit card is valid and false otherwise
+     */
     private static boolean isValidCreditCard(String creditCard){
+        //TODO check credit card validity for every transaction
+
+        //90% of the time the method accepts the credit card
+        //10% of the time the method rejects the credit card
+        //This method makes a random decision and is not a real credit card validator
         return Math.random() <= 0.95;
     }
 
     /**
-     * This method checks if the email address input by the user is valid
+     * Checks if the email address input by the user is valid
+     *
      * @param emailAddress is the email address input by the user
-     * @return returns boolean true if email address is valid and false otherwise
+     *
+     * @return true if email address is valid and false otherwise
      */
     private static boolean isValidEmail(String emailAddress) {
+        //regular expression to check format of the email address string input by user
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
                 "A-Z]{2,7}$";
-
         Pattern pat = Pattern.compile(emailRegex);
+
+        //if the string is null return false
         if (emailAddress == null) return false;
+
+        //if the email address entered by user matches the pattern from the regex
+        //then return true, else return false
         return pat.matcher(emailAddress).matches();
     }
 
-
+    /**
+     * This is the log in menu that allows the user to log in to either customer or internal account
+     *
+     * @throws IOException customer log in and internal log in methods in model throw IOException
+     * @throws ParseException customer log in and internal log in methods in model throw ParseException
+     */
     static void logIn() throws IOException, ParseException {
+        //prompt the user to choose which kind of account they want to log into
+
         System.out.println("Press 1 to log in to customer account. \nPress 2 to log in to internal account.");
         int logIn = input.nextInt();
         input.nextLine();
+
+        //prompt the user to input their username and password
         System.out.println("Enter username:");
         String username = input.nextLine();
         System.out.println("Enter password:");
         String password = input.nextLine();
+
         switch (logIn){
             case 1:
+                //if they want to log in to customer account
+                //validate their username and password in the customer account map
                 ValleyBikeSim.customerLogIn(username, password);
                 break;
             case 2:
+                //if they want to log in to internal account
+                //validate their username and password in the internal account map
                 ValleyBikeSim.internalLogIn(username, password);
                 break;
             default:
+                //if they did not choose either 1 or 2
+                //make them choose again by recursively calling log in
                 System.out.println("Invalid option chosen.");
                 logIn();
         }
@@ -176,15 +308,21 @@ public abstract class ValleyBikeController {
 
 
     /**
-     * Standard menu page for a user after logging in
-     * @param username: integer representing unique userID of account
+     * Standard menu page for a customer account after logging in
+     *
+     * @param username unique username associated with the customer account
+     *
+     * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
+     * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
-    static void userAccountHome(String username) throws IOException, ParseException {
+    public static void customerAccountHome(String username) throws IOException, ParseException {
+        //menu option for customer account home
         System.out.println("Please choose from one of the following menu options: \n"
                 + "1. Edit account info\n"
                 + "2. View account balance\n"
                 + "3. View station list\n"
                 + "4. Rent a bike\n"
+                + "5. Report a problem\n"
                 + "6. Log out \n");
 
         System.out.println("Please enter your selection (1-6):");
@@ -193,14 +331,14 @@ public abstract class ValleyBikeController {
         if (!input.hasNextInt()){
             //keep asking for input until valid
             System.out.println("Not a valid input");
-            userAccountHome(username);
+            customerAccountHome(username);
         }
 
         int num = input.nextInt();
         switch(num) {
             case 1:
-                //edit account info- return to create account or have separate method?
-                editAccount(username);
+                //edit account info
+                editCustomerAccount(username);
                 break;
             case 2:
                 //view account balance
@@ -215,35 +353,52 @@ public abstract class ValleyBikeController {
                 rentBike(username);
                 break;
             case 5:
-                //log out, return to homepage
+                //TODO report a problem
+                break;
+            case 6:
+                //return to homepage to log out
                 initialMenu();
                 break;
         }
 
         //if function call finished and returned to this page, keep calling menu again until log out/exit
-        userAccountHome(username);
+        customerAccountHome(username);
     }
 
-    private static void editAccount(String username) throws IOException, ParseException {
+    /**
+     * Menu page for editing customer account information
+     *
+     * @param username is the unique username associated with the customer account
+     */
+    private static void editCustomerAccount(String username){
         //TODO save edited fields
+        //TODO add a return to customer home option
+        //TODO recursively call itself to edit multiple fields
+        //TODO handle edge case of not entering int
+        //prompt user to choose which field they want to edit
         System.out.println("Press 1 to edit username.\nPress 2 to edit password." +
                 "\nPress 3 to edit email address. \nPress 4 to edit credit card number. \nPress 5 to edit membership.");
         int edit = input.nextInt();
         input.nextLine();
         switch (edit){
             case 1:
+                //edit username
                 enterUsername();
                 break;
             case 2:
+                //edit password
                 enterPassword();
                 break;
             case 3:
+                //edit email address
                 enterEmail();
                 break;
             case 4:
+                //edit credit card number
                 enterCreditCard();
                 break;
             case 5:
+                //edit membership type
                 enterMembership();
                 break;
         }
@@ -439,7 +594,7 @@ public abstract class ValleyBikeController {
         someBike.setStation(statId);
 
         // take user back to their account home
-        userAccountHome(username);
+        customerAccountHome(username);
     }
 
 
@@ -482,10 +637,15 @@ public abstract class ValleyBikeController {
         returnBike(username);
     }
 
-    /*
-     * Home screen for internal company employees
+    /**
+     * Main menu for internal accounts
+     *
+     * @throws IOException addStation, addBike, equalizeStations and initialMenu throw IOException
+     * @throws ParseException addStation, addBike, equalizeStations and initialMenu throw ParseException
      */
     static void internalAccountHome() throws IOException, ParseException {
+        //prompt user to pick option from main internal menu
+
         // TODO give user option to view station and bike list
         System.out.print("\n Choose from the following: \n"
                 + "1. View customer balances \n"
@@ -511,9 +671,11 @@ public abstract class ValleyBikeController {
                 //TODO view customer activity
                 break;
             case 3:
+                //add station to station list
                 addStation();
                 break;
             case 4:
+                //add bike to bike list
                 addBike();
                 break;
             case 5:
@@ -524,7 +686,7 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.equalizeStations();
                 break;
             case 7:
-                //log out
+                //go to initial menu to log out
                 initialMenu();
                 break;
         }
