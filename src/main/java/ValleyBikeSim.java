@@ -122,7 +122,8 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * Reads external csv file with station data
+	 * Reads external csv file with station data and adds it to the
+     * tree data structure
 	 *
 	 * @throws IOException
 	 */
@@ -219,17 +220,19 @@ public class ValleyBikeSim {
 			// format the view of the bike object values
 			System.out.format("%-15d%-15d%-15d%-15s%-15s\n",
 					key,
-					bike.location,
-					bike.station,
-					bike.mnt,
-					bike.mntReport
+					bike.getBikeLocatoin(),
+					bike.getStation(),
+					bike.getMnt(),
+					bike.getMntReport()
 			);
 		}
 
 	}
 
 	/**
-	 *
+	 * Loops through station objects in stations map data structure
+     * formats them to a table view for the user
+     *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
@@ -251,12 +254,12 @@ public class ValleyBikeSim {
 
 			// format the view values of station object
 			System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
-					key, station.bikes,
-					station.availableDocks,
-					station.maintenanceRequest,
-					station.capacity,
-					station.kioskBoolean,
-					station.name + "-" + station.address);
+					key, station.getBikes(),
+					station.getAvailableDocks(),
+					station.getMaintenanceRequest(),
+					station.getCapacity(),
+					station.getKioskBoolean(),
+					station.getStationName() + "-" + station.getAddress());
 		}
     }
 
@@ -491,9 +494,9 @@ public class ValleyBikeSim {
 
 			Station station = stationsMap.get(key);
 
-			int percentage = (int) (((float) (station.bikes) / station.capacity) * 100);
-			totalVehicles = totalVehicles + station.bikes;
-			totalCapacity = totalCapacity + station.capacity;
+			int percentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
+			totalVehicles = totalVehicles + station.getBikes();
+			totalCapacity = totalCapacity + station.getCapacity();
 
 			stationsCapacity.put(key, percentage);
 		}
@@ -523,15 +526,15 @@ public class ValleyBikeSim {
 					//continues to remove vehicles as long as removing a vehicle
 					//moves the percentage closer to ideal percentage
 					while(Math.abs(newPercentage - idealPercentage) > 
-					Math.abs(((int) (((float) (station.bikes - 1) / station.capacity) * 100))
+					Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
 							- idealPercentage)){
-						if(station.bikes > 0){
-							station.bikes = station.bikes - 1;
+						if(station.getBikes() > 0){
+							station.setBikes(station.getBikes() - 1);
 							extras.set(0, extras.get(0)+1);
 						} else {
 							extras.set(1, extras.get(1)+1);
 						}
-						newPercentage = (int) (((float) (station.bikes) / station.capacity) * 100);
+						newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 					}
 				}
 		}
@@ -560,18 +563,18 @@ public class ValleyBikeSim {
 			// moves the percentage closer to ideal percentage
 			// and there are still extra vehicles to add
 			while((Math.abs(newPercentage - idealPercentage) >
-					Math.abs((int) (((float) (station.bikes + 1) /
-							station.capacity) * 100)) - idealPercentage)
+					Math.abs((int) (((float) (station.getBikes() + 1) /
+							station.getCapacity()) * 100)) - idealPercentage)
 					&& Integer.sum(extras.get(0), extras.get(1))>0){
 
 				if(extras.get(0) > 0){
-						station.bikes = station.bikes + 1;
+						station.setBikes(station.getBikes() + 1);
 						extras.set(0, extras.get(0)-1);
 					} else{
 						extras.set(1, extras.get(1)-1);
 					}
 
-					newPercentage = (int) (((float) (station.bikes) / station.capacity) * 100);
+					newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 			}
 		}
 	}
@@ -596,6 +599,18 @@ public class ValleyBikeSim {
 				// set bike maintenance values to none
 				bike.setMnt(false);
 				bike.setMntReport("");
+
+				// bike now available for customers
+				bike.setBikeLocation(0);
+
+                // get station object as well
+                Station station = stationsMap.get(bike.getStation());
+
+                // get how many maintenance requests the station already had
+                int originalMntRqs = station.getMaintenanceRequest();
+
+                // decrease it by one
+                station.setMaintenanceRequest(originalMntRqs -1 );
 			}
 
 			// done resolving, so clear the list
@@ -629,8 +644,7 @@ public class ValleyBikeSim {
 	public static void addNewStation(int id, Station stationOb){
 		stationsMap.put(id, stationOb);
 	}
-
-	/**
+    /**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
 	 *
