@@ -645,7 +645,7 @@ public abstract class ValleyBikeController {
                 + "3. Add new station \n"
                 + "4. Add new bike \n"
                 + "5. View station list \n"
-                + "6. View nike list \n"
+                + "6. View bike list \n"
                 + "7. Edit/Resolve maintenance requests \n"
                 + "8. Equalize stations \n"
                 + "9. Log out \n");
