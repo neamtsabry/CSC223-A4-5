@@ -155,7 +155,7 @@ public class ValleyBikeSim {
                     Integer.parseInt(values[4]),
                     Integer.parseInt(values[5]),
                     Integer.parseInt(values[6]),
-                    values[8]);
+                    values[7]);
 
             // add to the station tree
             stationsMap.put(Integer.parseInt(values[0]),stationOb);

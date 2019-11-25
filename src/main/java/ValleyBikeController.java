@@ -40,7 +40,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                createAccount();
+//                createAccount();
+                rentBike("heyyo");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -470,7 +471,8 @@ public abstract class ValleyBikeController {
 
         while(someBike == null) {
             System.out.println("The bike ID entered does not exist in our system.");
-            b = getResponse("bike id");
+            b = b = getResponse("Please enter the id of the bike you" +
+                    " would like to rent.");
             someBike = ValleyBikeSim.getBikeObj(b);
         }
 
@@ -494,18 +496,13 @@ public abstract class ValleyBikeController {
      * @param: bikeID- unique ID associated with the bike that the user has checked out
      */
     private static void bikeRented(String username, int bikeID) throws IOException, ParseException {
-        System.out.print("\n Hope you enjoyed your bike ride! \n"
-                + "1. Return bike"
-                + "2. Report a problem");
-        System.out.println("Please enter your selection (1-2):");
+        // view options to either return bike or report problem
+        System.out.println("Hope you enjoyed your bike ride! \n"
+                + "1. Return bike\n"
+                + "2. Report a problem\n");
+        // get response
+        int num = getResponse("Please enter your selection (1-2):");
 
-        if (!input.hasNextInt()){
-            //keep asking for input until valid
-            System.out.println("Not a valid input \n");
-            bikeRented(username, bikeID);
-        }
-
-        int num = input.nextInt();
         switch(num) {
             case 1:
                 //return bike
@@ -520,6 +517,8 @@ public abstract class ValleyBikeController {
                 //save all files before exiting
                 System.exit(0);
                 break;
+            default:
+                bikeRented(username, bikeID);
         }
     }
 
@@ -567,13 +566,6 @@ public abstract class ValleyBikeController {
         // change to station the bike is returned to
         someBike.setStation(statId);
 
-        // if the bike doesn't exist
-        while(someBike == null) {
-            System.out.println("The bike ID entered does not exist in our system.");
-            b = getResponse("bike id");
-            someBike = ValleyBikeSim.getBikeObj(b);
-        }
-
         // time stamp recorded
         Date date = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
@@ -584,6 +576,8 @@ public abstract class ValleyBikeController {
 
         // set bike's station id to the station it's returned to
         someBike.setStation(statId);
+
+        System.out.println("You're all done! Thank you for returning this bike.");
 
         // take user back to their account home
         customerAccountHome(username);
@@ -704,6 +698,8 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     private static void addStation() throws IOException, ParseException{
+        //TODO call addBike() for every bike that is in the new station
+
         // use helper function to check input is valid and save it
         int id = getResponse("Please enter the ID for this station:");
 
