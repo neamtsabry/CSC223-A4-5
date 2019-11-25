@@ -1,28 +1,34 @@
 public class Bike {
     // bike id
-    int id;
-
-    // whether or not it requires maintenance
-    Boolean mnt;
-
-    // user's report on bike
-    String mntReport;
+    private int id;
 
     // Location of bike can be either of the following:
     // docked/available at station --> 0,
-    // live with customer --> 1,
-    // docked but out of commission --> 2
-    int location;
+    // docked but out of commission --> 1
+    // live with customer --> 2
+    private int location;
 
     // which station bike is in
     // if bike not available, station is set to -1
-    int station;
+    private int station;
 
+    // whether or not it requires maintenance
+    private Boolean mnt;
+
+    // user's report on bike
+    private String mntReport;
+
+    /**
+     * Constructor for
+     * @param bikeId the set integer  id for the bike
+     * @param bikeLocation location of the bike between 0 and 2 (explained above for the field)
+     * @param stationId the set integer id for the station
+     * @param maintenance boolean, true if bike requires maintenance
+     * @param maintenanceReport string report explaining why a bike requires maintenance
+     */
     public Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport){
         this.id = bikeId;
-
         this.location = bikeLocation;
-
         this.station = stationId;
 
         if(maintenance.equals('y')) this.mnt = true;
@@ -31,11 +37,21 @@ public class Bike {
         this.mntReport = maintenanceReport;
     }
 
+    /**
+     * Get a comma separated string for bike's data
+     *
+     * @return comma separated string of bike data
+     */
     public String getBikeString() {
         String fileLine = this.id + "," + this.location + "," +
                 this.station + "," + this.mnt + "," + this.mntReport;
         return fileLine;
     }
+
+    /**
+     * All following methods get and set appropriate fields
+     * for the bike object
+     */
 
     public int getId(){
         return id;
@@ -53,7 +69,7 @@ public class Bike {
         this.station = newStationValue;
     }
 
-    public int getBikeLocatoin(){
+    public int getBikeLocation(){
         return this.location;
     }
 
