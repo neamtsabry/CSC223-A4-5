@@ -237,7 +237,7 @@ public class ValleyBikeSim {
 	 */
     static void viewStationList() throws IOException, ParseException{
 		// format table view
-    	System.out.format("%-15s%-15s%-15s%-15s%-15s%-15s%-15s%-20s\n", "ID", "Bikes",
+        System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
                 "AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
 
 		// initiate iterator
@@ -251,12 +251,12 @@ public class ValleyBikeSim {
 			Station station = stationsMap.get(key);
 
 			// format the view values of station object
-			System.out.format("%-15d%-15d%-15d%-15d%-15d%-15d%-15b%-20s\n",
+			System.out.format("%-10d%-10d%-10d%-10d%-10d%-10d%-20s\n",
 					key, station.getBikes(),
 					station.getAvailableDocks(),
 					station.getMaintenanceRequest(),
 					station.getCapacity(),
-					station.getKioskBoolean(),
+					station.getKioskNum(),
 					station.getStationName() + "-" + station.getAddress());
 		}
     }

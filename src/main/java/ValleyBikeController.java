@@ -35,7 +35,8 @@ public abstract class ValleyBikeController {
 
         switch(num) {
             case 1:
-                createAccount();
+                rentBike("hashbsac");
+                //createAccount();
                 break;
             case 2:
                 logIn();
@@ -248,7 +249,6 @@ public abstract class ValleyBikeController {
         }
     }
 
-    //TODO equalize stations if returning bike makes station full
     /**
      * Can be used for both renting and returning bike
      * Prompts the user for info as to achieve those tasks
@@ -314,7 +314,6 @@ public abstract class ValleyBikeController {
             if(statId == bike.getStation()) {
                 System.out.format("%-10s%-10d\n", statId, key);
             }
-
         }
 
         // choose bike to rent
