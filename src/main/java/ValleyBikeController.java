@@ -414,17 +414,9 @@ public abstract class ValleyBikeController {
     public static void rentBike(String username) throws IOException, ParseException{
         // View stations
         System.out.println("Here's a list of station IDs and their names");
-        System.out.format("%-10s%-10s\n", "ID", "Name");
 
-        // initiate iterator
-        Iterator keyIterator = ValleyBikeSim.createIterator(false);
-
-        // while it has a next value
-        while(keyIterator.hasNext()){
-            Integer key = (Integer) keyIterator.next();
-            Station station = ValleyBikeSim.getStationObj(key);
-            System.out.format("%-10d%-10s\n", key, station.getStationName());
-        }
+        // view station list
+        ValleyBikeSim.viewStationList();
 
         // choose station to rent from
         int statId = getResponse("Please pick a station from list shown above" +
@@ -517,7 +509,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //return bike
-                returnBike(username);
+                returnBike(username, bikeID);
                 break;
             case 2:
                 //report a problem
@@ -537,11 +529,9 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      * @param username for user
-     *
+     * @param b bike id
      */
-    public static void returnBike(String username) throws IOException, ParseException{
-        //TODO wrapper function that asks for station id and bike id if bike not checked out
-
+    public static void returnBike(String username, int b) throws IOException, ParseException{
         // choose station to rent from
         int statId = getResponse("Please enter station you're returning the " +
                 "bike to");
@@ -571,9 +561,11 @@ public abstract class ValleyBikeController {
             System.out.println("All done!");
         }
 
-        // choose bike to rent
-        int b = getResponse("bike id");
+        // get rented bike
         Bike someBike = ValleyBikeSim.getBikeObj(b);
+
+        // change to station the bike is returned to
+        someBike.setStation(statId);
 
         // if the bike doesn't exist
         while(someBike == null) {
@@ -652,9 +644,11 @@ public abstract class ValleyBikeController {
                 + "2. View customer activity \n"
                 + "3. Add new station \n"
                 + "4. Add new bike \n"
-                + "5. Edit/Resolve maintenance requests \n"
-                + "6. Equalize stations \n"
-                + "7. Log out \n");
+                + "5. View station list \n"
+                + "6. View nike list \n"
+                + "7. Edit/Resolve maintenance requests \n"
+                + "8. Equalize stations \n"
+                + "9. Log out \n");
         System.out.println("Please enter your selection (1-5):");
 
         if (!input.hasNextInt()){
@@ -679,13 +673,20 @@ public abstract class ValleyBikeController {
                 addBike();
                 break;
             case 5:
-                ValleyBikeSim.resolveMntReqs();
+                ValleyBikeSim.viewStationList();
                 break;
             case 6:
+                ValleyBikeSim.viewBikeList();
+                break;
+            case 7:
+                // resolve maintenance requests
+                ValleyBikeSim.resolveMntReqs();
+                break;
+            case 8:
                 //equalize stations
                 ValleyBikeSim.equalizeStations();
                 break;
-            case 7:
+            case 9:
                 //go to initial menu to log out
                 initialMenu();
                 break;
