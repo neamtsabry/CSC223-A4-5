@@ -721,17 +721,19 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String name = input.nextLine();
 
-        // prompt user for number of bikes
-        Integer bikes = getResponse("How many bikes?");
-
-        // prompt for number of available docks at station
-        Integer availableDocks = getResponse("How many available docks?");
+        // set numbers of bikes to zero since it's a new station
+        // and has no bikes yet
+        Integer bikes = 0;
 
         // number of maintenance requests
         Integer maintenanceRequest = getResponse("How many maintenance requests?");
 
         // prompt capacity for station
         Integer capacity = getResponse("What is the station's capacity?");
+
+        // since it's a newly added station, the available docks will be
+        // the capacity of the station
+        Integer availableDocks = capacity;
 
         // number of kiosks
         Integer kiosk = getResponse("How many kiosks?");
