@@ -7,11 +7,17 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 
 ## Preconditions:
 
-1. Install the Java JDK; NOT the JRE: 
-[https://adoptopenjdk.net/](https://adoptopenjdk.net/) or
-[https://www.oracle.com/technetwork/java/javase/downloads/jdk12-downloads-5295953.html](https://www.oracle.com/technetwork/java/javase/downloads/jdk12-downloads-5295953.html)
+1. Install the Java JDK (make sure it's version 13); NOT the JRE: 
+[https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot](https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot) or
+[https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html](https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html)
 
-2. Install Eclipse, (using my link rather than searching for it, since there are many versions): [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
+2. Install either:
+
+    a. Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
+    
+    b. Intellij:
+    
+    [https://www.jetbrains.com/idea/download/#section=windows](https://www.jetbrains.com/idea/download/#section=windows)
 
 ## How to import this project into Eclipse
 
@@ -42,3 +48,23 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
     - Right-Click and choose "Run As > Java Application"
 18. The "Console" tab on the bottom should show you the output of the program. (When you implement the rest of the game, you will also need to type here... the cursor looks like it's in the wrong place sometimes but don't worry.)
     
+## Instructions for how to run project
+
+### Internal account login info
+
+**username:** alicia
+
+**password:** csc223
+
+**email address:** agrubb@smith.edu
+
+### User account login info
+
+
+**username:** aliciagrubb
+
+**password:** csc223
+
+**email address:** agrubb@smith.edu
+
+***
