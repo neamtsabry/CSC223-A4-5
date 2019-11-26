@@ -796,7 +796,7 @@ public abstract class ValleyBikeController {
         String mnt = input.nextLine();
 
         // initiate maintenance report string
-        String mntReport = "";
+        String mntReport = " ";
 
         // if it does require maintenance
         if(mnt.toLowerCase().equalsIgnoreCase("y")){
