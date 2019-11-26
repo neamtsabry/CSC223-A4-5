@@ -25,16 +25,7 @@ public abstract class ValleyBikeController {
                 + "1. Create Customer Account (Partially works) \n"
                 + "2. Log In\n"
                 + "0. Exit program\n");
-        System.out.println("Please enter your selection (0-2):");
-
-        // if input is not a integer
-        if (!input.hasNextInt()){
-            //keep asking for input until valid
-            System.out.println("Not a valid input");
-            initialMenu();
-        }
-
-        int num = input.nextInt();
+        int num = getResponse("Please enter your selection (0-2):");
         input.nextLine();
 
         switch(num) {
@@ -58,6 +49,8 @@ public abstract class ValleyBikeController {
 
                 System.exit(0);
                 break;
+            default:
+                initialMenu();
         }
     }
 
@@ -276,9 +269,7 @@ public abstract class ValleyBikeController {
      */
     static void logIn() throws IOException, ParseException {
         //prompt the user to choose which kind of account they want to log into
-
-        System.out.println("Press 1 to log in to customer account. \nPress 2 to log in to internal account.");
-        int logIn = input.nextInt();
+        int logIn = getResponse("Press 1 to log in to customer account. \nPress 2 to log in to internal account.");
         input.nextLine();
 
         //prompt the user to input their username and password
