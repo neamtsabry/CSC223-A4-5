@@ -428,7 +428,7 @@ public abstract class ValleyBikeController {
         // keep prompting user until the station obj is not null
         while(stationFrom == null) {
             System.out.println("The station entered does not exist in our system.");
-            statId = getResponse("Please pick a station from list shown above" +
+            statId = getResponse("Please pick a station from list shown above " +
                     "to rent a bike from");
             stationFrom = ValleyBikeSim.getStationObj(statId);
         }
