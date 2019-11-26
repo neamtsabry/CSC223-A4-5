@@ -11,9 +11,7 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 [https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot](https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot) or
 [https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html](https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html)
 
-2. Install either:
-
-    a. Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
+2. Install Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
 
 ## How to import this project into Eclipse
 
