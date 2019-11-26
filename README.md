@@ -51,15 +51,15 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 
 ### Internal account login info
 
-**username:** alicia (space)
-**password:** csc223 (space)
-**email address:** agrubb@smith.edu (space)
+**username:** alicia (space, space)
+**password:** csc223 (space, space)
+**email address:** agrubb@smith.edu (space, space)
 
 ### User account login info
 
 
-**username:** aliciagrubb (space)
-**password:** csc223 (space)
-**email address:** agrubb@smith.edu (space)
+**username:** aliciagrubb (space, space)
+**password:** csc223 (space, space)
+**email address:** agrubb@smith.edu (space, space)
 
 ***
