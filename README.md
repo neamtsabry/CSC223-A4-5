@@ -40,7 +40,7 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
     - Press the Green Run button at the top.
     - Use the Run menu at the top and select Run.
     - Right-Click and choose "Run As > Java Application"
-18. The "Console" tab on the bottom should show you the output of the program. (When you implement the rest of the game, you will also need to type here... the cursor looks like it's in the wrong place sometimes but don't worry.)
+18. The "Console" tab on the bottom should show you the output of the program. 
     
 ## Instructions for how to run project
 
