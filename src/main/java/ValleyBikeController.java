@@ -25,6 +25,7 @@ public abstract class ValleyBikeController {
                 + "1. Create Customer Account (Partially works) \n"
                 + "2. Log In\n"
                 + "0. Exit program\n");
+        //prompt the user to pick an int option
         int num = getResponse("Please enter your selection (0-2):");
         input.nextLine();
 
