@@ -55,8 +55,7 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 **password:** csc223 <br/>
 **email address:** agrubb@smith.edu 
 
-### User account login info
-
+### Customer account login info
 
 **username:** aliciagrubb <br/>
 **password:** csc223 <br/>
