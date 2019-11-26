@@ -530,6 +530,12 @@ public abstract class ValleyBikeController {
      * @param b bike id
      */
     public static void returnBike(String username, int b) throws IOException, ParseException{
+        // View stations
+        System.out.println("Here's a list of station IDs and their names");
+
+        // view station list
+        ValleyBikeSim.viewStationList();
+
         // choose station to rent from
         int statId = getResponse("Please enter station you're returning the " +
                 "bike to");
