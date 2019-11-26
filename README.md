@@ -15,7 +15,7 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 
     a. Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
     
-    b. Intellij: />
+    b. Intellij: <br/>
  [https://www.jetbrains.com/idea/download/#section=windows](https://www.jetbrains.com/idea/download/#section=windows)
 
 ## How to import this project into Eclipse
@@ -51,15 +51,15 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 
 ### Internal account login info
 
-**username:** alicia />
-**password:** csc223 />
+**username:** alicia <br/>
+**password:** csc223 <br/>
 **email address:** agrubb@smith.edu 
 
 ### User account login info
 
 
-**username:** aliciagrubb />
-**password:** csc223 />
+**username:** aliciagrubb <br/>
+**password:** csc223 <br/>
 **email address:** agrubb@smith.edu
 
 ***
