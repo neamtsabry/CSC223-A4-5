@@ -11,13 +11,7 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 [https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot](https://adoptopenjdk.net/?variant=openjdk13&jvmVariant=hotspot) or
 [https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html](https://www.oracle.com/technetwork/java/javase/downloads/jdk13-downloads-5672538.html)
 
-2. Install either:
-
-    a. Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
-    
-    b. Intellij:
-    
-    [https://www.jetbrains.com/idea/download/#section=windows](https://www.jetbrains.com/idea/download/#section=windows)
+2. Install Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
 
 ## How to import this project into Eclipse
 
@@ -46,25 +40,20 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
     - Press the Green Run button at the top.
     - Use the Run menu at the top and select Run.
     - Right-Click and choose "Run As > Java Application"
-18. The "Console" tab on the bottom should show you the output of the program. (When you implement the rest of the game, you will also need to type here... the cursor looks like it's in the wrong place sometimes but don't worry.)
+18. The "Console" tab on the bottom should show you the output of the program. 
     
 ## Instructions for how to run project
 
 ### Internal account login info
 
-**username:** alicia
+**username:** alicia <br/>
+**password:** csc223 <br/>
+**email address:** agrubb@smith.edu 
 
-**password:** csc223
+### Customer account login info
 
-**email address:** agrubb@smith.edu
-
-### User account login info
-
-
-**username:** aliciagrubb
-
-**password:** csc223
-
+**username:** aliciagrubb <br/>
+**password:** csc223 <br/>
 **email address:** agrubb@smith.edu
 
 ***
