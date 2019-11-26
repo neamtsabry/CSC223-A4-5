@@ -1,4 +1,4 @@
 ID,Name,Bikes,Available Docks,Maintenance Request,Capacity,Kiosk,Address
 1,stationA,3,5,0,4,1,1 chapin way
-12,stationB,6,11,0,12,1,academy of music
-13,stationC,6,9,0,14,1,forbes library
+12,stationB,7,12,0,12,1,academy of music
+13,stationC,7,10,0,14,1,forbes library

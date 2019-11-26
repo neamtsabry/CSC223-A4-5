@@ -22,7 +22,7 @@ public abstract class ValleyBikeController {
         //TODO back menu on all menus
         //TODO exit option on all menus
         System.out.print("\n Welcome to ValleyBike Share! \n"
-                + "1. Create Customer Account\n"
+                + "1. Create Customer Account (Partially works) \n"
                 + "2. Log In\n"
                 + "0. Exit program\n");
         System.out.println("Please enter your selection (0-2):");
@@ -318,7 +318,7 @@ public abstract class ValleyBikeController {
     public static void customerAccountHome(String username) throws IOException, ParseException {
         //menu option for customer account home
         System.out.println("Please choose from one of the following menu options: \n"
-                + "1. Edit account info\n"
+                + "1. Edit account info (Partially works) \n"
                 + "2. View account balance\n"
                 + "3. View station list\n"
                 + "4. Rent a bike\n"
@@ -635,14 +635,14 @@ public abstract class ValleyBikeController {
 
         // TODO give user option to view station and bike list
         System.out.print("\n Choose from the following: \n"
-                + "1. View customer balances \n"
-                + "2. View customer activity \n"
+                + "1. View customer balances (Coming Soon!) \n"
+                + "2. View customer activity (Coming Soon!) \n"
                 + "3. Add new station \n"
                 + "4. Add new bike \n"
                 + "5. View station list \n"
                 + "6. View bike list \n"
                 + "7. Edit/Resolve maintenance requests \n"
-                + "8. Equalize stations \n"
+                + "8. Equalize stations (Coming Soon!) \n"
                 + "9. Log out \n");
         System.out.println("Please enter your selection (1-5):");
 
@@ -796,7 +796,7 @@ public abstract class ValleyBikeController {
         String mnt = input.nextLine();
 
         // initiate maintenance report string
-        String mntReport = "";
+        String mntReport = " ";
 
         // if it does require maintenance
         if(mnt.toLowerCase().equalsIgnoreCase("y")){
