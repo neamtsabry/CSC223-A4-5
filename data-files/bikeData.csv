@@ -1,4 +1,7 @@
 ID,Location,StationId,Req_Mnt,Mnt_Report
-77,0,12,false,
+66,0,13,true,ITS NOT WORKING
+70,0,13,false,none
+76,1,1,false,charging error
+77,0,12,false,test
 89,2,12,false,IT'S CRAPPY TOO MUCH OF THE TIME DUDES
 123,1,12,false,ff
