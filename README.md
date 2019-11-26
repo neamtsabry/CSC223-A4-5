@@ -14,9 +14,6 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 2. Install either:
 
     a. Eclipse, (using my link rather than searching for it, since there are many versions):                             [https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers        ](https://www.eclipse.org/downloads/packages/release/2019-06/r/eclipse-ide-java-developers)
-    
-    b. Intellij: <br/>
- [https://www.jetbrains.com/idea/download/#section=windows](https://www.jetbrains.com/idea/download/#section=windows)
 
 ## How to import this project into Eclipse
 
