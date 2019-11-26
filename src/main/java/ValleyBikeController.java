@@ -511,13 +511,9 @@ public abstract class ValleyBikeController {
                 //report a problem
                 reportProblem(username, bikeID);
                 break;
-            case 0:
-                input.close();
-                //save all files before exiting
-                System.exit(0);
-                break;
             default:
                 bikeRented(username, bikeID);
+                break;
         }
     }
 
