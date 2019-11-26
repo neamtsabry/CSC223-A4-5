@@ -862,6 +862,7 @@ public abstract class ValleyBikeController {
     }
 
     /**
+     * We are not currently using this method.
      * Calls ValleyBikeSim's resolveData method to resolve ride data
      *
      * @throws IOException

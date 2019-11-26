@@ -439,6 +439,8 @@ public class ValleyBikeSim {
 	}
 
 	/**
+     * We are not currently using this method.
+     * 
 	 * Takes in a ride data file name from user
 	 * Parses and iterates through file and uses ride timestamps 
 	 * to determine average ride time.
