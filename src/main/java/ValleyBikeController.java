@@ -636,7 +636,7 @@ public abstract class ValleyBikeController {
                 + "7. Edit/Resolve maintenance requests \n"
                 + "8. Equalize stations (Coming Soon!) \n"
                 + "9. Log out \n");
-        System.out.println("Please enter your selection (1-5):");
+        System.out.println("Please enter your selection (1-9):");
 
         if (!input.hasNextInt()){
             //keep asking for input until valid
