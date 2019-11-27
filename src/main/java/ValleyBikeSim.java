@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 /**
  * Class that contains menu options and implementation for Simulator
  *
- * We're making the assumption in this bike that our system only has
+ * We make the assumption in this bike that our system only has
  * pedelecs. Every time we use the word bike in this code, we mean
  * pedelecs/electric bikes.
  */
