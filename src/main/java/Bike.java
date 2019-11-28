@@ -49,6 +49,29 @@ public class Bike {
     }
 
     /**
+     * Move a bike to a different (or no) station
+     * Also sets station data to match this move
+     *
+     * @param newStationValue - station ID of the station the bike is moving to
+     */
+    public void moveStation(int newStationValue) {
+        if (this.getStation() != 0) { // check if bike had an old station; '0' represents a bike without a current station
+            Station oldStation = ValleyBikeSim.getStationObj(this.station); // get old station object
+            oldStation.setBikes(oldStation.getBikes() - 1); // decrement number of bikes in old station
+            oldStation.setAvailableDocks(oldStation.getAvailableDocks()+1); // increment available docks at new station
+        }
+        this.station = newStationValue; // set bike's station to new station
+        if (newStationValue != 0) { // check if new station is a '0,' which is a placeholder station
+            Station newStation = ValleyBikeSim.getStationObj(this.station); // get new station object
+            newStation.setBikes(newStation.getBikes() + 1); // increment number of bikes in new station
+            newStation.setAvailableDocks(newStation.getAvailableDocks()-1); // decrement available docks at new station
+            setBikeLocation(0);
+        }
+        else {
+            setBikeLocation(2);
+        }
+    }
+    /**
      * All following methods get and set appropriate fields
      * for the bike object
      */
@@ -68,6 +91,7 @@ public class Bike {
     public void setStation(int newStationValue){
         this.station = newStationValue;
     }
+
 
     public int getBikeLocation(){
         return this.location;
