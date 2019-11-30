@@ -33,7 +33,7 @@ public class CustomerAccount extends Account{
         this.membership = membership;
         this.balance = 0;
 
-        this.lastRideIsReturned = false;
+        this.lastRideIsReturned = true;
     }
 
     /**
@@ -52,7 +52,7 @@ public class CustomerAccount extends Account{
         this.membership = membership;
         this.balance = balance;
 
-        this.lastRideIsReturned = false;
+        this.lastRideIsReturned = true;
     }
 
     /**

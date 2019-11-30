@@ -1,16 +1,14 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Station {
     // station name
     private String name;
 
     // number of bikes in station
-    private int bikes;
+    // private int bikes;
 
     // number of available docks
-    private int availableDocks;
+    // private int availableDocks;
 
     // number of maintenance requests
     private int maintenanceRequest;
@@ -28,26 +26,26 @@ public class Station {
     private String address;
 
     // list of bike ids associated with station
-    private LinkedList<Integer> bikeIdList = new LinkedList<>();
+    private LinkedList<Bike> bikeList = new LinkedList<>();
 
     /**
      * Constructor to create a new station object
-     * @param nameValue station name
-     * @param bikesValue number of bikes
-     * @param availableDocksValue number of available docks
+     *
+     * @param nameValue               station name
      * @param maintenanceRequestValue number of maintenance requests
-     * @param capacityValue the station capacity
-     * @param kiosk number of kiosks
-     * @param address1 station address
+     * @param capacityValue           the station capacity
+     * @param kiosk                   number of kiosks
+     * @param address1                station address
      */
-    public Station(String nameValue, Integer bikesValue,
-                   Integer availableDocksValue,
+    public Station(String nameValue,
+                   // Integer bikesValue,
+                   // Integer availableDocksValue,
                    Integer maintenanceRequestValue,
                    Integer capacityValue,
                    Integer kiosk, String address1) {
         this.name = nameValue;
-        this.bikes = bikesValue;
-        this.availableDocks = availableDocksValue;
+        // this.bikes = bikesValue;
+        // this.availableDocks = availableDocksValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
         this.kioskNumber = kiosk;
@@ -66,50 +64,91 @@ public class Station {
      */
 
     public String getStationString() {
-        String fileInput = this.name + "," + this.bikes + "," +
-                + this.availableDocks +
+        String fileInput = this.name + "," + this.getBikes() + "," +
+                +this.getAvailableDocks() +
                 "," + this.maintenanceRequest + ","
                 + this.capacity + "," + this.kioskNumber + "," + this.address;
         return fileInput;
     }
 
-    public String getStationName() { return this.name; }
-
-    public void setStationName(String newName) { this.name = newName; }
-
-    public int getBikes() { return this.bikes; }
-
-    public void setBikes(int newNumBikes) { this.bikes = newNumBikes; }
-
-    public int getAvailableDocks() { return this.availableDocks; }
-
-    public void setAvailableDocks(int newNumAvbDocks) { this.availableDocks = newNumAvbDocks; }
-
-    public int getMaintenanceRequest() { return this.maintenanceRequest; }
-
-    public void setMaintenanceRequest(int newNumRqst) { this.maintenanceRequest = newNumRqst; }
-
-    public int getCapacity() { return this.capacity; }
-
-    public void setCapacity(int newCap) { this.capacity = newCap; }
-
-    public boolean getKioskBoolean() { return this.kioskBoolean; }
-
-    public void setKioskBoolean(boolean newKioskBool) { this.kioskBoolean = newKioskBool; }
-
-	public int getKioskNum() { return this.kioskNumber; }
-
-	public void setKioskNum(int newKioskNum) { this.kioskNumber = newKioskNum; }
-
-    public String getAddress() { return this.address; }
-
-    public void setAddress(String newAdd) { this.address = newAdd; }
-
-    public LinkedList<Integer> getBikeId(){
-        return bikeIdList;
+    public String getStationName() {
+        return this.name;
     }
 
-    public void addToBikeList(int bikeId){
-        bikeIdList.add(bikeId);
+    public void setStationName(String newName) {
+        this.name = newName;
     }
+
+    public int getBikes() {
+        return bikeList.size();
+    }
+
+
+    // public void setBikes(int newNumBikes) { this.bikes = newNumBikes; }
+
+    public int getAvailableDocks() {
+        // return this.availableDocks;
+        return (this.capacity - bikeList.size());
+    }
+
+    public int getMaintenanceRequest() {
+        return this.maintenanceRequest;
+    }
+
+    public void setMaintenanceRequest(int newNumRqst) {
+        this.maintenanceRequest = newNumRqst;
+    }
+
+    public int getCapacity() {
+        return this.capacity;
+    }
+
+    public void setCapacity(int newCap) {
+        this.capacity = newCap;
+    }
+
+    public boolean getKioskBoolean() {
+        return this.kioskBoolean;
+    }
+
+    public void setKioskBoolean(boolean newKioskBool) {
+        this.kioskBoolean = newKioskBool;
+    }
+
+    public int getKioskNum() {
+        return this.kioskNumber;
+    }
+
+    public void setKioskNum(int newKioskNum) {
+        this.kioskNumber = newKioskNum;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(String newAdd) {
+        this.address = newAdd;
+    }
+
+    public LinkedList<Bike> getBikeList() {
+        return bikeList;
+    }
+
+    public void addToBikeList(Bike bike) {
+        bikeList.add(bike);
+    }
+
+    public boolean removeFromBikeList(Bike bike) {
+        // find index of bike ID in our linked list
+        int bikeIndex = bikeList.indexOf(bike);
+
+        // if our bike list doesn't contain this bike, return false
+        if (bikeIndex == -1) { return false; }
+
+        // remove bike from list and return true
+        bikeList.remove(bikeIndex);
+        return true;
+    }
+
 }

@@ -152,13 +152,13 @@ public class ValleyBikeSim {
 
             // start a new station with all the individual values we got
             Station stationOb = new Station(
-                    values[1],
-                    Integer.parseInt(values[2]),
-                    Integer.parseInt(values[3]),
-                    Integer.parseInt(values[4]),
-                    Integer.parseInt(values[5]),
-                    Integer.parseInt(values[6]),
-                    values[7]);
+                    values[1], // Station name
+                    // Integer.parseInt(values[2]), // bikes
+                    // Integer.parseInt(values[3]), // avail docks
+                    Integer.parseInt(values[4]), // maintenance rqsts
+                    Integer.parseInt(values[5]), // capacity
+                    Integer.parseInt(values[6]), // kiosks
+                    values[7]); // address
 
             // add to the station tree
             stationsMap.put(Integer.parseInt(values[0]),stationOb);
