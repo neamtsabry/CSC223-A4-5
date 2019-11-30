@@ -11,4 +11,9 @@ public class InternalAccount extends Account {
         //internal account inherits all fields from abstract class
         super(username, password, emailAddress);
     }
+
+    public String getInternalAccountString(){
+        return this.getUsername() + "," + this.getPassword() + "," +
+                this.getEmailAddress();
+    }
 }

@@ -26,4 +26,8 @@ public abstract class Membership {
         this.lastPayment = lastPayment;
     }
 
+    public int getMembershipInt(){
+        return 0;
+    }
+
 }
