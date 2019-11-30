@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.Stack;
+import java.util.UUID;
+
 public class CustomerAccount extends Account{
 
     /** This field is the credit card number of the customer */
@@ -8,6 +12,11 @@ public class CustomerAccount extends Account{
 
     /** This field is the balance of the customer in their account */
     private int balance;
+
+    // stack of ride ids user has
+    private ArrayList<UUID> rideIdList = new ArrayList<>();
+
+    private boolean lastRideIsReturned;
 
     /**
      * This is the constructor to create a new user account with balance = 0
@@ -23,6 +32,8 @@ public class CustomerAccount extends Account{
         this.creditCard = creditCard;
         this.membership = membership;
         this.balance = 0;
+
+        this.lastRideIsReturned = false;
     }
 
     /**
@@ -40,6 +51,8 @@ public class CustomerAccount extends Account{
         this.creditCard = creditCard;
         this.membership = membership;
         this.balance = balance;
+
+        this.lastRideIsReturned = false;
     }
 
     /**
@@ -99,5 +112,17 @@ public class CustomerAccount extends Account{
         return this.getUsername() + "," + this.getPassword() + "," +
                  this.getEmailAddress() + "," + this.getCreditCard() + ","
                 + this.getMembership().getMembershipInt() + "," + this.getBalance();
+    }
+
+    public void addNewRide(UUID rideID){
+        this.rideIdList.add(rideID);
+    }
+
+    public Boolean getIsReturned(){
+        return this.lastRideIsReturned;
+    }
+
+    public void setIsReturned(Boolean isReturnedValue){
+        this.lastRideIsReturned = isReturnedValue;
     }
 }
