@@ -700,7 +700,7 @@ public class ValleyBikeSim {
 	static CustomerAccount getCustomerObj(String key){
 	    return customerAccountMap.get(key);
     }
-    
+
     /**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
@@ -777,4 +777,14 @@ public class ValleyBikeSim {
 	 * @param bikeID integer UD of bike
 	 */
 	static void addToMntRqs(int bikeID, String mntRq){ mntReqs.put(bikeID, mntRq); }
+
+	static Boolean stationsMapContains(int key){
+		if(stationsMap.containsKey(key)) return true;
+		else return false;
+	}
+
+	static Boolean bikesMapContains(int key){
+		if(bikesMap.containsKey(key)) return true;
+		else return false;
+	}
 }

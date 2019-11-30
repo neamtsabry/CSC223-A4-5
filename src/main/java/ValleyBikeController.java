@@ -31,9 +31,7 @@ public abstract class ValleyBikeController {
             case 1:
                 //create a new customer account
                 // createAccount();
-                rentBike("aliciagrubb");
-                System.out.println("---------------------------");
-                returnBike("aliciagrubb");
+                addStation();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -760,17 +758,13 @@ public abstract class ValleyBikeController {
         // use helper function to check input is valid and save it
         int id = getResponse("Please enter the ID for this station:");
 
-        // get station object with id entered
-        Station station = ValleyBikeSim.getStationObj(id);
-
         // handle if the station already exists
-        while(station != null){
+        while(ValleyBikeSim.stationsMapContains(id)){
             // let user know
             System.out.println("Station with this ID already exists.");
 
             // re-prompt user for station id
             id = getResponse("Please re-enter the ID for this station:");
-            station = ValleyBikeSim.getStationObj(id);
         }
 
         // prompt user for station name
@@ -800,20 +794,34 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String address = input.nextLine();
 
-        // create new station object with received data from user
-        Station stationOb = new Station(
-                name,
-                bikes,
-                availableDocks,
-                maintenanceRequest,
-                capacity,
-                kiosk,
-                address);
+        // confirmation
+        System.out.println("Are you sure you want to add a station with the info entered?(y/n)");
+        String confirm = input.nextLine();
 
-        // add to the station tree
-        ValleyBikeSim.addNewStation(id, stationOb);
+        switch(confirm.toLowerCase()){
+            case "y":
+                // create new station object with received data from user
+                Station stationOb = new Station(
+                        name,
+                        bikes,
+                        availableDocks,
+                        maintenanceRequest,
+                        capacity,
+                        kiosk,
+                        address);
 
-        System.out.println("Station has been added!");
+                // add to the station tree
+                ValleyBikeSim.addNewStation(id, stationOb);
+
+                System.out.println("Station has been added!");
+                break;
+            case"n":
+                System.out.println("The station was not added, taking you back to your account home...");
+                break;
+            default:
+                System.out.println("You have to answer with y (yes) or n (no)");
+                break;
+        }
     }
 
     /**
@@ -827,7 +835,7 @@ public abstract class ValleyBikeController {
         int id = getResponse("Please enter the bike's ID");
 
         // if the bike already exists
-        while(ValleyBikeSim.getBikeObj(id) != null){
+        while(ValleyBikeSim.bikesMapContains(id)){
             // ask if user wants to overwrite bike
             System.out.println("Bike with this ID already exists.");
 
