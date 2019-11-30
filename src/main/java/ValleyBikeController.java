@@ -457,7 +457,7 @@ public abstract class ValleyBikeController {
         // if there's more than one bike at station
         if (stationFrom.getBikes() > 1){
             // station now has one less bike
-            stationFrom.setBikes(stationFrom.getBikes()+1);
+            stationFrom.setBikes(stationFrom.getBikes()-1);
             // and one more available dock
             stationFrom.setAvailableDocks(stationFrom.getAvailableDocks()+1);
         } else {
@@ -498,7 +498,8 @@ public abstract class ValleyBikeController {
         }
 
         // change bike location to live with customer
-        someBike.setBikeLocation(2);
+        // someBike.setBikeLocation(2);
+        someBike.moveStation(0); // move bike to station '0' <- our filler station
 
         // time stamp recorded
         Date date = new Date();

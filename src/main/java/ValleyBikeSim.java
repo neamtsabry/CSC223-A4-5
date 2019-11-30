@@ -7,8 +7,8 @@ import java.text.SimpleDateFormat;
 /**
  * Class that contains menu options and implementation for Simulator
  *
- * We're making the assumption in this bike that our system only has
- * pedelecs. Every time we use the word bike in this code, we mean
+ * We make the assumption in this bike that our system only has
+ * pedelecs. Every time we use the word 'bike' in this code, we mean
  * pedelecs/electric bikes.
  */
 public class ValleyBikeSim {
@@ -190,9 +190,13 @@ public class ValleyBikeSim {
             Bike bikeOb = new Bike(
                     Integer.parseInt(values[0]),
                     Integer.parseInt(values[1]),
-                    Integer.parseInt(values[2]),
+                    0, // start with station being '0', or no station
+                    //Integer.parseInt(values[2]), //station ID
                     values[3],
                     values[4]);
+
+            // move bike to correct station - this will set all our station and bike variables correctly
+            bikeOb.moveStation(Integer.parseInt(values[2]));
 
             // add to the bike tree
             bikesMap.put(Integer.parseInt(values[0]), bikeOb);
@@ -498,25 +502,21 @@ public class ValleyBikeSim {
 	 * This method prioritizes easily moving vehicles in order to get as many
 	 * stations within the ideal percentage as possible
 	 * However it does not prioritize stations further from the ideal percentage first
-	 * 
-	 * Decided to include both bikes and pedelecs, but not to differentiate
-	 * between the two when looking at percentages, because there were not
-	 * separate designated capacities for bikes and pedelecs in the stations
+	 *
 	 * 
 	 * @throws IOException
 	 * @throws ParseException
 	 */
 	public static void equalizeStations() throws IOException, ParseException{
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
-		//Extras contains number of extra bikes (position 0) and extra pedelecs (position 1)
-		ArrayList<Integer> extras = new ArrayList<>();
-		extras.add(0);
-		extras.add(0);
-		
-		int idealPercentage = getPercentageData(stationsCapacity);		
-		reassignHighPercentage(stationsCapacity, idealPercentage, extras);
-		reassignLowPercentage(stationsCapacity, idealPercentage, extras);
-		
+		Deque<Bike> extraBikes = new ArrayDeque<Bike>();// Extras contains bike objects
+		int idealPercentage = getPercentageData(stationsCapacity);
+
+		// get our bike stack from high percentage stations
+		extraBikes = reassignHighPercentage(stationsCapacity, idealPercentage, extraBikes);
+
+		// distribute our bike stack to low percentage stations
+		reassignLowPercentage(stationsCapacity, idealPercentage, extraBikes);
 	}
 	
 	/**
@@ -551,18 +551,21 @@ public class ValleyBikeSim {
 	 * Helper method for equalizeStations()
 	 * Iterates through station percentages and takes vehicles from those
 	 * whose percentage is over 10% away from idealPercentage
-	 * 
 	 * @param stationsCapacity - Map of stations to actual percentages
 	 * @param idealPercentage - Percentage stations should ideally have
-	 * @param extras - Bikes/peds taken from high percentage stations
+	 * @param extraBikes - Stack of bikes taken from high percentage stations
+	 * @return
 	 */
-	private static void reassignHighPercentage(Map<Integer, Integer> stationsCapacity, 
-			int idealPercentage, ArrayList<Integer> extras){
+	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
+														 int idealPercentage, Deque<Bike> extraBikes){
 		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
+		//Deque<Bike> extraBikes = new ArrayDeque<Bike>();
 		while (capacityIterator.hasNext()){
 			Integer key = (Integer) capacityIterator.next();
 			int percentage = (Integer) stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
+
+			Deque<Bike> bikesAtStation = getBikesAtStation(key);
 
 			if((percentage - idealPercentage) > 0){
                 int newPercentage = percentage;
@@ -571,16 +574,25 @@ public class ValleyBikeSim {
                 while(Math.abs(newPercentage - idealPercentage) >
                 Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
                         - idealPercentage)){
-                    if(station.getBikes() > 0){
-                        station.setBikes(station.getBikes() - 1);
-                        extras.set(0, extras.get(0)+1);
+                    if(!bikesAtStation.isEmpty()){ // if the station isn't empty
+						// move one bike from station stack to extra stack
+                    	Bike bike = bikesAtStation.pop();
+						extraBikes.push(bike);
+						bike.moveStation(0); // set bike's station to 0, or no station
+
+                    	// get bike object from key
+						// Bike bike = getBikeObj(bikeKey);
+                    	//station.setBikes(station.getBikes() - 1);
+                        //extras.set(0, extras.get(0)+1);
+
                     } else {
-                        extras.set(1, extras.get(1)+1);
+                        //extras.set(1, extras.get(1)+1);
                     }
                     newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 				}
 			}
 		}
+		return extraBikes;
 	}
 	
 	/**
@@ -588,36 +600,33 @@ public class ValleyBikeSim {
 	 * 
 	 * Reassigns extra bikes and pedelecs to stations with lower percentages
 	 * Until their percentages are within appropriate range
-	 * 
 	 * @param stationsCapacity - stations with percentages deemed too low
 	 * @param idealPercentage - percentage to aim for
+	 * @param extraBikes - stack of extra bikes to put in stations
 	 */
 	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity,
-			int idealPercentage, ArrayList<Integer> extras){
+											  int idealPercentage, Deque<Bike> extraBikes){
 		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
 		while (capacityIterator.hasNext()){
-			Integer key = (Integer) capacityIterator.next();
-			Station station = stationsMap.get(key);
+			Integer stationKey = (Integer) capacityIterator.next();
+			Station station = stationsMap.get(stationKey);
 
-			int newPercentage = stationsCapacity.get(key);
+			int newPercentage = stationsCapacity.get(stationKey);
 
 			// continues to add vehicles as long as adding a vehicle
 			// moves the percentage closer to ideal percentage
 			// and there are still extra vehicles to add
-
-			while((Math.abs(newPercentage - idealPercentage) >
+			while(Math.abs(newPercentage - idealPercentage) >
 					Math.abs((int) (((float) (station.getBikes() + 1) /
 							station.getCapacity()) * 100)) - idealPercentage)
-					&& Integer.sum(extras.get(0), extras.get(1))>0){
+			{
 
-				if(extras.get(0) > 0){
-						station.setBikes(station.getBikes() + 1);
-						extras.set(0, extras.get(0)-1);
-					} else{
-						extras.set(1, extras.get(1)-1);
+				if(!extraBikes.isEmpty()){ // while stack isn't empty
+					Bike bike = extraBikes.pop(); // get a bike from our stack
+					bike.moveStation(stationKey); // move this bike to the current station
 					}
-
-					newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
+				else { return; } // return when stack is empty
+				newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 			}
 		}
 	}
@@ -691,7 +700,7 @@ public class ValleyBikeSim {
 	static CustomerAccount getCustomerObj(String key){
 	    return customerAccountMap.get(key);
     }
-
+    
     /**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
@@ -735,6 +744,30 @@ public class ValleyBikeSim {
 		} else{
 			return stationsMap.keySet().iterator();
 		}
+	}
+
+	/**
+	 * Return a stack of bikes docked at a particular station
+	 * @param statId The int ID of the station from which we will
+	 *               collect the list of docked bikes.
+	 * @return bikesAtStation - a stack of bikes docked at this station
+	 *
+	 */
+	static Deque<Bike> getBikesAtStation(int statId){
+		// initiate our bike stack
+		Deque<Bike> bikesAtStation = new ArrayDeque<Bike>();
+		// initiate iterator
+		Iterator<Integer> bikeKeyIterator = ValleyBikeSim.createIterator(true);
+
+		// keep looping until there is no next value
+		while(bikeKeyIterator.hasNext()){
+			Integer key = (Integer) bikeKeyIterator.next();
+			Bike bike = ValleyBikeSim.getBikeObj(key);
+			if(statId == bike.getStation()) { // if the bike's station ID matches this station
+				bikesAtStation.push(bike); // add it to stack
+			}
+		}
+		return bikesAtStation;
 	}
 
 	/**
