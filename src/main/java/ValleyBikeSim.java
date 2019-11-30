@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.util.*;
 import java.sql.Timestamp;
@@ -29,10 +30,10 @@ public class ValleyBikeSim {
 
 	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
-	/** 
+	/**
 	 * Reads in the stations csv file data and parses it into station objects
 	 * mapped by id for easy access and manipulation throughout program
-	 * 
+	 *
 	 * Then outputs welcome message and menu selector
 	 */
 	public static void main(String[] args) throws IOException, ParseException {
@@ -75,7 +76,6 @@ public class ValleyBikeSim {
 					values[3],
 					membership,
 					Integer.parseInt(values[5]));
-
 
 			// add to the customer account map
 			customerAccountMap.put(values[0],accountObj);
@@ -126,8 +126,85 @@ public class ValleyBikeSim {
 	 *
 	 * @return the balance associate with the account accessed through the username
 	 */
-	static int viewAccountBalance(String username) {
+	static double viewAccountBalance(String username) {
 		return customerAccountMap.get(username).getBalance();
+	}
+
+	/**
+	 * View the membership type associated with a user's account
+	 *
+	 * @param username the unique username associated with the customer account
+	 * @return the membership type associated with the account accessed through the username
+	 */
+	static Membership viewMembershipType(String username) {
+		return customerAccountMap.get(username).getMembership();
+	}
+
+	/**
+	 * View the credit card associated with a user's account
+	 *
+	 * @param username the unique username associated with the customer account
+	 * @return the credit card number with the account accessed through the username
+	 */
+	static String viewCreditCard(String username) {
+		return customerAccountMap.get(username).getCreditCard();
+	}
+
+	/**
+	 * Method to check whether customer already has a bike rented and whether the rental has
+	 * gone on for too long (in which caase they are charged)
+	 *
+	 * @param username is the unique username associated with the customer account
+	 */
+	static Boolean checkBikeRented(String username) {
+		// get customer object
+		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+		// true if last ride was returned
+		Boolean isReturned = customer.getIsReturned();
+		if (!isReturned) {
+			//TODO access ride list in customer account
+			// find start time of unfinished ride, check length of rental
+			// if rental exceeds 24 hours, charge account 150 and notify user
+			// if rental is fresh, just remind them they have a rental
+		}
+		return isReturned;
+	}
+
+	/**
+	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
+	 *
+	 */
+	static void checkMembershipRenewal() {
+		// initiate iterator
+		Iterator<String> keyIterator1 = customerAccountMap.keySet().iterator();
+
+		// while the iterator has a next value
+		while(keyIterator1.hasNext()) {
+			// initiate key for iterator
+			String username = keyIterator1.next();
+			CustomerAccount user = customerAccountMap.get(username);
+			//TODO check all memberships to see whether their payment is due
+			// either add checkPaymentDue to all memberships (and PAYG always returns false
+			// or I would check to make sure its a monthly/yearly before performing checkPaymentDue
+			// but in that case the program is still trying to perform the call on a generic Membership and it doesnt work
+			//if (user.getMembership().checkPaymentDue()) {
+				if (ValleyBikeController.isValidCreditCard(username)) {
+					//TODO renew membership (renew rides remaining and charge card)
+					if (user.getMembership().getMembershipInt() == 2) {
+						//monthly things
+						user.getMembership().setTotalRidesLeft(20);
+						//TODO how would membership payment be reflected?
+					} else if (user.getMembership().getMembershipInt() == 0) {
+						//yearly things
+						user.getMembership().setTotalRidesLeft(260);
+						//TODO how would membership payment be reflected?
+					}
+				} else {
+					//TODO switch them to PAYG, inform them
+					//Membership payg = user.getMembership().setMembership(1);
+				}
+			//}
+		}
 	}
 
 	/**
@@ -206,11 +283,11 @@ public class ValleyBikeSim {
         // close our reader
         bufferedReader.close();
     }
-	
+
 	/**
 	 * Iterates through tree map and outputs bike data by ID order
 	 * in a nicely formatted table
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
@@ -428,12 +505,12 @@ public class ValleyBikeSim {
 
 	/**
 	 * Overwrites old station data in csv with updated data from stationMap
-	 * 
+	 *
 	 * The choice to overwrite all data instead of simply adding new stations
 	 * to existing file was made because recording rides can update information
 	 * in both old and added stations, and it was important to make sure those updates
 	 * were reflected in the new saved list as well
-	 * 
+	 *
 	 * @throws IOException
 	 */
 	static void saveStationList() throws IOException {
@@ -497,11 +574,11 @@ public class ValleyBikeSim {
      * We are not currently using this method.
      *
 	 * Takes in a ride data file name from user
-	 * Parses and iterates through file and uses ride timestamps 
+	 * Parses and iterates through file and uses ride timestamps
 	 * to determine average ride time.
-	 * 
+	 *
 	 * Prints out number of rides for that day and average time
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
@@ -539,20 +616,20 @@ public class ValleyBikeSim {
 		System.out.println("Number of rides: " + rides);
 		System.out.println("Average ride time in minutes: " + averageTime);
 	}
-	
+
 	/**
 	 * Iterates through stations to determine ideal percentage of vehicles to capacity
 	 * for the stations, and maps station ids to their actual percentages
-	 * 
+	 *
 	 * Then goes through and pulls extra vehicles from stations with percentages over ideal
 	 * and sequentially adds those extra vehicles to stations with percentages
 	 * under ideal until both have as close as possible to the ideal percentage
-	 * 
+	 *
 	 * This method prioritizes easily moving vehicles in order to get as many
 	 * stations within the ideal percentage as possible
 	 * However it does not prioritize stations further from the ideal percentage first
 	 *
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws ParseException
 	 */
@@ -567,11 +644,11 @@ public class ValleyBikeSim {
 		// distribute our bike stack to low percentage stations
 		reassignLowPercentage(stationsCapacity, idealPercentage, extraBikes);
 	}
-	
+
 	/**
 	 * Helper method for equalizeStations()
 	 * Iterates through station map and maps station ids to their current percentage
-	 * 
+	 *
 	 * @param stationsCapacity - Map to add station percentage data to
 	 * @return ideal station percentage based on total vehicles and total capacity
 	 */
@@ -595,7 +672,7 @@ public class ValleyBikeSim {
 
 		return idealPercentage;
 	}
-	
+
 	/**
 	 * Helper method for equalizeStations()
 	 * Iterates through station percentages and takes vehicles from those
@@ -643,10 +720,10 @@ public class ValleyBikeSim {
 		}
 		return extraBikes;
 	}
-	
+
 	/**
 	 * Helper method for equalizeStations()
-	 * 
+	 *
 	 * Reassigns extra bikes and pedelecs to stations with lower percentages
 	 * Until their percentages are within appropriate range
 	 * @param stationsCapacity - stations with percentages deemed too low
@@ -749,7 +826,7 @@ public class ValleyBikeSim {
 	static CustomerAccount getCustomerObj(String key){
 	    return customerAccountMap.get(key);
     }
-    
+
     /**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
@@ -826,4 +903,14 @@ public class ValleyBikeSim {
 	 * @param bikeID integer UD of bike
 	 */
 	static void addToMntRqs(int bikeID, String mntRq){ mntReqs.put(bikeID, mntRq); }
+
+	static Boolean stationsMapContains(int key){
+		if(stationsMap.containsKey(key)) return true;
+		else return false;
+	}
+
+	static Boolean bikesMapContains(int key){
+		if(bikesMap.containsKey(key)) return true;
+		else return false;
+	}
 }

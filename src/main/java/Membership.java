@@ -2,20 +2,20 @@ import java.time.LocalDate;
 
 public abstract class Membership {
 
-    private int totalRidesTaken;
+    private int totalRidesLeft;
 
     private LocalDate lastPayment;
 
     public Membership() {
-        this.totalRidesTaken = 0;
+        this.totalRidesLeft = 0;
     }
 
-    public int getTotalRidesTaken() {
-        return totalRidesTaken;
+    public int getTotalRidesLeft() {
+        return totalRidesLeft;
     }
 
-    public void setTotalRidesTaken(int totalRidesTaken) {
-        this.totalRidesTaken = totalRidesTaken;
+    public void setTotalRidesLeft(int totalRidesLeft) {
+        this.totalRidesLeft = totalRidesLeft;
     }
 
     public LocalDate getLastPayment() {

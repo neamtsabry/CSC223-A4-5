@@ -56,4 +56,11 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 **password:** csc223 <br/>
 **email address:** agrubb@smith.edu
 
+
+
+
+###CITATIONS
+https://stackoverflow.com/questions/27005861/calculate-days-between-two-dates-in-java-8
+
+
 ***
