@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class Station {
     // station name
     private String name;
@@ -22,6 +26,9 @@ public class Station {
 
     // address of the station
     private String address;
+
+    // list of bike ids associated with station
+    private LinkedList<Integer> bikeIdList = new LinkedList<>();
 
     /**
      * Constructor to create a new station object
@@ -97,4 +104,12 @@ public class Station {
     public String getAddress() { return this.address; }
 
     public void setAddress(String newAdd) { this.address = newAdd; }
+
+    public LinkedList<Integer> getBikeId(){
+        return bikeIdList;
+    }
+
+    public void addToBikeList(int bikeId){
+        bikeIdList.add(bikeId);
+    }
 }
