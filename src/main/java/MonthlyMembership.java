@@ -20,4 +20,8 @@ public class MonthlyMembership extends Membership{
         return super.getTotalRidesTaken() >= maxRides;
     }
 
+    public int getMembershipInt(){
+        return 2;
+    }
+
 }

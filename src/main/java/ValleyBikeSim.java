@@ -13,19 +13,21 @@ import java.text.SimpleDateFormat;
  */
 public class ValleyBikeSim {
 	/** data structure for keeping track of stations */
-	static Map<Integer, Station> stationsMap = new TreeMap<>();
+	static Map<Integer, Station> stationsMap = new HashMap<>();
 
 	/** data structure for keeping track of bikes */
-	static Map<Integer, Bike> bikesMap = new TreeMap<>();
+	static Map<Integer, Bike> bikesMap = new HashMap<>();
 
 	/** list for storing bike ids of bikes that require maintenance */
-	static ArrayList<Integer> mntReqs = new ArrayList<>();
+	static Map<Integer, String> mntReqs = new HashMap<>();
 
 	/** data structure for keeping track of customer accounts */
 	private static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
 
 	/** data structure for keeping track of internal accounts */
 	private static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
+
+	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
 	/** 
 	 * Reads in the stations csv file data and parses it into station objects
@@ -63,6 +65,7 @@ public class ValleyBikeSim {
 			// store comma separated values in string array
 			String[] values = line.split(",");
 
+			Membership membership = checkMembershipType(Integer.parseInt(values[4]));
 
 			// start a new customer account with all the individual values we got
 			CustomerAccount accountObj = new CustomerAccount(
@@ -70,7 +73,7 @@ public class ValleyBikeSim {
 					values[1],
 					values[2],
 					values[3],
-					values[4],
+					membership,
 					Integer.parseInt(values[5]));
 
 
@@ -248,7 +251,7 @@ public class ValleyBikeSim {
     static void viewStationList() throws IOException, ParseException{
 		// format table view
         System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
-                "AvDocs", "MainReq", "Cap", "Kiosk","Name - Address");
+                "AvDocs", "MainReq", "Capacity", "Kiosk","Name - Address");
 
 		// initiate iterator
         Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
@@ -261,12 +264,12 @@ public class ValleyBikeSim {
 			Station station = stationsMap.get(key);
 
 			// format the view values of station object
-			System.out.format("%-10d%-10d%-10d%-10d%-10d%-10d%-20s\n",
+			System.out.format("%-10d%-10d%-10d%-10d%-10d%-10b%-20s\n",
 					key, station.getBikes(),
 					station.getAvailableDocks(),
 					station.getMaintenanceRequest(),
 					station.getCapacity(),
-					station.getKioskNum(),
+					station.getKioskBoolean(),
 					station.getStationName() + "-" + station.getAddress());
 		}
     }
@@ -290,7 +293,29 @@ public class ValleyBikeSim {
     		//if the username does not already exist
 			//add the new customer account object to customer account map
     		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
+    		saveCustomerAccountList();
 		}
+	}
+
+	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException{
+    	Membership membershipType = checkMembershipType(membership);
+    	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
+		//add customer account to customer account map
+		ValleyBikeSim.addCustomerAccount(customerAccount);
+
+	}
+
+	public static Membership checkMembershipType(int membership){
+    	if (membership == 1){
+    		return new PayAsYouGoMembership();
+		}
+    	if (membership == 2){
+    		return new MonthlyMembership();
+		}
+    	if (membership == 3){
+    		return new YearlyMembership();
+		}
+    	return null;
 	}
 
 	/**
@@ -346,7 +371,7 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		}
 		//if the username and password both match with associated customer account object, lead the user to internal account home
-		ValleyBikeController.internalAccountHome();
+		ValleyBikeController.internalAccountHome(username);
 	}
 
 	/**
@@ -373,6 +398,32 @@ public class ValleyBikeSim {
 		// then end the fileWriter
 		customerAccountsWriter.flush();
 		customerAccountsWriter.close();
+	}
+
+	/**
+	 * Overwrites old internal account data in csv with updated data from internalAccountMap
+	 *
+	 * @throws IOException
+	 */
+	public static void saveInternalAccountList() throws IOException {
+		// initiate fileWriter and iterator
+		FileWriter internalAccountsWriter = new FileWriter("data-files/internal-account-data.csv");
+		Iterator<String> keyIterator = internalAccountMap.keySet().iterator();
+
+		// write the labels at the beginning of the file
+		internalAccountsWriter.write("Username,Password,Email Address");
+
+		// loop through customer accounts and transform customer account object
+		while(keyIterator.hasNext()){
+			String key = keyIterator.next();
+			InternalAccount internalAccount = internalAccountMap.get(key);
+			internalAccountsWriter.write("\n");
+			internalAccountsWriter.write(internalAccount.getInternalAccountString());
+		}
+
+		// then end the fileWriter
+		internalAccountsWriter.flush();
+		internalAccountsWriter.close();
 	}
 
 	/**
@@ -637,14 +688,14 @@ public class ValleyBikeSim {
 	static void resolveMntReqs(){
 		// if there are maintenance requests
 		if(mntReqs != null) {
-			System.out.println("Here's a list of bike iDs in need of maintenance");
+			System.out.println("Here's a list of bike iDs in need of maintenance and their reports.");
 			// loop through all the bike ids in need of maintenance
-			for(int bikeId : mntReqs){
+			for(Map.Entry<Integer, String> entry : mntReqs.entrySet()){
 				// view each id
-				System.out.format("%-5d\n", bikeId);
+				System.out.format("%-5d%-20s\n", entry.getKey(), entry.getValue());
 
 				// get bike object
-				Bike bike = bikesMap.get(bikeId);
+				Bike bike = bikesMap.get(entry.getKey());
 
 				// set bike maintenance values to none
 				bike.setMnt(false);
@@ -695,6 +746,10 @@ public class ValleyBikeSim {
 		stationsMap.put(id, stationOb);
 	}
 
+	static CustomerAccount getCustomerObj(String key){
+	    return customerAccountMap.get(key);
+    }
+    
     /**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
@@ -714,6 +769,14 @@ public class ValleyBikeSim {
 	static void addNewBike(int id, Bike bikeObj){
 		bikesMap.put(id, bikeObj);
 	}
+
+	static void addToRideMap(UUID rideID, Ride rideObj){
+	    rideMap.put(rideID, rideObj);
+    }
+
+    static Ride getRideObj(UUID key){
+	    return rideMap.get(key);
+    }
 
 	/**
 	 * Helper method for controller class to return a key set
@@ -762,5 +825,5 @@ public class ValleyBikeSim {
 	 *
 	 * @param bikeID integer UD of bike
 	 */
-	static void addToMntRqs(int bikeID){ mntReqs.add(bikeID); }
+	static void addToMntRqs(int bikeID, String mntRq){ mntReqs.put(bikeID, mntRq); }
 }

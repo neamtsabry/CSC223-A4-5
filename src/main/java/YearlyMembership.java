@@ -19,4 +19,8 @@ public class YearlyMembership extends Membership{
     public boolean checkMaxRidesExceeded(){
         return super.getTotalRidesTaken() >= maxRides;
     }
+
+    public int getMembershipInt(){
+        return 3;
+    }
 }
