@@ -1,7 +1,6 @@
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -25,8 +24,7 @@ public abstract class ValleyBikeController {
         //TODO exit option on all menus
 
         //check whether it's time to renew customer's memberships
-        LocalDate date = LocalDate.now();
-        ValleyBikeSim.checkMembershipRenewal(date);
+        ValleyBikeSim.checkMembershipRenewal();
 
         System.out.print("\n Welcome to ValleyBike Share! \n"
                 + "1. Create Customer Account (Partially works) \n"
