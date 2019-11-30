@@ -7,3 +7,5 @@ target
 .classpath
 bin
 target
+src/main/java/CustomerAccount.java
+src/main/java/ValleyBikeController.java
