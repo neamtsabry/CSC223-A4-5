@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Scanner;
@@ -21,6 +22,11 @@ public abstract class ValleyBikeController {
     static void initialMenu() throws IOException, ParseException {
         //TODO back menu on all menus
         //TODO exit option on all menus
+
+        //check whether it's time to renew customer's memberships
+        LocalDate date = LocalDate.now();
+        ValleyBikeSim.checkMembershipRenewal(date);
+
         System.out.print("\n Welcome to ValleyBike Share! \n"
                 + "1. Create Customer Account (Partially works) \n"
                 + "2. Log In\n"
@@ -93,176 +99,6 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * Prompts user to input username
-     * Validates if username is between 6-14 characters
-     * Recursively calls itself until valid username input by user
-     *
-     * @return valid username input by user
-     */
-    private static String enterUsername(){
-        //prompts user to input username
-        System.out.println("Enter username (must be between 6-14 characters):");
-        String username = input.nextLine();
-
-        //validates if username is between 6-24 characters
-        if (!isValidUsername(username)){
-
-            //recursively calls itself until valid username input by user
-            System.out.println("Username is not valid.");
-            enterUsername();
-        }
-
-        //return valid username input by user
-        return username;
-    }
-
-    /**
-     * Prompts user to input password
-     * Validates if password is between 6-14 characters
-     * Recursively calls itself until valid password input by user
-     *
-     * @return valid password input by user
-     */
-    private static String enterPassword(){
-        //prompts user to input password
-        System.out.println("Enter password (must be between 6-14 characters):");
-        String password = input.nextLine();
-
-        //validates if password is between 6-24 characters
-        if (!isValidPassword(password)){
-
-            //recursively calls itself until valid password input by user
-            System.out.println("Password is not valid.");
-            enterPassword();
-        }
-
-        //return valid password input by user
-        return password;
-    }
-
-    /**
-     * Prompts user to input email address
-     * Validates if email address is in correct format
-     * Recursively calls itself until valid email address input by user
-     *
-     * @return valid email address input by user
-     */
-    private static String enterEmail(){
-        // TODO let user know how to make valid email address
-        //prompts user to input email address
-        System.out.println("Enter email address:");
-        String emailAddress = input.nextLine();
-
-        //validates if email address is in correct format
-        if (!isValidEmail(emailAddress)){
-
-            //recursively calls itself until valid email address input by user
-            System.out.println("Email address is not valid.");
-            enterEmail();
-        }
-
-        //return valid email address input by user
-        return emailAddress;
-    }
-
-    /**
-     * Prompts user to input credit card
-     * Validates if credit card is correct
-     * Recursively calls itself until valid email address input by user
-     *
-     * @return valid credit card input by user
-     */
-    private static String enterCreditCard(){
-        //prompts user to input email address
-        System.out.println("Enter credit card number:");
-        String creditCard = input.nextLine();
-
-        //validates if credit card is correct
-        if (!isValidCreditCard(creditCard)){
-
-            //recursively calls itself until valid credit card input by user
-            System.out.println("Credit card is not valid.");
-            enterCreditCard();
-        }
-
-        //return valid credit card input by user
-        return creditCard;
-    }
-
-    /**
-     * Prompts user to input membership
-     *
-     * @return membership string input by user
-     */
-    private static String enterMembership(){
-        //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
-        System.out.println("Enter membership type:");
-        String membership = input.nextLine();
-        return membership;
-    }
-
-    /**
-     * Validates if username is between 6 and 14 characters
-     *
-     * @param username is the username input by the user
-     *
-     * @return true if username is valid and false otherwise
-     */
-    private static boolean isValidUsername(String username){
-        return username.length() >= 6 && username.length() <= 14;
-    }
-
-    /**
-     * Validates if password is between 6 and 14 characters
-     *
-     * @param password is the password input by the user
-     *
-     * @return true if password is valid and false otherwise
-     */
-    private static boolean isValidPassword(String password){
-        return password.length() >= 6 && password.length() <= 14;
-    }
-
-    /**
-     * Validates credit card number input by user
-     *
-     * @param creditCard is the credit card number input by user
-     *
-     * @return true if credit card is valid and false otherwise
-     */
-    private static boolean isValidCreditCard(String creditCard){
-        //TODO check credit card validity for every transaction
-
-        //90% of the time the method accepts the credit card
-        //10% of the time the method rejects the credit card
-        //This method makes a random decision and is not a real credit card validator
-        return Math.random() <= 0.95;
-    }
-
-    /**
-     * Checks if the email address input by the user is valid
-     *
-     * @param emailAddress is the email address input by the user
-     *
-     * @return true if email address is valid and false otherwise
-     */
-    private static boolean isValidEmail(String emailAddress) {
-        //regular expression to check format of the email address string input by user
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        Pattern pat = Pattern.compile(emailRegex);
-
-        //if the string is null return false
-        if (emailAddress == null) return false;
-
-        //if the email address entered by user matches the pattern from the regex
-        //then return true, else return false
-        return pat.matcher(emailAddress).matches();
-    }
-
-    /**
      * This is the log in menu that allows the user to log in to either customer or internal account
      *
      * @throws IOException customer log in and internal log in methods in model throw IOException
@@ -308,6 +144,9 @@ public abstract class ValleyBikeController {
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
     public static void customerAccountHome(String username) throws IOException, ParseException {
+        //check to see if currently has a bike rented
+        ValleyBikeSim.checkBikeRented(username);
+
         //menu option for customer account home
         System.out.println("Please choose from one of the following menu options: \n"
                 + "1. Edit account info (Partially works) \n"
@@ -404,6 +243,18 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     public static void rentBike(String username) throws IOException, ParseException{
+
+        //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
+        String membership = ValleyBikeSim.viewMembershipType(username);
+        if (membership.equals("Pay-as-you-go")) {
+            String creditCard = ValleyBikeSim.viewCreditCard(username);
+            //check validity of credit card, send them back to home screen if not valid
+            if (!isValidCreditCard(creditCard)) {
+                System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved in your account is correct, then try again.");
+                customerAccountHome(username);
+            }
+        } //if there is no problem, continue with rental
+
         // View stations
         System.out.println("Here's a list of station IDs and their names");
 
@@ -424,6 +275,8 @@ public abstract class ValleyBikeController {
                     "to rent a bike from");
             stationFrom = ValleyBikeSim.getStationObj(statId);
         }
+
+        //TODO call the maintenance worker after theyve rented the bike instead of before
 
         // if there's more than one bike at station
         if (stationFrom.getBikes() > 1){
@@ -540,6 +393,8 @@ public abstract class ValleyBikeController {
             stationTo = ValleyBikeSim.getStationObj(statId);
         }
 
+        //TODO only call maintenance worker when bike is finished being returned
+
         // if there's more than one bike at station
         if (stationTo.getBikes() > 1){
             // station now has one less bike
@@ -570,6 +425,20 @@ public abstract class ValleyBikeController {
 
         // set bike's station id to the station it's returned to
         someBike.setStation(statId);
+
+        //check membership to determine how to charge for rental
+        String membership = ValleyBikeSim.viewMembershipType(username);
+        //TODO view rides remaining not balance
+        int ridesRemaining = ValleyBikeSim.viewAccountBalance(username);
+        //if pay-as-you-go or no rides remaining on membership, charge by time
+        if (membership.equals("Pay-as-you-go") || ridesRemaining == 0) {
+            //TODO get timestamps from ride object
+            // calculate time and then calculate payment
+            // add payment to users account history and ride
+        //otherwise merely decrement rides remaining in membership
+        } else {
+            //TODO decrement rides remaining
+        }
 
         System.out.println("You're all done! Thank you for returning this bike.");
 
@@ -872,6 +741,176 @@ public abstract class ValleyBikeController {
     public void resolveData() throws IOException, ParseException {
         String dataFile = input.next();
         ValleyBikeSim.resolveData(dataFile);
+    }
+
+    /**
+     * Prompts user to input username
+     * Validates if username is between 6-14 characters
+     * Recursively calls itself until valid username input by user
+     *
+     * @return valid username input by user
+     */
+    private static String enterUsername(){
+        //prompts user to input username
+        System.out.println("Enter username (must be between 6-14 characters):");
+        String username = input.nextLine();
+
+        //validates if username is between 6-24 characters
+        if (!isValidUsername(username)){
+
+            //recursively calls itself until valid username input by user
+            System.out.println("Username is not valid.");
+            enterUsername();
+        }
+
+        //return valid username input by user
+        return username;
+    }
+
+    /**
+     * Prompts user to input password
+     * Validates if password is between 6-14 characters
+     * Recursively calls itself until valid password input by user
+     *
+     * @return valid password input by user
+     */
+    private static String enterPassword(){
+        //prompts user to input password
+        System.out.println("Enter password (must be between 6-14 characters):");
+        String password = input.nextLine();
+
+        //validates if password is between 6-24 characters
+        if (!isValidPassword(password)){
+
+            //recursively calls itself until valid password input by user
+            System.out.println("Password is not valid.");
+            enterPassword();
+        }
+
+        //return valid password input by user
+        return password;
+    }
+
+    /**
+     * Prompts user to input email address
+     * Validates if email address is in correct format
+     * Recursively calls itself until valid email address input by user
+     *
+     * @return valid email address input by user
+     */
+    private static String enterEmail(){
+        // TODO let user know how to make valid email address
+        //prompts user to input email address
+        System.out.println("Enter email address:");
+        String emailAddress = input.nextLine();
+
+        //validates if email address is in correct format
+        if (!isValidEmail(emailAddress)){
+
+            //recursively calls itself until valid email address input by user
+            System.out.println("Email address is not valid.");
+            enterEmail();
+        }
+
+        //return valid email address input by user
+        return emailAddress;
+    }
+
+    /**
+     * Prompts user to input credit card
+     * Validates if credit card is correct
+     * Recursively calls itself until valid email address input by user
+     *
+     * @return valid credit card input by user
+     */
+    private static String enterCreditCard(){
+        //prompts user to input email address
+        System.out.println("Enter credit card number:");
+        String creditCard = input.nextLine();
+
+        //validates if credit card is correct
+        if (!isValidCreditCard(creditCard)){
+
+            //recursively calls itself until valid credit card input by user
+            System.out.println("Credit card is not valid.");
+            enterCreditCard();
+        }
+
+        //return valid credit card input by user
+        return creditCard;
+    }
+
+    /**
+     * Prompts user to input membership
+     *
+     * @return membership string input by user
+     */
+    private static String enterMembership(){
+        //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
+        System.out.println("Enter membership type:");
+        String membership = input.nextLine();
+        return membership;
+    }
+
+    /**
+     * Validates if username is between 6 and 14 characters
+     *
+     * @param username is the username input by the user
+     *
+     * @return true if username is valid and false otherwise
+     */
+    private static boolean isValidUsername(String username){
+        return username.length() >= 6 && username.length() <= 14;
+    }
+
+    /**
+     * Validates if password is between 6 and 14 characters
+     *
+     * @param password is the password input by the user
+     *
+     * @return true if password is valid and false otherwise
+     */
+    private static boolean isValidPassword(String password){
+        return password.length() >= 6 && password.length() <= 14;
+    }
+
+    /**
+     * Validates credit card number input by user
+     *
+     * @param creditCard is the credit card number input by user
+     *
+     * @return true if credit card is valid and false otherwise
+     */
+    static boolean isValidCreditCard(String creditCard){
+        //TODO check credit card validity for every transaction
+
+        //90% of the time the method accepts the credit card
+        //10% of the time the method rejects the credit card
+        //This method makes a random decision and is not a real credit card validator
+        return Math.random() <= 0.95;
+    }
+
+    /**
+     * Checks if the email address input by the user is valid
+     *
+     * @param emailAddress is the email address input by the user
+     *
+     * @return true if email address is valid and false otherwise
+     */
+    private static boolean isValidEmail(String emailAddress) {
+        //regular expression to check format of the email address string input by user
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        Pattern pat = Pattern.compile(emailRegex);
+
+        //if the string is null return false
+        if (emailAddress == null) return false;
+
+        //if the email address entered by user matches the pattern from the regex
+        //then return true, else return false
+        return pat.matcher(emailAddress).matches();
     }
 }
 

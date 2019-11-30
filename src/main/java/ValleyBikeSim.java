@@ -1,4 +1,7 @@
+import jdk.vm.ci.meta.Local;
+
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -63,7 +66,6 @@ public class ValleyBikeSim {
 			// store comma separated values in string array
 			String[] values = line.split(",");
 
-
 			// start a new customer account with all the individual values we got
 			CustomerAccount accountObj = new CustomerAccount(
 					values[0],
@@ -72,7 +74,6 @@ public class ValleyBikeSim {
 					values[3],
 					values[4],
 					Integer.parseInt(values[5]));
-
 
 			// add to the customer account map
 			customerAccountMap.put(values[0],accountObj);
@@ -125,6 +126,74 @@ public class ValleyBikeSim {
 	 */
 	static int viewAccountBalance(String username) {
 		return customerAccountMap.get(username).getBalance();
+	}
+
+	/**
+	 * View the membership type associated with a user's account
+	 *
+	 * @param username the unique username associated with the customer account
+	 * @return the membership type associated with the account accessed through the username
+	 */
+	static String viewMembershipType(String username) {
+		return customerAccountMap.get(username).getMembership();
+	}
+
+	/**
+	 * View the credit card associated with a user's account
+	 *
+	 * @param username the unique username associated with the customer account
+	 * @return the credit card number with the account accessed through the username
+	 */
+	static String viewCreditCard(String username) {
+		return customerAccountMap.get(username).getCreditCard();
+	}
+
+	/**
+	 * Method to check whether customer already has a bike rented and whether the rental has
+	 * gone on for too long (in which caase they are charged)
+	 *
+	 * @param username is the unique username associated with the customer account
+	 */
+	static void checkBikeRented(String username) {
+		//TODO check to see if user currently has a bike checked out
+		boolean bikeOut = true;
+		if (bikeOut) {
+			//TODO check most recent ride in Customer's ride linked list
+			// check timestamps to find length of rental so far
+			// if ride has exceeded 24 hours charge the heck outta em
+			// charge 150, tell user
+			// if rental has just been short, remind them they have a rental
+		}
+	}
+
+	/**
+	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
+	 *
+	 */
+	static void checkMembershipRenewal(LocalDate date) {
+		// initiate iterator
+		Iterator<String> keyIterator1 = customerAccountMap.keySet().iterator();
+
+		// while the iterator ha     s a next value
+		while(keyIterator1.hasNext()) {
+			// initiate key for iterator
+			String username = keyIterator1.next();
+			CustomerAccount user = customerAccountMap.get(username);
+			//if first date of membership period, renew
+			//if credit card not valid, switch them to pay-as-you-go
+			if (true) {
+				if (ValleyBikeController.isValidCreditCard(username)) {
+					//TODO renew membership (renew rides remaining and charge card)
+					if (user.getMembership().equals("Monthly")) {
+						//monthly things
+					} else if (user.getMembership().equals("Yearly")) {
+						//yearly things
+					}
+				} else {
+					//TODO switch them to PAYG, inform them
+				}
+			}
+		}
 	}
 
 	/**
