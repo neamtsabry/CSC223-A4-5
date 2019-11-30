@@ -8,7 +8,7 @@ public class CustomerAccount extends Account{
     private String creditCard;
 
     /** This field is the membership type that the customer is paying for */
-    private String membership;
+    private Membership membership;
 
     /** This field is the balance of the customer in their account */
     private int balance;
@@ -26,7 +26,7 @@ public class CustomerAccount extends Account{
      * @param creditCard is the credit card number input by the user
      * @param membership is the membership type that the customer is paying for
      */
-    public CustomerAccount(String username, String password, String emailAddress, String creditCard, String membership) {
+    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership) {
         //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
@@ -45,7 +45,7 @@ public class CustomerAccount extends Account{
      * @param membership is the membership type that the customer is paying for
      * @param balance is the money that the customer has available in their account
      */
-    public CustomerAccount(String username, String password, String emailAddress, String creditCard, String membership, int balance) {
+    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, int balance) {
         //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
@@ -67,8 +67,7 @@ public class CustomerAccount extends Account{
      * This is the setter method to update membership
      * @param membership is the new membership type entered by the user
      */
-    public void setMembership(String membership) {
-        //TODO currently the membership is just a string but it will be a class in A5
+    public void setMembership(Membership membership) {
         this.membership = membership;
     }
 
@@ -84,7 +83,7 @@ public class CustomerAccount extends Account{
      * This is the getter method to access membership type associated with the customer account
      * @return the membership type associated with the customer account
      */
-    public String getMembership() {
+    public Membership getMembership() {
         return membership;
     }
 
@@ -112,7 +111,7 @@ public class CustomerAccount extends Account{
     public String getCustomerAccountString(){
         return this.getUsername() + "," + this.getPassword() + "," +
                  this.getEmailAddress() + "," + this.getCreditCard() + ","
-                + this.getMembership() + "," + this.getBalance();
+                + this.getMembership().getMembershipInt() + "," + this.getBalance();
     }
 
     public void addNewRide(UUID rideID){

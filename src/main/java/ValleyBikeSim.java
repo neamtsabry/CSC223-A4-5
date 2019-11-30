@@ -65,6 +65,7 @@ public class ValleyBikeSim {
 			// store comma separated values in string array
 			String[] values = line.split(",");
 
+			Membership membership = checkMembershipType(Integer.parseInt(values[4]));
 
 			// start a new customer account with all the individual values we got
 			CustomerAccount accountObj = new CustomerAccount(
@@ -72,7 +73,7 @@ public class ValleyBikeSim {
 					values[1],
 					values[2],
 					values[3],
-					values[4],
+					membership,
 					Integer.parseInt(values[5]));
 
 
@@ -292,7 +293,29 @@ public class ValleyBikeSim {
     		//if the username does not already exist
 			//add the new customer account object to customer account map
     		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
+    		saveCustomerAccountList();
 		}
+	}
+
+	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException{
+    	Membership membershipType = checkMembershipType(membership);
+    	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
+		//add customer account to customer account map
+		ValleyBikeSim.addCustomerAccount(customerAccount);
+
+	}
+
+	public static Membership checkMembershipType(int membership){
+    	if (membership == 1){
+    		return new PayAsYouGoMembership();
+		}
+    	if (membership == 2){
+    		return new MonthlyMembership();
+		}
+    	if (membership == 3){
+    		return new YearlyMembership();
+		}
+    	return null;
 	}
 
 	/**
@@ -375,6 +398,32 @@ public class ValleyBikeSim {
 		// then end the fileWriter
 		customerAccountsWriter.flush();
 		customerAccountsWriter.close();
+	}
+
+	/**
+	 * Overwrites old internal account data in csv with updated data from internalAccountMap
+	 *
+	 * @throws IOException
+	 */
+	public static void saveInternalAccountList() throws IOException {
+		// initiate fileWriter and iterator
+		FileWriter internalAccountsWriter = new FileWriter("data-files/internal-account-data.csv");
+		Iterator<String> keyIterator = internalAccountMap.keySet().iterator();
+
+		// write the labels at the beginning of the file
+		internalAccountsWriter.write("Username,Password,Email Address");
+
+		// loop through customer accounts and transform customer account object
+		while(keyIterator.hasNext()){
+			String key = keyIterator.next();
+			InternalAccount internalAccount = internalAccountMap.get(key);
+			internalAccountsWriter.write("\n");
+			internalAccountsWriter.write(internalAccount.getInternalAccountString());
+		}
+
+		// then end the fileWriter
+		internalAccountsWriter.flush();
+		internalAccountsWriter.close();
 	}
 
 	/**

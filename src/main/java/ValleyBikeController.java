@@ -19,8 +19,8 @@ public abstract class ValleyBikeController {
     static void initialMenu() throws IOException, ParseException {
         //TODO back menu on all menus
         //TODO exit option on all menus
-        System.out.print("\n Welcome to ValleyBike Share! \n"
-                + "1. Create Customer Account (Partially works) \n"
+        System.out.print("\nWelcome to ValleyBike Share! \n"
+                + "1. Create Customer Account \n"
                 + "2. Log In\n"
                 + "0. Exit program\n");
         //prompt the user to pick an int option
@@ -50,6 +50,7 @@ public abstract class ValleyBikeController {
                 System.exit(0);
                 break;
             default:
+                System.out.println("That is an invalid option. Please try again.");
                 initialMenu();
         }
     }
@@ -67,28 +68,23 @@ public abstract class ValleyBikeController {
         //i.e. only internal staff can create new internal accounts
 
         //TODO separate create customer account and create internal account method and implement them in the correct places
-        //TODO membership types
+        //TODO Check if username already exists right away
 
         //each field has its own method which calls itself until a valid input is entered
         String username = enterUsername();
         String password = enterPassword();
         String emailAddress = enterEmail();
         String creditCard = enterCreditCard();
-        String membership = enterMembership();
+        int membership = enterMembership();
 
         //once all the required fields have been input by the user, create new customer account
         //Assumption: initially the balance in customer account is always 0
-        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership);
-
-        //add customer account to customer account map
-        ValleyBikeSim.addCustomerAccount(customerAccount);
+        ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
 
         //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
 
-        //go to account menu
-        String user = customerAccount.getUsername();
-        customerAccountHome(user);
+        customerAccountHome(username);
     }
 
     /**
@@ -193,11 +189,16 @@ public abstract class ValleyBikeController {
      *
      * @return membership string input by user
      */
-    private static String enterMembership(){
+    private static int enterMembership(){
         //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
-        System.out.println("Enter membership type:");
-        String membership = input.nextLine();
-        return membership;
+        System.out.println("Choose membership type: \n" +
+                "1. Pay-as-you-go Membership \n" +
+                "2. Monthly Membership \n" +
+                "3. Yearly Membership");
+        //prompt the user to pick an int option
+        int num = getResponse("Please enter your selection (1-3):");
+        input.nextLine();
+        return num;
     }
 
     /**
@@ -271,14 +272,26 @@ public abstract class ValleyBikeController {
      */
     static void logIn() throws IOException, ParseException {
         //prompt the user to choose which kind of account they want to log into
-        int logIn = getResponse("Press 1 to log in to customer account. \nPress 2 to log in to internal account.");
+        int logIn = getResponse("Press 1 to log in to customer account. \nPress 2 to log in to internal account. \nPress 0 to log out.");
         input.nextLine();
 
+        //if user wants to log out take them to initial menu to log out
+        if (logIn == 0){
+            initialMenu();
+        }
+
+        //this is not inside the switch case because if it is in the switch case,
+        //it informs the user that they picked an invalid option after asking for username and password
+        if (logIn != 1 && logIn != 2){
+            //if they did not choose either 1 or 2
+            //make them choose again by recursively calling log in
+            System.out.println("Invalid option chosen.");
+            logIn();
+        }
+
         //prompt the user to input their username and password
-        System.out.println("Enter username:");
-        String username = input.nextLine();
-        System.out.println("Enter password:");
-        String password = input.nextLine();
+        String username = enterUsername();
+        String password = enterPassword();
 
         switch (logIn){
             case 1:
@@ -291,11 +304,6 @@ public abstract class ValleyBikeController {
                 //validate their username and password in the internal account map
                 ValleyBikeSim.internalLogIn(username, password);
                 break;
-            default:
-                //if they did not choose either 1 or 2
-                //make them choose again by recursively calling log in
-                System.out.println("Invalid option chosen.");
-                logIn();
         }
     }
 
@@ -687,17 +695,18 @@ public abstract class ValleyBikeController {
         //prompt user to pick option from main internal menu
 
         System.out.print("\n Choose from the following: \n"
-                + "1. View customer balances (Coming Soon!) \n"
-                + "2. View customer activity (Coming Soon!) \n"
-                + "3. Add new station \n"
-                + "4. Add new bike \n"
-                + "5. View station list \n"
-                + "6. View bike list \n"
-                + "7. Report problem \n"
-                + "8. Edit/Resolve maintenance requests \n"
-                + "9. Equalize stations (Coming Soon!) \n"
+                + "1. Create new internal account \n"
+                + "2. Edit account information \n"
+                + "3. View customer balances \n"
+                + "4. View customer activity \n"
+                + "5. Add new station \n"
+                + "6. Add new bike \n"
+                + "7. View station list \n"
+                + "8. View bike list \n"
+                + "9. Edit/Resolve maintenance requests \n"
+                + "10. Equalize stations (Coming Soon!) \n"
                 + "0. Log out \n");
-        System.out.println("Please enter your selection (0-9):");
+        System.out.println("Please enter your selection (1-9):");
 
         if (!input.hasNextInt()){
             //keep asking for input until valid
@@ -707,33 +716,36 @@ public abstract class ValleyBikeController {
         int num = input.nextInt();
         switch(num) {
             case 1:
-                //TODO view customer balances
+                //TODO create new internal account
                 break;
             case 2:
-                //TODO view customer activity
+                //TODO edit internal account
                 break;
             case 3:
+                //TODO view customer balances
+                break;
+            case 4:
+                //TODO view customer activity
+                break;
+            case 5:
                 //add station to station list
                 addStation();
                 break;
-            case 4:
+            case 6:
                 //add bike to bike list
                 addBike();
                 break;
-            case 5:
+            case 7:
                 ValleyBikeSim.viewStationList();
                 break;
-            case 6:
+            case 8:
                 ValleyBikeSim.viewBikeList();
                 break;
-            case 7:
-                reportProblem(username);
-                break;
-            case 8:
+            case 9:
                 // resolve maintenance requests
                 ValleyBikeSim.resolveMntReqs();
                 break;
-            case 9:
+            case 10:
                 //equalize stations
                 ValleyBikeSim.equalizeStations();
                 break;
@@ -932,7 +944,7 @@ public abstract class ValleyBikeController {
     private static Integer getResponse(String request){
         System.out.println(request);
         while (!input.hasNextInt()){
-            System.out.println("That is not a valid number");
+            System.out.println("That is not a valid number. Please try again.");
             System.out.println(request);
             input.next();
         }
