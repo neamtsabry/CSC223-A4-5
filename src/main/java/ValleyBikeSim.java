@@ -68,6 +68,8 @@ public class ValleyBikeSim {
 			// store comma separated values in string array
 			String[] values = line.split(",");
 
+			Membership membership = checkMembershipType(Integer.parseInt(values[4]));
+
 			// start a new customer account with all the individual values we got
 			CustomerAccount accountObj = new CustomerAccount(
 					values[0],
@@ -126,7 +128,7 @@ public class ValleyBikeSim {
 	 *
 	 * @return the balance associate with the account accessed through the username
 	 */
-	static int viewAccountBalance(String username) {
+	static double viewAccountBalance(String username) {
 		return customerAccountMap.get(username).getBalance();
 	}
 
@@ -136,7 +138,7 @@ public class ValleyBikeSim {
 	 * @param username the unique username associated with the customer account
 	 * @return the membership type associated with the account accessed through the username
 	 */
-	static String viewMembershipType(String username) {
+	static Membership viewMembershipType(String username) {
 		return customerAccountMap.get(username).getMembership();
 	}
 
@@ -156,45 +158,54 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static void checkBikeRented(String username) {
-		//TODO check to see if user currently has a bike checked out
-		boolean bikeOut = true;
-		if (bikeOut) {
-			//TODO check most recent ride in Customer's ride linked list
-			// check timestamps to find length of rental so far
-			// if ride has exceeded 24 hours charge the heck outta em
-			// charge 150, tell user
-			// if rental has just been short, remind them they have a rental
+	static Boolean checkBikeRented(String username) {
+		// get customer object
+		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+		// true if last ride was returned
+		Boolean isReturned = customer.getIsReturned();
+		if (!isReturned) {
+			//TODO access ride list in customer account
+			// find start time of unfinished ride, check length of rental
+			// if rental exceeds 24 hours, charge account 150 and notify user
+			// if rental is fresh, just remind them they have a rental
 		}
+		return isReturned;
 	}
 
 	/**
 	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
 	 *
 	 */
-	static void checkMembershipRenewal(LocalDate date) {
+	static void checkMembershipRenewal() {
 		// initiate iterator
 		Iterator<String> keyIterator1 = customerAccountMap.keySet().iterator();
 
-		// while the iterator ha     s a next value
+		// while the iterator has a next value
 		while(keyIterator1.hasNext()) {
 			// initiate key for iterator
 			String username = keyIterator1.next();
 			CustomerAccount user = customerAccountMap.get(username);
-			//if first date of membership period, renew
-			//if credit card not valid, switch them to pay-as-you-go
-			if (true) {
+			//TODO check all memberships to see whether their payment is due
+			// either add checkPaymentDue to all memberships (and PAYG always returns false
+			// or I would check to make sure its a monthly/yearly before performing checkPaymentDue
+			// but in that case the program is still trying to perform the call on a generic Membership and it doesnt work
+			//if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(username)) {
 					//TODO renew membership (renew rides remaining and charge card)
-					if (user.getMembership().equals("Monthly")) {
+					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
-					} else if (user.getMembership().equals("Yearly")) {
+						user.getMembership().setTotalRidesLeft(20);
+						//TODO how would membership payment be reflected?
+					} else if (user.getMembership().getMembershipInt() == 0) {
 						//yearly things
+						user.getMembership().setTotalRidesLeft(260);
+						//TODO how would membership payment be reflected?
 					}
 				} else {
 					//TODO switch them to PAYG, inform them
+					//Membership payg = user.getMembership().setMembership(1);
 				}
-			}
+			//}
 		}
 	}
 
