@@ -37,15 +37,10 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-<<<<<<< HEAD
                 createAccount();
                 // rentBike("aliciagrubb");
                 // System.out.println("---------------------------");
                 // returnBike("aliciagrubb");
-=======
-                // createAccount();
-                addStation();
->>>>>>> fa5b52d071fa2fe84f3bc9ecb19bfc5fee733cb1
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -158,14 +153,15 @@ public abstract class ValleyBikeController {
         //checks whether user has a rental, and if so whether it exceeds 24 hours
         Boolean isReturned = ValleyBikeSim.checkBikeRented(username);
 
+        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         //menu option for customer account home
         System.out.println("Please choose from one of the following menu options: \n"
                 + "1. Edit account info (Partially works) \n"
                 + "2. View account balance\n"
-                + "3. View station list\n");
+                + "3. View station list");
 
-        if (customer.getIsReturned()) { System.out.println("4. Rent a bike\n"); }
-        else { System.out.println("4. Return bike\n"); }
+        if (customer.getIsReturned()) { System.out.println("4. Rent a bike"); }
+        else { System.out.println("4. Return bike"); }
 
         System.out.println("5. Report a problem\n"
                 + "6. Log out \n");
@@ -308,30 +304,7 @@ public abstract class ValleyBikeController {
             ValleyBikeSim.viewStationList();
             statId = getResponse("Please pick a station from list shown above " +
                     "to rent a bike from");
-<<<<<<< HEAD
             stationFrom = ValleyBikeSim.getStationObj(statId);}
-=======
-            stationFrom = ValleyBikeSim.getStationObj(statId);
-        }
-
-        //TODO call the maintenance worker after theyve rented the bike instead of before
-        // because they could decide not to rent a bike after choosing station, before choosing bike
-
-        // if there's more than one bike at station
-        if (stationFrom.getBikes() > 1){
-            // station now has one less bike
-            stationFrom.setBikes(stationFrom.getBikes()-1);
-            // and one more available dock
-            stationFrom.setAvailableDocks(stationFrom.getAvailableDocks()+1);
-        } else {
-            // if there's less, notify maintenance worker to resolve data
-            System.out.println("Station is almost empty!");
-            System.out.println("Notifying maintenance worker to resolve this...");
-            // doesn't work
-            ValleyBikeSim.equalizeStations();
-            System.out.println("All done!");
-        }
->>>>>>> fa5b52d071fa2fe84f3bc9ecb19bfc5fee733cb1
 
         // View available bike ids at station
         System.out.println("Here's a list of bike IDs at this station");
@@ -459,24 +432,6 @@ public abstract class ValleyBikeController {
             stationTo = ValleyBikeSim.getStationObj(statId);
         }
 
-<<<<<<< HEAD
-=======
-        //TODO only call maintenance worker when bike is finished being returned
-
-        // if there's more than one bike at station
-        if (stationTo.getBikes() > 1){
-            // station now has one less bike
-            stationTo.setBikes(stationTo.getBikes()+1);
-            // and one more available dock
-            stationTo.setAvailableDocks(stationTo.getAvailableDocks()+1);
-        } else {
-            // if there's less, notify maintenance worker to resolve data
-            System.out.println("Station is almost empty!");
-            System.out.println("Notifying maintenance worker to resolve this...");
-            ValleyBikeSim.equalizeStations();
-            System.out.println("All done!");
-        }
->>>>>>> fa5b52d071fa2fe84f3bc9ecb19bfc5fee733cb1
 
         int bikeId = rideObj.getBikeId();
 
@@ -499,7 +454,6 @@ public abstract class ValleyBikeController {
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         customer.setIsReturned(true);
 
-<<<<<<< HEAD
         System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
         System.out.println();
 
@@ -513,7 +467,6 @@ public abstract class ValleyBikeController {
             System.out.println("The bikes have now been redistributed between the stations.");
             System.out.println();
         }
-=======
         //check membership to determine how to charge for rental
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
@@ -530,7 +483,6 @@ public abstract class ValleyBikeController {
         }
 
         System.out.println("You're all done! Thank you for returning this bike.");
->>>>>>> fa5b52d071fa2fe84f3bc9ecb19bfc5fee733cb1
 
         //TODO remember to save
 
@@ -697,20 +649,7 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String address = input.nextLine();
 
-<<<<<<< HEAD
-        // create new station object with received data from user
-        Station stationOb = new Station(
-                name,
-                maintenanceRequest,
-                capacity,
-                kiosk,
-                address);
-
-        // add to the station tree
-        ValleyBikeSim.addNewStation(id, stationOb);
-
         System.out.println("Station has been added!");
-=======
         // confirmation
         System.out.println("Are you sure you want to add a station with the info entered?(y/n)");
         String confirm = input.nextLine();
@@ -720,8 +659,6 @@ public abstract class ValleyBikeController {
                 // create new station object with received data from user
                 Station stationOb = new Station(
                         name,
-                        bikes,
-                        availableDocks,
                         maintenanceRequest,
                         capacity,
                         kiosk,
@@ -739,7 +676,6 @@ public abstract class ValleyBikeController {
                 System.out.println("You have to answer with y (yes) or n (no)");
                 break;
         }
->>>>>>> fa5b52d071fa2fe84f3bc9ecb19bfc5fee733cb1
     }
 
     /**

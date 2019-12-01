@@ -11,7 +11,7 @@ public class CustomerAccount extends Account{
     private Membership membership;
 
     /** This field is the balance of the customer in their account */
-    private double balance;
+    private int balance;
 
     // stack of ride ids user has
     private ArrayList<UUID> rideIdList = new ArrayList<>();
@@ -91,7 +91,7 @@ public class CustomerAccount extends Account{
      * This is the getter method to access the balance associated with the customer account
      * @return the balance associated with the customer account
      */
-    public double getBalance() {
+    public int getBalance() {
         return balance;
     }
 
