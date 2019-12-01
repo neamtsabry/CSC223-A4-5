@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -507,11 +508,6 @@ public abstract class ValleyBikeController {
         // someBike.setBikeLocation(2);
         someBike.moveStation(0); // move bike to station '0' <- our filler station
 
-        // time stamp recorded
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-        String formattedDate = sdf.format(date);
-
         lastRideId = UUID.randomUUID();
 
         // create new ride object
@@ -520,7 +516,7 @@ public abstract class ValleyBikeController {
                 username,
                 false);
 
-        ride.setStartTimeStamp(formattedDate);
+        ride.setStartTimeStamp(Instant.now());
 
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
@@ -612,11 +608,6 @@ public abstract class ValleyBikeController {
         // change to station the bike is returned to
         someBike.setStation(statId);
 
-        // time stamp recorded
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy h:mm:ss a");
-        String formattedDate = sdf.format(date);
-
         // if returned, then bike location is available and docked
         someBike.setBikeLocation(0);
 
@@ -625,7 +616,7 @@ public abstract class ValleyBikeController {
 
         // set ride to be returned
         rideObj.setIsReturned(true);
-        rideObj.setEndTimeStamp(formattedDate);
+        rideObj.setEndTimeStamp(Instant.now());
 
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);

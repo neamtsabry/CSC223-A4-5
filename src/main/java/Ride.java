@@ -1,5 +1,9 @@
+import java.text.Format;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -23,11 +27,11 @@ public class Ride {
     private long rideLength;
 
     // start time rented
-    private String startTimeStamp;
+    private Instant startTimeStamp;
 
     // end time returned
     // null if isReturned is false
-    private String endTimeStamp;
+    private Instant endTimeStamp;
 
     //TODO ??
     private String payment;
@@ -38,13 +42,6 @@ public class Ride {
         this.bikeId = bikeIdVal;
         this.username = usernameVal;
         this.isReturned = isReturnedVal;
-
-        if(isReturnedVal){
-            SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
-            Date date1 = format.parse(startTimeStamp);
-            Date date2 = format.parse(endTimeStamp);
-            this.rideLength = date2.getTime() - date1.getTime();
-        }
     }
 
     public void setRideId(UUID rideId) {
@@ -59,9 +56,7 @@ public class Ride {
         this.bikeId = bikeId;
     }
 
-    public int getBikeId() {
-        return this.bikeId;
-    }
+    public int getBikeId() { return this.bikeId; }
 
     public void setUsername(String username) {
         this.username = username;
@@ -71,27 +66,22 @@ public class Ride {
         return this.username;
     }
 
-    public void setStartTimeStamp(String startTimeStamp) {
-        this.startTimeStamp = startTimeStamp;
-    }
+    public void setStartTimeStamp(Instant startTimeStamp) { startTimeStamp = startTimeStamp; }
 
-    public String getStartTimeStamp() {
+    public Instant getStartTimeStamp() {
         return this.startTimeStamp;
     }
 
-    public void setEndTimeStamp(String endTimeStamp) {
+    public void setEndTimeStamp(Instant endTimeStamp) {
         this.endTimeStamp = endTimeStamp;
     }
 
-    public String getEndTimeStamp() {
+    public Instant getEndTimeStamp() {
         return this.endTimeStamp;
     }
 
-    public void setRideLength(long rideLength) {
-        this.rideLength = rideLength;
-    }
-
     public long getRideLength() {
+        this.rideLength = Duration.between(getStartTimeStamp(), getEndTimeStamp()).toDays();
         return this.rideLength;
     }
 
@@ -109,5 +99,14 @@ public class Ride {
 
     public Boolean getIsReturned(){
         return this.isReturned;
+    }
+
+    // checks if it's been 24 hours since user rented bike or not
+    public Boolean is24hours() throws ParseException, InterruptedException {
+        Instant now =  Instant.now();
+        long between = Duration.between(getStartTimeStamp(), now).toDays();
+
+        if(between >= 1) return true;
+        return false;
     }
 }

@@ -125,4 +125,12 @@ public class CustomerAccount extends Account{
     public void setIsReturned(Boolean isReturnedValue){
         this.lastRideIsReturned = isReturnedValue;
     }
+
+    public ArrayList<UUID> getRideIdList() {
+        return rideIdList;
+    }
+
+    public UUID getLastRideId(){
+        return rideIdList.get(rideIdList.size()- 1);
+    }
 }
