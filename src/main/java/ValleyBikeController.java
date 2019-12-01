@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Iterator;
+import java.util.Scanner;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -20,8 +22,12 @@ public abstract class ValleyBikeController {
     static void initialMenu() throws IOException, ParseException {
         //TODO back menu on all menus
         //TODO exit option on all menus
-        System.out.print("\nWelcome to ValleyBike Share! \n"
-                + "1. Create Customer Account \n"
+
+        //check whether it's time to renew customer's memberships
+        ValleyBikeSim.checkMembershipRenewal();
+
+        System.out.print("\n Welcome to ValleyBike Share! \n"
+                + "1. Create Customer Account (Partially works) \n"
                 + "2. Log In\n"
                 + "0. Exit program\n");
         //prompt the user to pick an int option
@@ -31,8 +37,10 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                // createAccount();
-                addStation();
+                createAccount();
+                // rentBike("aliciagrubb");
+                // System.out.println("---------------------------");
+                // returnBike("aliciagrubb");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -89,183 +97,6 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * Prompts user to input username
-     * Validates if username is between 6-14 characters
-     * Recursively calls itself until valid username input by user
-     *
-     * @return valid username input by user
-     */
-    private static String enterUsername(){
-        //prompts user to input username
-        System.out.println("Enter username (must be between 6-14 characters):");
-        String username = input.nextLine();
-
-        //validates if username is between 6-24 characters
-        if (!isValidUsername(username)){
-
-            //recursively calls itself until valid username input by user
-            System.out.println("Username is not valid.");
-            enterUsername();
-        }
-
-        //return valid username input by user
-        return username;
-    }
-
-    /**
-     * Prompts user to input password
-     * Validates if password is between 6-14 characters
-     * Recursively calls itself until valid password input by user
-     *
-     * @return valid password input by user
-     */
-    private static String enterPassword(){
-        //prompts user to input password
-        System.out.println("Enter password (must be between 6-14 characters):");
-        String password = input.nextLine();
-
-        //validates if password is between 6-24 characters
-        if (!isValidPassword(password)){
-
-            //recursively calls itself until valid password input by user
-            System.out.println("Password is not valid.");
-            enterPassword();
-        }
-
-        //return valid password input by user
-        return password;
-    }
-
-    /**
-     * Prompts user to input email address
-     * Validates if email address is in correct format
-     * Recursively calls itself until valid email address input by user
-     *
-     * @return valid email address input by user
-     */
-    private static String enterEmail(){
-        // TODO let user know how to make valid email address
-        //prompts user to input email address
-        System.out.println("Enter email address:");
-        String emailAddress = input.nextLine();
-
-        //validates if email address is in correct format
-        if (!isValidEmail(emailAddress)){
-
-            //recursively calls itself until valid email address input by user
-            System.out.println("Email address is not valid.");
-            enterEmail();
-        }
-
-        //return valid email address input by user
-        return emailAddress;
-    }
-
-    /**
-     * Prompts user to input credit card
-     * Validates if credit card is correct
-     * Recursively calls itself until valid email address input by user
-     *
-     * @return valid credit card input by user
-     */
-    private static String enterCreditCard(){
-        //prompts user to input email address
-        System.out.println("Enter credit card number:");
-        String creditCard = input.nextLine();
-
-        //validates if credit card is correct
-        if (!isValidCreditCard(creditCard)){
-
-            //recursively calls itself until valid credit card input by user
-            System.out.println("Credit card is not valid.");
-            enterCreditCard();
-        }
-
-        //return valid credit card input by user
-        return creditCard;
-    }
-
-    /**
-     * Prompts user to input membership
-     *
-     * @return membership string input by user
-     */
-    private static int enterMembership(){
-        //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
-        System.out.println("Choose membership type: \n" +
-                "1. Pay-as-you-go Membership \n" +
-                "2. Monthly Membership \n" +
-                "3. Yearly Membership");
-        //prompt the user to pick an int option
-        int num = getResponse("Please enter your selection (1-3):");
-        input.nextLine();
-        return num;
-    }
-
-    /**
-     * Validates if username is between 6 and 14 characters
-     *
-     * @param username is the username input by the user
-     *
-     * @return true if username is valid and false otherwise
-     */
-    private static boolean isValidUsername(String username){
-        return username.length() >= 6 && username.length() <= 14;
-    }
-
-    /**
-     * Validates if password is between 6 and 14 characters
-     *
-     * @param password is the password input by the user
-     *
-     * @return true if password is valid and false otherwise
-     */
-    private static boolean isValidPassword(String password){
-        return password.length() >= 6 && password.length() <= 14;
-    }
-
-    /**
-     * Validates credit card number input by user
-     *
-     * @param creditCard is the credit card number input by user
-     *
-     * @return true if credit card is valid and false otherwise
-     */
-    private static boolean isValidCreditCard(String creditCard){
-        //TODO check credit card validity for every transaction
-
-        //90% of the time the method accepts the credit card
-        //10% of the time the method rejects the credit card
-        //This method makes a random decision and is not a real credit card validator
-        return Math.random() <= 0.95;
-    }
-
-    /**
-     * Checks if the email address input by the user is valid
-     *
-     * @param emailAddress is the email address input by the user
-     *
-     * @return true if email address is valid and false otherwise
-     */
-    private static boolean isValidEmail(String emailAddress) {
-        //regular expression to check format of the email address string input by user
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        Pattern pat = Pattern.compile(emailRegex);
-
-        //if the string is null return false
-        if (emailAddress == null) return false;
-
-        //if the email address entered by user matches the pattern from the regex
-        //then return true, else return false
-        return pat.matcher(emailAddress).matches();
-    }
-
-    //TODO should we make an isValidStation and isValidBike too?
-
-    /**
      * This is the log in menu that allows the user to log in to either customer or internal account
      *
      * @throws IOException customer log in and internal log in methods in model throw IOException
@@ -318,23 +149,21 @@ public abstract class ValleyBikeController {
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
     public static void customerAccountHome(String username) throws IOException, ParseException {
-        // get customer object
+
+        //checks whether user has a rental, and if so whether it exceeds 24 hours
+        Boolean isReturned = ValleyBikeSim.checkBikeRented(username);
+
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
-
-        // true if ;ast ride was returned
-        Boolean isReturned = customer.getIsReturned();
-
-        if(!isReturned){
-            System.out.println("Reminder that you still haven't returned your last rented bike!");
-        }
-
         //menu option for customer account home
         System.out.println("Please choose from one of the following menu options: \n"
                 + "1. Edit account info (Partially works) \n"
                 + "2. View account balance\n"
-                + "3. View station list\n"
-                + "4. Rent a bike\n"
-                + "5. Report a problem\n"
+                + "3. View station list");
+
+        if (customer.getIsReturned()) { System.out.println("4. Rent a bike"); }
+        else { System.out.println("4. Return bike"); }
+
+        System.out.println("5. Report a problem\n"
                 + "6. Log out \n");
 
         System.out.println("Please enter your selection (1-6):");
@@ -361,10 +190,12 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.viewStationList();
                 break;
             case 4:
-                // helps user rent a bike
-                rentBike(username);
-                //TODO save data after renting
+                // if customer has no ongoing rentals, help user rent a bike
+                if (customer.getIsReturned()) { rentBike(username); }
+                else { returnBike(username); } // if customer has ongoing rental, help user return bike
+                //TODO save data after renting and returning
                 break;
+                /*
             case 5:
                 // return bike
                 if(isReturned){
@@ -372,7 +203,7 @@ public abstract class ValleyBikeController {
                 } else{
                     returnBike(username);
                 }
-                //TODO save data after returning
+                 */
             case 6:
                 //TODO report a problem
                 break;
@@ -439,93 +270,103 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     public static void rentBike(String username) throws IOException, ParseException{
+
+        //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
+        int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
+        if (membership == 1) {
+            String creditCard = ValleyBikeSim.viewCreditCard(username);
+            //check validity of credit card, send them back to home screen if not valid
+            if (!isValidCreditCard(creditCard)) {
+                System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
+                        " in your account is correct, then try again.");
+                customerAccountHome(username);
+            }
+        } //if there is no problem, continue with rental
+
         // View stations
         System.out.println("Here's a list of station IDs and their names");
-
-        // view station list
-        ValleyBikeSim.viewStationList();
+        ValleyBikeSim.viewStationList(); // view station list
 
         // choose station to rent from
-        int statId = getResponse("Please pick a station from list shown above" +
-                "to rent a bike from");
+        int statId = getResponse("Please pick a station from the above list to rent a bike from. " +
+                " Enter the station ID ('11'): ");
 
-        // designated station, whether bike returned to or bike rented from
-        Station stationFrom = ValleyBikeSim.getStationObj(statId);
-
-        // keep prompting user until the station obj is not null
-        while(stationFrom == null) {
-            System.out.println("The station entered does not exist in our system.");
+        // Validate user input for station ID
+        // keep prompting user until input matches the ID of an available station
+        Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
+        // if station doesn't exist or doesn't have any bikes
+        while((stationFrom == null)||(Objects.equals(stationFrom.getBikes(), 0))) {
+            if (stationFrom == null) {
+            System.out.println("The station ID entered does not exist in our system.");}
+            else if (Objects.equals(stationFrom.getBikes(), 0)) {
+                System.out.println("The station entered does not have any bikes.");
+            }
             ValleyBikeSim.viewStationList();
             statId = getResponse("Please pick a station from list shown above " +
                     "to rent a bike from");
-            stationFrom = ValleyBikeSim.getStationObj(statId);
-        }
+            stationFrom = ValleyBikeSim.getStationObj(statId);}
 
-        // if there's more than one bike at station
-        if (stationFrom.getBikes() > 1){
-            // station now has one less bike
-            stationFrom.setBikes(stationFrom.getBikes()-1);
-            // and one more available dock
-            stationFrom.setAvailableDocks(stationFrom.getAvailableDocks()+1);
-        } else {
-            // if there's less, notify maintenance worker to resolve data
-            System.out.println("Station is almost empty!");
-            System.out.println("Notifying maintenance worker to resolve this...");
-            // doesn't work
-            ValleyBikeSim.equalizeStations();
-            System.out.println("All done!");
-        }
-
-        // view available bike ids at station
+        // View available bike ids at station
         System.out.println("Here's a list of bike IDs at this station");
         System.out.format("%-10s%-10s\n", "Station", "Bike ID");
 
-        // initiate iterator
-        Iterator<Integer> keyIterator2 = ValleyBikeSim.createIterator(true);;
+        // Get list iterator of bikes at station
+        LinkedList<Bike> bikeList = stationFrom.getBikeList();
+        ListIterator<Bike> bikesAtStation = bikeList.listIterator();
 
-        // keep looping until there is no next value
-        while(keyIterator2.hasNext()){
-            Integer key = (Integer) keyIterator2.next();
-            Bike bike = ValleyBikeSim.getBikeObj(key);
-            if(statId == bike.getStation()) {
-                System.out.format("%-10s%-10d\n", statId, key);
-            }
+        // Print bikes at station
+        while(bikesAtStation.hasNext()){
+            Bike bike = bikesAtStation.next();
+            System.out.format("%-10s%-10d\n", statId, bike.getId());
         }
 
-        // choose bike to rent
-        int b = getResponse("Please enter the id of the bike you" +
-                " would like to rent.");
-        Bike someBike = ValleyBikeSim.getBikeObj(b);
+        // Choose bike to rent
+        int bikeID = getResponse("Please enter the ID number of the bike you" +
+                " would like to rent ('11'): ");
+        Bike someBike = ValleyBikeSim.getBikeObj(bikeID); // get bike object or null from bike ID
 
-        while(someBike == null) {
-            System.out.println("The bike ID entered does not exist in our system.");
-            b = b = getResponse("Please enter the id of the bike you" +
-                    " would like to rent.");
-            someBike = ValleyBikeSim.getBikeObj(b);
+        while (!bikeList.contains(someBike)){
+            System.out.println("The bike ID entered is not at this station.");
+            bikeID = getResponse("Please enter the ID number of the bike you" +
+                    " would like to rent ('11'): ");
+            someBike = ValleyBikeSim.getBikeObj(bikeID);
         }
 
-        // change bike location to live with customer
-        // someBike.setBikeLocation(2);
-        someBike.moveStation(0); // move bike to station '0' <- our filler station
+        someBike.moveStation(0); // move bike to station '0' <- our "non-station" ID
 
         lastRideId = UUID.randomUUID();
 
         // create new ride object
         Ride ride = new Ride(lastRideId,
-                b,
+                bikeID,
                 username,
                 false);
 
         ride.setStartTimeStamp(Instant.now());
 
+        // Add ride to customer account
         // assume username is always valid
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
+        customer.addNewRide(lastRideId); // add ride to customer account
+        customer.setIsReturned(false); // set customer account to show a bike has yet to be returned
 
-        customer.addNewRide(lastRideId);
         ValleyBikeSim.addToRideMap(lastRideId, ride);
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
+        System.out.println("You have rented bike #" + bikeID + " from station #" + statId + ". Enjoy your ride!");
+        System.out.println();
+
+        // equalize stations if there's one bike or less left at station after bike is rented
+        // notify maintenance worker to redistribute bikes
+        // right now this work is automated by the equalizeStations() function
+        if (stationFrom.getBikes() <= 1){
+            System.out.println("This station is almost empty!");
+            System.out.println("Notifying maintenance worker to resolve this...");
+            ValleyBikeSim.equalizeStations();
+            System.out.println("The bikes have now been redistributed between the stations.");
+            System.out.println();
+        }
     }
 
     /**
@@ -581,32 +422,19 @@ public abstract class ValleyBikeController {
         // keep prompting user until the station obj is not null
         while(stationTo == null) {
             System.out.println("The station entered does not exist in our system.");
-            statId = getResponse("Please enter station you're returning the " +
-                    "bike to");
+            statId = getResponse("Please enter the ID of the station to which " +
+                    "you're returning the bike ('11'): ");
             stationTo = ValleyBikeSim.getStationObj(statId);
         }
 
-        // if there's more than one bike at station
-        if (stationTo.getBikes() > 1){
-            // station now has one less bike
-            stationTo.setBikes(stationTo.getBikes()+1);
-            // and one more available dock
-            stationTo.setAvailableDocks(stationTo.getAvailableDocks()+1);
-        } else {
-            // if there's less, notify maintenance worker to resolve data
-            System.out.println("Station is almost empty!");
-            System.out.println("Notifying maintenance worker to resolve this...");
-            ValleyBikeSim.equalizeStations();
-            System.out.println("All done!");
-        }
 
-        int b = rideObj.getBikeId();
+        int bikeId = rideObj.getBikeId();
 
         // get rented bike
-        Bike someBike = ValleyBikeSim.getBikeObj(b);
+        Bike someBike = ValleyBikeSim.getBikeObj(bikeId);
 
-        // change to station the bike is returned to
-        someBike.setStation(statId);
+        // move bike to new station
+        someBike.moveStation(statId);
 
         // if returned, then bike location is available and docked
         someBike.setBikeLocation(0);
@@ -621,6 +449,34 @@ public abstract class ValleyBikeController {
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         customer.setIsReturned(true);
+
+        System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
+        System.out.println();
+
+        if (stationTo.getAvailableDocks() <= 1){
+            // if there's 1 available docks or less at station after bike is returned
+            // notify maintenance worker to redistribute bikes
+            // right now this work is automated by the equalizeStations() function
+            System.out.println("Station is almost full!");
+            System.out.println("Notifying maintenance worker to resolve this...");
+            ValleyBikeSim.equalizeStations();
+            System.out.println("The bikes have now been redistributed between the stations.");
+            System.out.println();
+        }
+        //check membership to determine how to charge for rental
+        int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
+        int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
+        //if pay-as-you-go or no rides remaining on membership, charge by time
+        if (membership == 1 || ridesLeft == 0) {
+            long rideLength = rideObj.getRideLength();
+            long paymentDue = rideLength * (long) .30;
+            double balance = ValleyBikeSim.viewAccountBalance(username) + paymentDue;
+            rideObj.setPayment(paymentDue);
+            //TODO update user balance using balance
+        } else {
+            ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
+            //otherwise merely decrement rides remaining in membership
+        }
 
         System.out.println("You're all done! Thank you for returning this bike.");
 
@@ -775,19 +631,11 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String name = input.nextLine();
 
-        // set numbers of bikes to zero since it's a new station
-        // and has no bikes yet
-        Integer bikes = 0;
-
         // assume new station starts off with no maintenance requests
         Integer maintenanceRequest = 0;
 
         // prompt capacity for station
         Integer capacity = getResponse("What is the station's capacity?");
-
-        // since it's a newly added station, the available docks will be
-        // the capacity of the station
-        Integer availableDocks = capacity;
 
         // number of kiosks
         Integer kiosk = getResponse("How many kiosks?");
@@ -797,6 +645,7 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String address = input.nextLine();
 
+        System.out.println("Station has been added!");
         // confirmation
         System.out.println("Are you sure you want to add a station with the info entered?(y/n)");
         String confirm = input.nextLine();
@@ -806,8 +655,6 @@ public abstract class ValleyBikeController {
                 // create new station object with received data from user
                 Station stationOb = new Station(
                         name,
-                        bikes,
-                        availableDocks,
                         maintenanceRequest,
                         capacity,
                         kiosk,
@@ -892,7 +739,7 @@ public abstract class ValleyBikeController {
 //                "0: Docked/available at station\n" +
 //                "2: Docked/out of commission\n");
 
-        // assume bike stars off as available
+        // assume bike starts off as available
         int bikeLocation = 0;
 
         // while the answer is not between the options, keep prompting user
@@ -908,10 +755,6 @@ public abstract class ValleyBikeController {
 //        }
 
 
-        // increase number of bikes for station
-        station.setBikes(station.getBikes()+1);
-        // decrease available docks
-        station.setAvailableDocks(station.getAvailableDocks()+1);
 
         // create new bike object based on user's inputs
         Bike bikeOb = new Bike(
@@ -921,7 +764,7 @@ public abstract class ValleyBikeController {
                 mnt,
                 mntReport
         );
-
+        station.addToBikeList(bikeOb);
         // add to bike tree structure
         ValleyBikeSim.addNewBike(id, bikeOb);
     }
@@ -972,5 +815,182 @@ public abstract class ValleyBikeController {
         String dataFile = input.next();
         ValleyBikeSim.resolveData(dataFile);
     }
-}
 
+    /**
+     * Prompts user to input username
+     * Validates if username is between 6-14 characters
+     * Recursively calls itself until valid username input by user
+     *
+     * @return valid username input by user
+     */
+    private static String enterUsername(){
+        //prompts user to input username
+        System.out.println("Enter username (must be between 6-14 characters):");
+        String username = input.nextLine();
+
+        //validates if username is between 6-24 characters
+        if (!isValidUsername(username)){
+
+            //recursively calls itself until valid username input by user
+            System.out.println("Username is not valid.");
+            enterUsername();
+        }
+
+        //return valid username input by user
+        return username;
+    }
+
+    /**
+     * Prompts user to input password
+     * Validates if password is between 6-14 characters
+     * Recursively calls itself until valid password input by user
+     *
+     * @return valid password input by user
+     */
+    private static String enterPassword(){
+        //prompts user to input password
+        System.out.println("Enter password (must be between 6-14 characters):");
+        String password = input.nextLine();
+
+        //validates if password is between 6-24 characters
+        if (!isValidPassword(password)){
+
+            //recursively calls itself until valid password input by user
+            System.out.println("Password is not valid.");
+            enterPassword();
+        }
+
+        //return valid password input by user
+        return password;
+    }
+
+    /**
+     * Prompts user to input email address
+     * Validates if email address is in correct format
+     * Recursively calls itself until valid email address input by user
+     *
+     * @return valid email address input by user
+     */
+    private static String enterEmail(){
+        // TODO let user know how to make valid email address
+        //prompts user to input email address
+        System.out.println("Enter email address:");
+        String emailAddress = input.nextLine();
+
+        //validates if email address is in correct format
+        if (!isValidEmail(emailAddress)){
+
+            //recursively calls itself until valid email address input by user
+            System.out.println("Email address is not valid.");
+            enterEmail();
+        }
+
+        //return valid email address input by user
+        return emailAddress;
+    }
+
+    /**
+     * Prompts user to input credit card
+     * Validates if credit card is correct
+     * Recursively calls itself until valid email address input by user
+     *
+     * @return valid credit card input by user
+     */
+    private static String enterCreditCard(){
+        //prompts user to input email address
+        System.out.println("Enter credit card number:");
+        String creditCard = input.nextLine();
+
+        //validates if credit card is correct
+        if (!isValidCreditCard(creditCard)){
+
+            //recursively calls itself until valid credit card input by user
+            System.out.println("Credit card is not valid.");
+            enterCreditCard();
+        }
+
+        //return valid credit card input by user
+        return creditCard;
+    }
+
+    /**
+     * Prompts user to input membership
+     *
+     * @return membership string input by user
+     */
+    private static int enterMembership(){
+        //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
+        System.out.println("Choose membership type: \n" +
+                "1. Pay-as-you-go Membership \n" +
+                "2. Monthly Membership \n" +
+                "3. Yearly Membership");
+        //prompt the user to pick an int option
+        int num = getResponse("Please enter your selection (1-3):");
+        input.nextLine();
+        return num;
+    }
+
+    /**
+     * Validates if username is between 6 and 14 characters
+     *
+     * @param username is the username input by the user
+     *
+     * @return true if username is valid and false otherwise
+     */
+    private static boolean isValidUsername(String username){
+        return username.length() >= 6 && username.length() <= 14;
+    }
+
+    /**
+     * Validates if password is between 6 and 14 characters
+     *
+     * @param password is the password input by the user
+     *
+     * @return true if password is valid and false otherwise
+     */
+    private static boolean isValidPassword(String password){
+        return password.length() >= 6 && password.length() <= 14;
+    }
+
+    /**
+     * Validates credit card number input by user
+     *
+     * @param creditCard is the credit card number input by user
+     *
+     * @return true if credit card is valid and false otherwise
+     */
+    static boolean isValidCreditCard(String creditCard){
+        //TODO check credit card validity for every transaction
+
+        //90% of the time the method accepts the credit card
+        //10% of the time the method rejects the credit card
+        //This method makes a random decision and is not a real credit card validator
+        return Math.random() <= 0.95;
+    }
+
+    /**
+     * Checks if the email address input by the user is valid
+     *
+     * @param emailAddress is the email address input by the user
+     *
+     * @return true if email address is valid and false otherwise
+     */
+    private static boolean isValidEmail(String emailAddress) {
+        //regular expression to check format of the email address string input by user
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        Pattern pat = Pattern.compile(emailRegex);
+
+        //if the string is null return false
+        if (emailAddress == null) return false;
+
+        //if the email address entered by user matches the pattern from the regex
+        //then return true, else return false
+        return pat.matcher(emailAddress).matches();
+    }
+
+    //TODO should we make an isValidStation and isValidBike too?
+
+}

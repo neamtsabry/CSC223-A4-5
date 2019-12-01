@@ -34,7 +34,7 @@ public class Ride {
     private Instant endTimeStamp;
 
     //TODO ??
-    private String payment;
+    private double payment;
 
     public Ride(UUID rideIdVal, int bikeIdVal, String usernameVal,
                 Boolean isReturnedVal) throws ParseException {
@@ -85,11 +85,11 @@ public class Ride {
         return this.rideLength;
     }
 
-    public void setPayment(String payment) {
+    public void setPayment(double payment) {
         this.payment = payment;
     }
 
-    public String getPayment() {
+    public double getPayment() {
         return this.payment;
     }
 
