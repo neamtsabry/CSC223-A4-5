@@ -19,7 +19,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    static void initialMenu() throws IOException, ParseException {
+    static void initialMenu() throws IOException, ParseException, InterruptedException {
         //TODO back menu on all menus
         //TODO exit option on all menus
 
@@ -72,7 +72,7 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    static void createAccount() throws IOException, ParseException {
+    static void createAccount() throws IOException, ParseException, InterruptedException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
@@ -102,7 +102,7 @@ public abstract class ValleyBikeController {
      * @throws IOException customer log in and internal log in methods in model throw IOException
      * @throws ParseException customer log in and internal log in methods in model throw ParseException
      */
-    static void logIn() throws IOException, ParseException {
+    static void logIn() throws IOException, ParseException, InterruptedException {
         //prompt the user to choose which kind of account they want to log into
         int logIn = getResponse("Press 1 to log in to customer account. \nPress 2 to log in to internal account. \nPress 0 to log out.");
         input.nextLine();
@@ -148,10 +148,10 @@ public abstract class ValleyBikeController {
      * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
-    public static void customerAccountHome(String username) throws IOException, ParseException {
+    public static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException {
 
         //checks whether user has a rental, and if so whether it exceeds 24 hours
-        Boolean isReturned = ValleyBikeSim.checkBikeRented(username);
+        ValleyBikeSim.checkBikeRented(username);
 
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         //menu option for customer account home
@@ -269,7 +269,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public static void rentBike(String username) throws IOException, ParseException{
+    public static void rentBike(String username) throws IOException, ParseException, InterruptedException {
 
         //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
@@ -404,7 +404,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      * @param username for user
      */
-    public static void returnBike(String username) throws IOException, ParseException{
+    public static void returnBike(String username) throws IOException, ParseException, InterruptedException {
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
         System.out.println("Here's a list of station IDs and their names");
@@ -502,7 +502,7 @@ public abstract class ValleyBikeController {
         String mntReport = input.nextLine();
 
         int bikeId = getResponse("Please enter the id of the bike you" +
-                " would like to rent.");
+                " are experiencing problems with.");
 
         // add to maintenance requests
         ValleyBikeSim.addToMntRqs(bikeId, mntReport);
@@ -538,7 +538,7 @@ public abstract class ValleyBikeController {
      * @throws IOException addStation, addBike, equalizeStations and initialMenu throw IOException
      * @throws ParseException addStation, addBike, equalizeStations and initialMenu throw ParseException
      */
-    static void internalAccountHome(String username) throws IOException, ParseException {
+    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException {
         //prompt user to pick option from main internal menu
 
         System.out.print("\n Choose from the following: \n"

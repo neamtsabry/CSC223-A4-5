@@ -1,5 +1,6 @@
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.*;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -36,7 +37,7 @@ public class ValleyBikeSim {
 	 *
 	 * Then outputs welcome message and menu selector
 	 */
-	public static void main(String[] args) throws IOException, ParseException {
+	public static void main(String[] args) throws IOException, ParseException, InterruptedException {
 		// read all required files
 		readStationData();
         readBikeData();
@@ -156,16 +157,23 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static Boolean checkBikeRented(String username) {
+	static Boolean checkBikeRented(String username) throws ParseException, InterruptedException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 		// true if last ride was returned
 		Boolean isReturned = customer.getIsReturned();
 		if (!isReturned) {
-			//TODO access ride list in customer account
-			// find start time of unfinished ride, check length of rental
-			// if rental exceeds 24 hours, charge account 150 and notify user
-			// if rental is fresh, just remind them they have a rental
+			UUID ride = customer.getLastRideId();
+			if (rideMap.get(ride).is24hours()) {
+				// if rental exceeds 24 hours, charge account 150 and notify user
+				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
+						"$150 to your credit card.");
+				//TODO how do we save the $150? does it go into thir account balance?
+			} else {
+				//if rental is under 24 hours, just remind them they have a rental
+				System.out.println("Reminder that you currently have a bike rented. " +
+						"It must be returned within 24 hours of check-out.");
+			}
 		}
 		return isReturned;
 	}
@@ -188,21 +196,28 @@ public class ValleyBikeSim {
 			// or I would check to make sure its a monthly/yearly before performing checkPaymentDue
 			// but in that case the program is still trying to perform the call on a generic Membership and it doesnt work
 			//if (user.getMembership().checkPaymentDue()) {
+
 				if (ValleyBikeController.isValidCreditCard(username)) {
 					//TODO renew membership (renew rides remaining and charge card)
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
 						//TODO how would membership payment be reflected?
-					} else if (user.getMembership().getMembershipInt() == 0) {
+					} else if (user.getMembership().getMembershipInt() == 3) {
 						//yearly things
 						user.getMembership().setTotalRidesLeft(260);
 						//TODO how would membership payment be reflected?
 					}
+					user.getMembership().setLastPayment(LocalDate.now());
 				} else {
-					//TODO switch them to PAYG, inform them
-					//Membership payg = user.getMembership().setMembership(1);
+					//if credit card cannot be charged, reset membership to pay-as-you-go
+					Membership paygMembership = checkMembershipType(1);
+					user.setMembership(paygMembership);
+					//Assumption: In a real system, here we would send out emails notifying users that
+					//they had been switched to a PAYG member because their credit card was not valid
 				}
+			//} else if (user.getMembership().getMembershipInt() == 3) {
+
 			//}
 		}
 	}
@@ -359,7 +374,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException{
+    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException {
     	//if the username for the new customer account is already in the customer account map
     	if (customerAccountMap.get(customerAccount.getUsername()) != null){
     		//print that the username already exists
@@ -374,7 +389,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException{
+	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
     	Membership membershipType = checkMembershipType(membership);
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
@@ -404,7 +419,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void customerLogIn(String username, String password) throws IOException, ParseException{
+	public static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the customer account map
     	if (!customerAccountMap.containsKey(username)){
     		//print that the account does not exist
@@ -432,7 +447,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void internalLogIn(String username, String password) throws IOException, ParseException{
+	public static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the internal account map
 		if (!internalAccountMap.containsKey(username)){
 			//print that the account does not exist
@@ -883,7 +898,7 @@ public class ValleyBikeSim {
 		// initiate our bike stack
 		Deque<Bike> bikesAtStation = new ArrayDeque<Bike>();
 		// initiate iterator
-		Iterator<Integer> bikeKeyIterator = ValleyBikeSim.createIterator(true);
+		Iterator bikeKeyIterator = ValleyBikeSim.createIterator(true);
 
 		// keep looping until there is no next value
 		while(bikeKeyIterator.hasNext()){
@@ -905,12 +920,10 @@ public class ValleyBikeSim {
 	static void addToMntRqs(int bikeID, String mntRq){ mntReqs.put(bikeID, mntRq); }
 
 	static Boolean stationsMapContains(int key){
-		if(stationsMap.containsKey(key)) return true;
-		else return false;
+		return stationsMap.containsKey(key);
 	}
 
 	static Boolean bikesMapContains(int key){
-		if(bikesMap.containsKey(key)) return true;
-		else return false;
+		return bikesMap.containsKey(key);
 	}
 }
