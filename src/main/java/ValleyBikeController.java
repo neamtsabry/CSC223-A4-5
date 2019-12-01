@@ -192,20 +192,14 @@ public abstract class ValleyBikeController {
             case 4:
                 // if customer has no ongoing rentals, help user rent a bike
                 if (customer.getIsReturned()) { rentBike(username); }
-                else { returnBike(username); } // if customer has ongoing rental, help user return bike
+                else {
+                    UUID lastRideId = customer.getLastRideId();
+                    returnBike(username, lastRideId);
+                } // if customer has ongoing rental, help user return bike
                 //TODO save data after renting and returning
                 break;
-                /*
-            case 5:
-                // return bike
-                if(isReturned){
-                    System.out.println("You have no rented bikes to return.");
-                } else{
-                    returnBike(username);
-                }
-                 */
             case 6:
-                //TODO report a problem
+                reportProblem(username);
                 break;
             case 7:
                 //return to homepage to log out
@@ -260,8 +254,6 @@ public abstract class ValleyBikeController {
         }
     }
 
-    private static UUID lastRideId;
-
     /**
      * Can be used for both renting and returning bike
      * Prompts the user for info as to achieve those tasks
@@ -270,7 +262,6 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     public static void rentBike(String username) throws IOException, ParseException{
-
         //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         if (membership == 1) {
@@ -291,9 +282,12 @@ public abstract class ValleyBikeController {
         int statId = getResponse("Please pick a station from the above list to rent a bike from. " +
                 " Enter the station ID ('11'): ");
 
+        //TODO why not just automatically equalize if number of bikes is 0?
+
         // Validate user input for station ID
         // keep prompting user until input matches the ID of an available station
         Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
+
         // if station doesn't exist or doesn't have any bikes
         while((stationFrom == null)||(Objects.equals(stationFrom.getBikes(), 0))) {
             if (stationFrom == null) {
@@ -334,10 +328,10 @@ public abstract class ValleyBikeController {
 
         someBike.moveStation(0); // move bike to station '0' <- our "non-station" ID
 
-        lastRideId = UUID.randomUUID();
+        UUID rideId = UUID.randomUUID();
 
         // create new ride object
-        Ride ride = new Ride(lastRideId,
+        Ride ride = new Ride(rideId,
                 bikeID,
                 username,
                 false);
@@ -347,10 +341,10 @@ public abstract class ValleyBikeController {
         // Add ride to customer account
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
-        customer.addNewRide(lastRideId); // add ride to customer account
+        customer.addNewRide(rideId); // add ride to customer account
         customer.setIsReturned(false); // set customer account to show a bike has yet to be returned
 
-        ValleyBikeSim.addToRideMap(lastRideId, ride);
+        ValleyBikeSim.addToRideMap(rideId, ride);
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
@@ -404,7 +398,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      * @param username for user
      */
-    public static void returnBike(String username) throws IOException, ParseException{
+    public static void returnBike(String username, UUID lastRideId) throws IOException, ParseException{
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
         System.out.println("Here's a list of station IDs and their names");
