@@ -45,6 +45,7 @@ public class ValleyBikeSim {
         readInternalAccountData();
 
         // start the initial menu
+		System.out.print("\nWelcome to ValleyBike Share!");
 		ValleyBikeController.initialMenu();
 	}
 
@@ -378,7 +379,7 @@ public class ValleyBikeSim {
     	//if the username for the new customer account is already in the customer account map
     	if (customerAccountMap.get(customerAccount.getUsername()) != null){
     		//print that the username already exists
-			System.out.println("Customer account with this username already exists. \nPlease try again with another username or log in.");
+			System.out.println("Customer account with this username already exists.\nPlease try again with another username or log in.");
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {

@@ -66,7 +66,7 @@ public class Ride {
         return this.username;
     }
 
-    public void setStartTimeStamp(Instant startTimeStamp) { startTimeStamp = startTimeStamp; }
+    public void setStartTimeStamp(Instant startTimeStamp) { this.startTimeStamp = startTimeStamp; }
 
     public Instant getStartTimeStamp() {
         return this.startTimeStamp;
@@ -104,9 +104,9 @@ public class Ride {
     // checks if it's been 24 hours since user rented bike or not
     public Boolean is24hours() throws ParseException, InterruptedException {
         Instant now =  Instant.now();
-        long between = Duration.between(getStartTimeStamp(), now).toDays();
+        long between = Duration.between(getStartTimeStamp(), now).toHours();
 
-        if(between >= 1) return true;
+        if(between >= 24) return true;
         return false;
     }
 }
