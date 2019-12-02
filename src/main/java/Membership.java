@@ -30,4 +30,12 @@ public abstract class Membership {
         return 0;
     }
 
+    public boolean checkPaymentDue(){
+        return false;
+    }
+
+    public boolean checkMaxRidesExceeded() {
+        return false;
+    }
+
 }
