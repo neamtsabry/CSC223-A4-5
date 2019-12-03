@@ -43,6 +43,7 @@ public class ValleyBikeSim {
 		connectToDatabase();
 
         // start the initial menu
+		System.out.print("\nWelcome to ValleyBike Share!");
 		ValleyBikeController.initialMenu();
 	}
 
@@ -159,7 +160,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static Boolean checkBikeRented(String username) throws ParseException, InterruptedException {
+	static void checkBikeRented(String username) throws ParseException, InterruptedException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 		// true if last ride was returned
@@ -170,45 +171,36 @@ public class ValleyBikeSim {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO how do we save the $150? does it go into thir account balance?
+				//TODO how do we save the $150? does it go into their account balance? (AM)
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
 						"It must be returned within 24 hours of check-out.");
 			}
 		}
-		return isReturned;
 	}
 
 	/**
 	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
+	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
 	 *
 	 */
 	static void checkMembershipRenewal() {
-		// initiate iterator
-		Iterator<String> keyIterator1 = customerAccountMap.keySet().iterator();
-
-		// while the iterator has a next value
-		while(keyIterator1.hasNext()) {
+		//check each user's membership to find whether their payment is due
+		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
-			String username = keyIterator1.next();
 			CustomerAccount user = customerAccountMap.get(username);
-			//TODO check all memberships to see whether their payment is due
-			// either add checkPaymentDue to all memberships (and PAYG always returns false
-			// or I would check to make sure its a monthly/yearly before performing checkPaymentDue
-			// but in that case the program is still trying to perform the call on a generic Membership and it doesnt work
-			//if (user.getMembership().checkPaymentDue()) {
-
+			//TODO check all memberships to see whether their payment is due (AM)
+			if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(username)) {
-					//TODO renew membership (renew rides remaining and charge card)
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
-						//TODO how would membership payment be reflected?
+						//TODO how would membership payment be reflected? (AM)
 					} else if (user.getMembership().getMembershipInt() == 3) {
 						//yearly things
 						user.getMembership().setTotalRidesLeft(260);
-						//TODO how would membership payment be reflected?
+						//TODO how would membership payment be reflected? (AM)
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
 				} else {
@@ -218,9 +210,7 @@ public class ValleyBikeSim {
 					//Assumption: In a real system, here we would send out emails notifying users that
 					//they had been switched to a PAYG member because their credit card was not valid
 				}
-			//} else if (user.getMembership().getMembershipInt() == 3) {
-
-			//}
+			}
 		}
 	}
 
@@ -255,7 +245,6 @@ public class ValleyBikeSim {
 					bike.getMntReport()
 			);
 		}
-
 	}
 
 	/**
@@ -303,7 +292,7 @@ public class ValleyBikeSim {
     	//if the username for the new customer account is already in the customer account map
     	if (customerAccountMap.get(customerAccount.getUsername()) != null){
     		//print that the username already exists
-			System.out.println("Customer account with this username already exists. \nPlease try again with another username or log in.");
+			System.out.println("Customer account with this username already exists.\nPlease try again with another username or log in.");
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
@@ -314,7 +303,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
     	Membership membershipType = checkMembershipType(membership);
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
@@ -322,7 +311,7 @@ public class ValleyBikeSim {
 
 	}
 
-	public static Membership checkMembershipType(int membership){
+	static Membership checkMembershipType(int membership){
     	if (membership == 1){
     		return new PayAsYouGoMembership();
 		}
@@ -344,7 +333,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the customer account map
     	if (!customerAccountMap.containsKey(username)){
     		//print that the account does not exist
@@ -372,7 +361,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the internal account map
 		if (!internalAccountMap.containsKey(username)){
 			//print that the account does not exist
@@ -396,7 +385,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void saveCustomerAccountList() throws IOException {
+	static void saveCustomerAccountList() throws IOException {
 		// initiate fileWriter and iterator
 		FileWriter customerAccountsWriter = new FileWriter("data-files/customer-account-data.csv");
 		Iterator<String> keyIterator = customerAccountMap.keySet().iterator();
@@ -573,7 +562,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void equalizeStations() throws IOException, ParseException{
+	static void equalizeStations() throws IOException, ParseException{
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
 		Deque<Bike> extraBikes = new ArrayDeque<Bike>();// Extras contains bike objects
 		int idealPercentage = getPercentageData(stationsCapacity);
