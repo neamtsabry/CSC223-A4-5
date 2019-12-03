@@ -9,6 +9,6 @@ public class PayAsYouGoMembership extends Membership {
     }
 
     public String getMembershipString(){
-        return "Pay As You Go Membership";
+        return "Pay Per Ride";
     }
 }

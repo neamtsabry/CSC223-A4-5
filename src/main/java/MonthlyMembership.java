@@ -25,7 +25,7 @@ public class MonthlyMembership extends Membership{
     }
 
     public String getMembershipString(){
-        return "Monthly Membership";
+        return "Monthly";
     }
 
 }
