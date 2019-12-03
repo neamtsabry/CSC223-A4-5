@@ -33,7 +33,7 @@ public class Bike {
         this.location = bikeLocation;
 
 
-        if(maintenance.equals('y')) this.mnt = true;
+        if(maintenance.equals("y")) this.mnt = true;
         else this.mnt = false;
 
         this.mntReport = maintenanceReport;

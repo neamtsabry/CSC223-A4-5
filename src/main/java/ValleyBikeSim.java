@@ -1,10 +1,11 @@
 
 import java.io.*;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Class that contains menu options and implementation for Simulator
@@ -37,89 +38,90 @@ public class ValleyBikeSim {
 	 *
 	 * Then outputs welcome message and menu selector
 	 */
-	public static void main(String[] args) throws IOException, ParseException, InterruptedException {
-		// read all required files
-		readStationData();
-        readBikeData();
-        readCustomerAccountData();
-        readInternalAccountData();
+	public static void main(String[] args) throws IOException, ParseException, InterruptedException, SQLException, ClassNotFoundException {
+		// connect to sqlite database and read all required tables
+		connectToDatabase();
 
         // start the initial menu
 		System.out.print("\nWelcome to ValleyBike Share!");
 		ValleyBikeController.initialMenu();
 	}
 
-	/**
-	 * Reads external csv file with customer account data
-	 *
-	 * @throws IOException readLine throws IOException
-	 */
-	private static void readCustomerAccountData() throws IOException {
-		// start reading our designated file
-		FileReader fileReader = new FileReader("data-files/customer-account-data.csv");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		bufferedReader.readLine();
+	public static void connectToDatabase() throws SQLException, ClassNotFoundException{
+		Class.forName("org.sqlite.JDBC");
+		String dbURL = "jdbc:sqlite:ValleyBike.db";
+		Connection conn = DriverManager.getConnection(dbURL);
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			readCustomerAccountData(conn, stmt);
+			readInternalAccountData(conn, stmt);
+			conn.close();
+		}
+	}
 
-		// initialize string for customer account data
-		String line;
-
-		// while there's more lines to read in the file
-		while((line = bufferedReader.readLine()) != null){
-			// store comma separated values in string array
-			String[] values = line.split(",");
-
-			Membership membership = checkMembershipType(Integer.parseInt(values[4]));
-
-			// start a new customer account with all the individual values we got
-			CustomerAccount accountObj = new CustomerAccount(
-					values[0],
-					values[1],
-					values[2],
-					values[3],
-					membership,
-					Integer.parseInt(values[5]));
+	private static void readCustomerAccountData(Connection conn, Statement stmt) throws SQLException{
+		ResultSet rs = stmt.executeQuery("SELECT * FROM Customer_Account");
+		while ( rs.next() ) {
+			String username = rs.getString("username");
+			String password = rs.getString("password");
+			String emailAddress = rs.getString("email_address");
+			String creditCard = rs.getString("credit_card");
+			Membership membership = checkMembershipType(rs.getInt("membership"));
+			int balance = Integer.parseInt(rs.getString("balance"));
+			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance);
 
 			// add to the customer account map
-			customerAccountMap.put(values[0],accountObj);
+			customerAccountMap.put(username,customerAccount);
 		}
-
-		// close our reader
-		bufferedReader.close();
 	}
 
-	/**
-	 * Reads external csv file with internal account data
-	 *
-	 * @throws IOException readLine throws IOException
-	 */
-	private static void readInternalAccountData() throws IOException {
-		// start reading our designated file
-		FileReader fileReader = new FileReader("data-files/internal-account-data.csv");
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		bufferedReader.readLine();
-
-		// initialize string for internal account data
-		String line;
-
-		// while there's more lines to read in the file
-		while((line = bufferedReader.readLine()) != null){
-			// store comma separated values in string array
-			String[] values = line.split(",");
-
-			// start a new internal account with all the individual values we got
-			InternalAccount accountObj = new InternalAccount(
-					values[0],
-					values[1],
-					values[2]);
+	private static void readInternalAccountData(Connection conn, Statement stmt) throws SQLException{
+		ResultSet rs = stmt.executeQuery("SELECT * FROM Internal_Account");
+		while ( rs.next() ) {
+			String username = rs.getString("username");
+			String password = rs.getString("password");
+			String emailAddress = rs.getString("email_address");
+			InternalAccount internalAccount = new InternalAccount(username, password, emailAddress);
 
 			// add to the internal account map
-			internalAccountMap.put(values[0],accountObj);
+			internalAccountMap.put(username,internalAccount);
 		}
-
-		// close our reader
-		bufferedReader.close();
 	}
 
+	private static void readStationData(Connection conn, Statement stmt) throws SQLException{
+		ResultSet rs = stmt.executeQuery("SELECT * FROM Station");
+		while ( rs.next() ) {
+			int id = rs.getInt("id");
+			String name = rs.getString("name");
+			int reqMnt = rs.getInt("req_mnt");
+			int capacity = rs.getInt("capacity");
+			int kiosk= rs.getInt("kiosk");
+			String address = rs.getString("address");
+			Station station = new Station(name, reqMnt, capacity, kiosk, address);
+
+			// add to the station tree
+			stationsMap.put(id,station);
+		}
+	}
+
+	private static void readBikeData(Connection conn, Statement stmt) throws SQLException{
+		ResultSet rs = stmt.executeQuery("SELECT * FROM Bike");
+		while ( rs.next() ) {
+			int id = rs.getInt("id");
+			int location = rs.getInt("location");
+			int stationId = rs.getInt("station_id");
+			int reqMnt = rs.getInt("req_mnt");
+			String maintenance = null;
+			if (reqMnt == 1){
+				maintenance = "y";
+			}
+			String mntReport = rs.getString("mnt_report");
+			Bike bike = new Bike(id, location, stationId, maintenance, mntReport);
+
+			// add to the bike tree
+			bikesMap.put(id, bike);
+		}
+	}
 
 	/**
 	 * View the account balance associated with a user's account
@@ -158,7 +160,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static Boolean checkBikeRented(String username) throws ParseException, InterruptedException {
+	static void checkBikeRented(String username) throws ParseException, InterruptedException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 		// true if last ride was returned
@@ -169,45 +171,36 @@ public class ValleyBikeSim {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO how do we save the $150? does it go into thir account balance?
+				//TODO how do we save the $150? does it go into their account balance? (AM)
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
 						"It must be returned within 24 hours of check-out.");
 			}
 		}
-		return isReturned;
 	}
 
 	/**
 	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
+	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
 	 *
 	 */
 	static void checkMembershipRenewal() {
-		// initiate iterator
-		Iterator<String> keyIterator1 = customerAccountMap.keySet().iterator();
-
-		// while the iterator has a next value
-		while(keyIterator1.hasNext()) {
+		//check each user's membership to find whether their payment is due
+		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
-			String username = keyIterator1.next();
 			CustomerAccount user = customerAccountMap.get(username);
-			//TODO check all memberships to see whether their payment is due
-			// either add checkPaymentDue to all memberships (and PAYG always returns false
-			// or I would check to make sure its a monthly/yearly before performing checkPaymentDue
-			// but in that case the program is still trying to perform the call on a generic Membership and it doesnt work
-			//if (user.getMembership().checkPaymentDue()) {
-
+			//TODO check all memberships to see whether their payment is due (AM)
+			if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(username)) {
-					//TODO renew membership (renew rides remaining and charge card)
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
-						//TODO how would membership payment be reflected?
+						//TODO how would membership payment be reflected? (AM)
 					} else if (user.getMembership().getMembershipInt() == 3) {
 						//yearly things
 						user.getMembership().setTotalRidesLeft(260);
-						//TODO how would membership payment be reflected?
+						//TODO how would membership payment be reflected? (AM)
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
 				} else {
@@ -217,88 +210,9 @@ public class ValleyBikeSim {
 					//Assumption: In a real system, here we would send out emails notifying users that
 					//they had been switched to a PAYG member because their credit card was not valid
 				}
-			//} else if (user.getMembership().getMembershipInt() == 3) {
-
-			//}
+			}
 		}
 	}
-
-	/**
-	 * Reads external csv file with station data and adds it to the
-     * tree data structure
-	 *
-	 * @throws IOException readLine throws IOException
-	 */
-	private static void readStationData() throws IOException {
-        // start reading our designated file
-        FileReader fileReader = new FileReader("data-files/station-data.csv");
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-        bufferedReader.readLine();
-
-        // initialize string for station data
-        String line;
-
-        // while there's more lines to read in the file
-        while((line = bufferedReader.readLine()) != null){
-            // store comma separated values in string array
-            String[] values = line.split(",");
-
-            // start a new station with all the individual values we got
-            Station stationOb = new Station(
-                    values[1], // Station name
-                    // Integer.parseInt(values[2]), // bikes
-                    // Integer.parseInt(values[3]), // avail docks
-                    Integer.parseInt(values[4]), // maintenance rqsts
-                    Integer.parseInt(values[5]), // capacity
-                    Integer.parseInt(values[6]), // kiosks
-                    values[7]); // address
-
-            // add to the station tree
-            stationsMap.put(Integer.parseInt(values[0]),stationOb);
-        }
-
-        // close our reader
-        bufferedReader.close();
-    }
-
-	/**
-	 * Reads external csv file with bike data
-	 *
-	 * @throws IOException readLine throws IOException
-	 */
-	private static void readBikeData() throws IOException {
-		// start reading our designated file
-        FileReader fileReader = new FileReader("data-files/bikeData.csv");
-        BufferedReader bufferedReader = new BufferedReader(fileReader);
-        bufferedReader.readLine();
-
-        // initialize string for bike data
-        String line;
-
-        // while there's more lines to read in the file
-        while((line = bufferedReader.readLine()) != null){
-            // store comma separated values in string array
-            String[] values = line.split(",");
-
-            // start a new bike with all the individual values we got
-            Bike bikeOb = new Bike(
-                    Integer.parseInt(values[0]),
-                    Integer.parseInt(values[1]),
-                    0, // start with station being '0', or no station
-                    //Integer.parseInt(values[2]), //station ID
-                    values[3],
-                    values[4]);
-
-            // move bike to correct station - this will set all our station and bike variables correctly
-            bikeOb.moveStation(Integer.parseInt(values[2]));
-
-            // add to the bike tree
-            bikesMap.put(Integer.parseInt(values[0]), bikeOb);
-        }
-
-        // close our reader
-        bufferedReader.close();
-    }
 
 	/**
 	 * Iterates through tree map and outputs bike data by ID order
@@ -331,7 +245,6 @@ public class ValleyBikeSim {
 					bike.getMntReport()
 			);
 		}
-
 	}
 
 	/**
@@ -390,7 +303,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
     	Membership membershipType = checkMembershipType(membership);
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
@@ -398,7 +311,7 @@ public class ValleyBikeSim {
 
 	}
 
-	public static Membership checkMembershipType(int membership){
+	static Membership checkMembershipType(int membership){
     	if (membership == 1){
     		return new PayAsYouGoMembership();
 		}
@@ -420,7 +333,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the customer account map
     	if (!customerAccountMap.containsKey(username)){
     		//print that the account does not exist
@@ -448,7 +361,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the internal account map
 		if (!internalAccountMap.containsKey(username)){
 			//print that the account does not exist
@@ -472,7 +385,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void saveCustomerAccountList() throws IOException {
+	static void saveCustomerAccountList() throws IOException {
 		// initiate fileWriter and iterator
 		FileWriter customerAccountsWriter = new FileWriter("data-files/customer-account-data.csv");
 		Iterator<String> keyIterator = customerAccountMap.keySet().iterator();
@@ -649,7 +562,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void equalizeStations() throws IOException, ParseException{
+	static void equalizeStations() throws IOException, ParseException{
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
 		Deque<Bike> extraBikes = new ArrayDeque<Bike>();// Extras contains bike objects
 		int idealPercentage = getPercentageData(stationsCapacity);

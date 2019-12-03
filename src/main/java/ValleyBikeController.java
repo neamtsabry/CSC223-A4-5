@@ -1,8 +1,6 @@
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.Scanner;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -316,7 +314,7 @@ public abstract class ValleyBikeController {
                 "3. Edit email address.\n" +
                 "4. Edit credit card number.\n" +
                 "5. Edit membership.\n" +
-                "0. Return to menu.\n" +
+                "0. Return to account home." +
                 "Please enter your selection (0-5):");
         int edit = input.nextInt();
         input.nextLine();
@@ -361,7 +359,7 @@ public abstract class ValleyBikeController {
             default:
                 System.out.println("That is not a valid input. Please try again.");
         }
-        //if function call finished and returned to this page, keep calling menu again until 'return to menu' is chosen
+        //if function call finished and returned to this page, keep calling home again until 'return to menu' is chosen
         editCustomerAccount(username);
     }
 
@@ -592,12 +590,12 @@ public abstract class ValleyBikeController {
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
         //if pay-as-you-go or no rides remaining on membership, charge by time
-        if (membership == 1 || ridesLeft == 0) {
+        if (ridesLeft == 0) {
             long rideLength = rideObj.getRideLength();
             long paymentDue = rideLength * (long) .30;
             double balance = ValleyBikeSim.viewAccountBalance(username) + paymentDue;
             rideObj.setPayment(paymentDue);
-            //TODO update user balance using balance
+            //TODO update user balance using balance (AM)
         } else {
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
             //otherwise merely decrement rides remaining in membership
