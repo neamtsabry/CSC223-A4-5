@@ -169,7 +169,7 @@ public class ValleyBikeSim {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO how do we save the $150? does it go into thir account balance?
+				//TODO how do we save the $150? does it go into thier account balance? (AM)
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -181,6 +181,7 @@ public class ValleyBikeSim {
 
 	/**
 	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
+	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
 	 *
 	 */
 	static void checkMembershipRenewal() {
@@ -192,22 +193,17 @@ public class ValleyBikeSim {
 			// initiate key for iterator
 			String username = keyIterator1.next();
 			CustomerAccount user = customerAccountMap.get(username);
-			//TODO check all memberships to see whether their payment is due
-			// either add checkPaymentDue to all memberships (and PAYG always returns false
-			// or I would check to make sure its a monthly/yearly before performing checkPaymentDue
-			// but in that case the program is still trying to perform the call on a generic Membership and it doesnt work
-			//if (user.getMembership().checkPaymentDue()) {
-
+			//TODO check all memberships to see whether their payment is due (AM)
+			if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(username)) {
-					//TODO renew membership (renew rides remaining and charge card)
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
-						//TODO how would membership payment be reflected?
+						//TODO how would membership payment be reflected? (AM)
 					} else if (user.getMembership().getMembershipInt() == 3) {
 						//yearly things
 						user.getMembership().setTotalRidesLeft(260);
-						//TODO how would membership payment be reflected?
+						//TODO how would membership payment be reflected? (AM)
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
 				} else {
@@ -217,9 +213,7 @@ public class ValleyBikeSim {
 					//Assumption: In a real system, here we would send out emails notifying users that
 					//they had been switched to a PAYG member because their credit card was not valid
 				}
-			//} else if (user.getMembership().getMembershipInt() == 3) {
-
-			//}
+			}
 		}
 	}
 
