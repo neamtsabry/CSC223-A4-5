@@ -18,7 +18,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    static void initialMenu() throws IOException, ParseException, InterruptedException {
+    static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         //TODO back menu on all menus
         //TODO exit option on all menus
 
@@ -69,7 +69,7 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    static void createAccount() throws IOException, ParseException, InterruptedException {
+    static void createAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
@@ -99,7 +99,7 @@ public abstract class ValleyBikeController {
      * @throws IOException customer log in and internal log in methods in model throw IOException
      * @throws ParseException customer log in and internal log in methods in model throw ParseException
      */
-    static void logIn() throws IOException, ParseException, InterruptedException {
+    static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         //prompt the user to choose which kind of account they want to log into
 
         System.out.println("\nPlease choose from one of the following menu options:");
@@ -152,7 +152,7 @@ public abstract class ValleyBikeController {
      * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
-    public static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException {
+    public static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 
         //checks whether user has a rental, and if so whether it exceeds 24 hours
         ValleyBikeSim.checkBikeRented(username);
@@ -233,10 +233,10 @@ public abstract class ValleyBikeController {
         for (int i=0; i<customer.getPassword().length(); i++){
             System.out.print("*");
         }
-        System.out.println("Email Address: " + customer.getEmailAddress());
+        System.out.println("\nEmail Address: " + customer.getEmailAddress());
         //TODO Must validate CC is 16 characters long for this 'last 4 #s of cc' substring to work
         //System.out.println("Credit Card: " + customer.getCreditCard().substring(11));
-        System.out.println("Membership: " + customer.getMembership());
+        System.out.println("Membership: " + customer.getMembership().getMembershipString());
     }
 
 
@@ -245,7 +245,7 @@ public abstract class ValleyBikeController {
      *
      * @param username is the unique username associated with the customer account
      */
-    private static void editCustomerAccount(String username){
+    private static void editCustomerAccount(String username) throws ClassNotFoundException{
         //TODO save edited fields
         //TODO add a return to customer home option
         //TODO recursively call itself to edit multiple fields
@@ -265,23 +265,28 @@ public abstract class ValleyBikeController {
         switch (edit){
             case 1:
                 //edit username
-                enterUsername();
+                String newUsername = enterUsername();
+                ValleyBikeSim.updateCustomerUsername(username, newUsername);
                 break;
             case 2:
                 //edit password
-                enterPassword();
+                String newPassword = enterPassword();
+                ValleyBikeSim.updateCustomerPassword(username, newPassword);
                 break;
             case 3:
                 //edit email address
-                enterEmail();
+                String newEmail = enterEmail();
+                ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
                 break;
             case 4:
                 //edit credit card number
-                enterCreditCard();
+                String newCreditCard = enterCreditCard();
+                ValleyBikeSim.updateCustomerCreditCard(username, newCreditCard);
                 break;
             case 5:
                 //edit membership type
-                enterMembership();
+                int newMembership = enterMembership();
+                ValleyBikeSim.updateCustomerMembership(username, newMembership);
                 break;
             case 0:
                 return;
@@ -299,7 +304,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public static void rentBike(String username) throws IOException, ParseException, InterruptedException {
+    public static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
 
         //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
@@ -442,7 +447,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      * @param username for user
      */
-    public static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException {
+    public static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
         System.out.println("Here's a list of station IDs and their names");
@@ -576,7 +581,7 @@ public abstract class ValleyBikeController {
      * @throws IOException addStation, addBike, equalizeStations and initialMenu throw IOException
      * @throws ParseException addStation, addBike, equalizeStations and initialMenu throw ParseException
      */
-    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException {
+    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
         //prompt user to pick option from main internal menu
 
         System.out.print("\n Choose from the following: \n"
@@ -867,11 +872,15 @@ public abstract class ValleyBikeController {
         String username = input.nextLine();
 
         //validates if username is between 6-24 characters
-        if (!isValidUsername(username)){
+        while (!isValidUsername(username)){
 
             //recursively calls itself until valid username input by user
             System.out.println("Username is not valid.");
-            enterUsername();
+
+            //prompts user to input username
+            System.out.println("Enter username (must be between 6-14 characters):");
+            username = input.nextLine();
+
         }
 
         //return valid username input by user
@@ -891,11 +900,14 @@ public abstract class ValleyBikeController {
         String password = input.nextLine();
 
         //validates if password is between 6-24 characters
-        if (!isValidPassword(password)){
+        while (!isValidPassword(password)){
 
             //recursively calls itself until valid password input by user
             System.out.println("Password is not valid.");
-            enterPassword();
+
+            //prompts user to input password
+            System.out.println("Enter password (must be between 6-14 characters):");
+            password = input.nextLine();
         }
 
         //return valid password input by user
@@ -916,11 +928,14 @@ public abstract class ValleyBikeController {
         String emailAddress = input.nextLine();
 
         //validates if email address is in correct format
-        if (!isValidEmail(emailAddress)){
+        while (!isValidEmail(emailAddress)){
 
             //recursively calls itself until valid email address input by user
             System.out.println("Email address is not valid.");
-            enterEmail();
+
+            //prompts user to input email address
+            System.out.println("Enter email address:");
+            emailAddress = input.nextLine();
         }
 
         //return valid email address input by user
@@ -940,11 +955,14 @@ public abstract class ValleyBikeController {
         String creditCard = input.nextLine();
 
         //validates if credit card is correct
-        if (!isValidCreditCard(creditCard)){
+        while (!isValidCreditCard(creditCard)){
 
             //recursively calls itself until valid credit card input by user
             System.out.println("Credit card is not valid.");
-            enterCreditCard();
+
+            //prompts user to input email address
+            System.out.println("Enter credit card number:");
+            creditCard = input.nextLine();
         }
 
         //return valid credit card input by user
