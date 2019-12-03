@@ -30,6 +30,8 @@ public abstract class Membership {
         return 0;
     }
 
+    public String getMembershipString(){ return null; }
+
     public boolean checkPaymentDue(){
         return false;
     }
