@@ -158,7 +158,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static Boolean checkBikeRented(String username) throws ParseException, InterruptedException {
+	static void checkBikeRented(String username) throws ParseException, InterruptedException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 		// true if last ride was returned
@@ -169,14 +169,13 @@ public class ValleyBikeSim {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO how do we save the $150? does it go into thier account balance? (AM)
+				//TODO how do we save the $150? does it go into their account balance? (AM)
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
 						"It must be returned within 24 hours of check-out.");
 			}
 		}
-		return isReturned;
 	}
 
 	/**
@@ -185,13 +184,9 @@ public class ValleyBikeSim {
 	 *
 	 */
 	static void checkMembershipRenewal() {
-		// initiate iterator
-		Iterator<String> keyIterator1 = customerAccountMap.keySet().iterator();
-
-		// while the iterator has a next value
-		while(keyIterator1.hasNext()) {
+		//check each user's membership to find whether their payment is due
+		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
-			String username = keyIterator1.next();
 			CustomerAccount user = customerAccountMap.get(username);
 			//TODO check all memberships to see whether their payment is due (AM)
 			if (user.getMembership().checkPaymentDue()) {
@@ -325,7 +320,6 @@ public class ValleyBikeSim {
 					bike.getMntReport()
 			);
 		}
-
 	}
 
 	/**
@@ -384,7 +378,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
     	Membership membershipType = checkMembershipType(membership);
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
@@ -392,7 +386,7 @@ public class ValleyBikeSim {
 
 	}
 
-	public static Membership checkMembershipType(int membership){
+	static Membership checkMembershipType(int membership){
     	if (membership == 1){
     		return new PayAsYouGoMembership();
 		}
@@ -414,7 +408,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the customer account map
     	if (!customerAccountMap.containsKey(username)){
     		//print that the account does not exist
@@ -442,7 +436,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	public static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
 		//if the username entered by the user does not exist in the internal account map
 		if (!internalAccountMap.containsKey(username)){
 			//print that the account does not exist
@@ -466,7 +460,7 @@ public class ValleyBikeSim {
 	 *
 	 * @throws IOException
 	 */
-	public static void saveCustomerAccountList() throws IOException {
+	static void saveCustomerAccountList() throws IOException {
 		// initiate fileWriter and iterator
 		FileWriter customerAccountsWriter = new FileWriter("data-files/customer-account-data.csv");
 		Iterator<String> keyIterator = customerAccountMap.keySet().iterator();
@@ -643,7 +637,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 */
-	public static void equalizeStations() throws IOException, ParseException{
+	static void equalizeStations() throws IOException, ParseException{
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
 		Deque<Bike> extraBikes = new ArrayDeque<Bike>();// Extras contains bike objects
 		int idealPercentage = getPercentageData(stationsCapacity);
