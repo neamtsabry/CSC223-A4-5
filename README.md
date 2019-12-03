@@ -32,6 +32,16 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 13. Click "Finish"
 14. Right-Click on the new project that showed up in the "Package Explorer" on the left. Select "Configure > Convert to Maven Project".
 
+## Connect to the database
+
+1. Download the sqlite-jdbc-3.27.2.1.jar file from this link: https://bitbucket.org/xerial/sqlite-jdbc/downloads/
+2. Right click on your project
+3. Select Build Path
+4. Click on Configure Build Path
+5. Click on Libraries and select Add External JARs
+6. Select the jar file from step 1 from the folder
+7. Click and Apply and Ok
+
 ## Find and run the code!
 
 1. Expand the "ValleyBikeSim" folder, expand the "src/main/java" and "(default package)" folders.
