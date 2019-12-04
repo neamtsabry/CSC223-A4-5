@@ -439,6 +439,8 @@ public abstract class ValleyBikeController {
         rideObj.setIsReturned(true);
         rideObj.setEndTimeStamp(Instant.now());
 
+
+
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         customer.setIsReturned(true);

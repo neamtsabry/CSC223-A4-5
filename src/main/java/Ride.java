@@ -104,6 +104,10 @@ public class Ride {
     // checks if it's been 24 hours since user rented bike or not
     public Boolean is24hours() throws ParseException, InterruptedException {
         Instant now =  Instant.now();
+
+        //testing start time stamp
+        System.out.println(getStartTimeStamp());
+
         long between = Duration.between(getStartTimeStamp(), now).toDays();
 
         if(between >= 1) return true;
