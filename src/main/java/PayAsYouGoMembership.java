@@ -7,4 +7,8 @@ public class PayAsYouGoMembership extends Membership {
     public int getMembershipInt(){
         return 1;
     }
+
+    public String getMembershipString(){
+        return "Pay Per Ride";
+    }
 }

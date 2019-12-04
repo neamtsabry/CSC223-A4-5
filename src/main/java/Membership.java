@@ -38,4 +38,8 @@ public abstract class Membership {
         return false;
     }
 
+    public String getMembershipString(){
+        return null;
+    }
+
 }

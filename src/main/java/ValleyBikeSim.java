@@ -40,23 +40,28 @@ public class ValleyBikeSim {
 	 */
 	public static void main(String[] args) throws IOException, ParseException, InterruptedException, SQLException, ClassNotFoundException {
 		// connect to sqlite database and read all required tables
-		connectToDatabase();
+		Connection conn = connectToDatabase();
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			readCustomerAccountData(conn, stmt);
+			readInternalAccountData(conn, stmt);
+			readStationData(conn, stmt);
+			readBikeData(conn, stmt);
+			conn.close();
+		} else {
+			System.out.println("Sorry, something went wrong connecting to the ValleyBike Database.");
+		}
 
         // start the initial menu
 		System.out.print("\nWelcome to ValleyBike Share!");
 		ValleyBikeController.initialMenu();
 	}
 
-	public static void connectToDatabase() throws SQLException, ClassNotFoundException{
+	public static Connection connectToDatabase() throws SQLException, ClassNotFoundException{
 		Class.forName("org.sqlite.JDBC");
 		String dbURL = "jdbc:sqlite:ValleyBike.db";
 		Connection conn = DriverManager.getConnection(dbURL);
-		if (conn != null) {
-			Statement stmt = conn.createStatement();
-			readCustomerAccountData(conn, stmt);
-			readInternalAccountData(conn, stmt);
-			conn.close();
-		}
+		return conn;
 	}
 
 	private static void readCustomerAccountData(Connection conn, Statement stmt) throws SQLException{
@@ -121,6 +126,91 @@ public class ValleyBikeSim {
 			// add to the bike tree
 			bikesMap.put(id, bike);
 		}
+	}
+
+	public static void updateCustomerEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException{
+		String sql = "UPDATE Customer_Account SET email_address = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newEmailAddress);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		customerAccountMap.get(username).setEmailAddress(newEmailAddress);
+		System.out.println("Your email address has been successfully updated to " + newEmailAddress);
+	}
+
+	public static void updateCustomerUsername(String username, String newUsername) throws ClassNotFoundException{
+		String sql = "UPDATE Customer_Account SET username = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newUsername);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update username in database at this time.");
+		}
+
+		customerAccountMap.get(username).setUsername(newUsername);
+		System.out.println("Your username has been successfully updated to " + newUsername);
+
+	}
+
+	public static void updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException{
+		String sql = "UPDATE Customer_Account SET password = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newPassword);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update password in database at this time.");
+		}
+
+		customerAccountMap.get(username).setPassword(newPassword);
+		System.out.println("Your password has been successfully updated to " + newPassword);
+	}
+
+	public static void updateCustomerCreditCard(String username, String newCreditCard) throws ClassNotFoundException{
+		String sql = "UPDATE Customer_Account SET credit_card = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newCreditCard);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update credit card information in database at this time.");
+		}
+
+		customerAccountMap.get(username).setCreditCard(newCreditCard);
+		System.out.println("Your credit card information has been successfully updated to " + newCreditCard);
+	}
+
+	public static void updateCustomerMembership(String username, int newMembership){
+		//TODO update customer membership
 	}
 
 	/**
@@ -288,7 +378,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException {
+    public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
     	//if the username for the new customer account is already in the customer account map
     	if (customerAccountMap.get(customerAccount.getUsername()) != null){
     		//print that the username already exists
@@ -303,7 +393,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException {
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
     	Membership membershipType = checkMembershipType(membership);
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
@@ -333,7 +423,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 		//if the username entered by the user does not exist in the customer account map
     	if (!customerAccountMap.containsKey(username)){
     		//print that the account does not exist
@@ -361,7 +451,7 @@ public class ValleyBikeSim {
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
-	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException {
+	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 		//if the username entered by the user does not exist in the internal account map
 		if (!internalAccountMap.containsKey(username)){
 			//print that the account does not exist

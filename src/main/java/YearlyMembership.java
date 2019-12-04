@@ -23,4 +23,8 @@ public class YearlyMembership extends Membership{
     public int getMembershipInt(){
         return 3;
     }
+
+    public String getMembershipString(){
+        return "Yearly";
+    }
 }
