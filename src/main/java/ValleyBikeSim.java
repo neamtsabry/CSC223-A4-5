@@ -585,10 +585,7 @@ public class ValleyBikeSim {
 		int totalVehicles = 0;
 		int totalCapacity = 0;
 
-        Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
-
-        while(keyIterator.hasNext()){
-            Integer key = (Integer) keyIterator.next();
+		for (Integer key : stationsMap.keySet()) {
 			Station station = stationsMap.get(key);
 
 			int percentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
@@ -613,37 +610,35 @@ public class ValleyBikeSim {
 	 */
 	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
 														 int idealPercentage, Deque<Bike> extraBikes){
-		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
 		//Deque<Bike> extraBikes = new ArrayDeque<Bike>();
-		while (capacityIterator.hasNext()){
-			Integer key = (Integer) capacityIterator.next();
-			int percentage = (Integer) stationsCapacity.get(key);
+		for (Integer key : stationsCapacity.keySet()) {
+			int percentage = stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
 
 			Deque<Bike> bikesAtStation = getBikesAtStation(key);
 
-			if((percentage - idealPercentage) > 0){
-                int newPercentage = percentage;
-                //continues to remove vehicles as long as removing a vehicle
-                //moves the percentage closer to ideal percentage
-                while(Math.abs(newPercentage - idealPercentage) >
-                Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
-                        - idealPercentage)){
-                    if(!bikesAtStation.isEmpty()){ // if the station isn't empty
+			if ((percentage - idealPercentage) > 0) {
+				int newPercentage = percentage;
+				//continues to remove vehicles as long as removing a vehicle
+				//moves the percentage closer to ideal percentage
+				while (Math.abs(newPercentage - idealPercentage) >
+						Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
+								- idealPercentage)) {
+					if (!bikesAtStation.isEmpty()) { // if the station isn't empty
 						// move one bike from station stack to extra stack
-                    	Bike bike = bikesAtStation.pop();
+						Bike bike = bikesAtStation.pop();
 						extraBikes.push(bike);
 						bike.moveStation(0); // set bike's station to 0, or no station
 
-                    	// get bike object from key
+						// get bike object from key
 						// Bike bike = getBikeObj(bikeKey);
-                    	//station.setBikes(station.getBikes() - 1);
-                        //extras.set(0, extras.get(0)+1);
+						//station.setBikes(station.getBikes() - 1);
+						//extras.set(0, extras.get(0)+1);
 
-                    } else {
-                        //extras.set(1, extras.get(1)+1);
-                    }
-                    newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
+					} else {
+						//extras.set(1, extras.get(1)+1);
+					}
+					newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 				}
 			}
 		}
@@ -661,9 +656,8 @@ public class ValleyBikeSim {
 	 */
 	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity,
 											  int idealPercentage, Deque<Bike> extraBikes){
-		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
-		while (capacityIterator.hasNext()){
-			Integer stationKey = (Integer) capacityIterator.next();
+
+		for (Integer stationKey : stationsCapacity.keySet()) {
 			Station station = stationsMap.get(stationKey);
 
 			int newPercentage = stationsCapacity.get(stationKey);
@@ -671,16 +665,16 @@ public class ValleyBikeSim {
 			// continues to add vehicles as long as adding a vehicle
 			// moves the percentage closer to ideal percentage
 			// and there are still extra vehicles to add
-			while(Math.abs(newPercentage - idealPercentage) >
+			while (Math.abs(newPercentage - idealPercentage) >
 					Math.abs((int) (((float) (station.getBikes() + 1) /
-							station.getCapacity()) * 100)) - idealPercentage)
-			{
+							station.getCapacity()) * 100)) - idealPercentage) {
 
-				if(!extraBikes.isEmpty()){ // while stack isn't empty
+				if (!extraBikes.isEmpty()) { // while stack isn't empty
 					Bike bike = extraBikes.pop(); // get a bike from our stack
 					bike.moveStation(stationKey); // move this bike to the current station
-					}
-				else { return; } // return when stack is empty
+				} else {
+					return;
+				} // return when stack is empty
 				newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 			}
 		}
