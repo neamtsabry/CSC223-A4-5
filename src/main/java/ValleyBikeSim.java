@@ -670,7 +670,7 @@ public class ValleyBikeSim {
 	 * @return
 	 */
 	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
-														 int idealPercentage, Deque<Bike> extraBikes){
+														 int idealPercentage, Deque<Bike> extraBikes) {
 		//Deque<Bike> extraBikes = new ArrayDeque<Bike>();
 		for (Integer key : stationsCapacity.keySet()) {
 			int percentage = stationsCapacity.get(key);
@@ -695,9 +695,8 @@ public class ValleyBikeSim {
 						// Bike bike = getBikeObj(bikeKey);
 						//station.setBikes(station.getBikes() - 1);
 						//extras.set(0, extras.get(0)+1);
-
+						newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 					}
-					newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 				}
 			}
 		}
@@ -713,8 +712,8 @@ public class ValleyBikeSim {
 	 * @param idealPercentage - percentage to aim for
 	 * @param extraBikes - stack of extra bikes to put in stations
 	 */
-	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity,
-											  int idealPercentage, Deque<Bike> extraBikes){
+	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity, int idealPercentage, Deque<Bike> extraBikes){
+
 		for (Integer stationKey : stationsCapacity.keySet()) {
 			Station station = stationsMap.get(stationKey);
 
