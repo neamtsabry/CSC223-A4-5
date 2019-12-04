@@ -5,7 +5,7 @@ public class MonthlyMembership extends Membership{
 
     private final int maxRides = 20;
 
-    public MonthlyMembership() {
+    MonthlyMembership() {
         super();
     }
 
@@ -22,6 +22,10 @@ public class MonthlyMembership extends Membership{
 
     public int getMembershipInt(){
         return 2;
+    }
+
+    public String getMembershipString(){
+        return "Monthly";
     }
 
 }

@@ -1,4 +1,4 @@
-public class InternalAccount extends Account {
+class InternalAccount extends Account {
 
     /**
      * This is the constructor to create an internal account
@@ -6,13 +6,13 @@ public class InternalAccount extends Account {
      * @param password is the password for the internal staff account
      * @param emailAddress is the email address associated with the internal staff account
      */
-    public InternalAccount(String username, String password, String emailAddress) {
+    InternalAccount(String username, String password, String emailAddress) {
         //internal account does not have any extra fields that the abstract account class does not have
         //internal account inherits all fields from abstract class
         super(username, password, emailAddress);
     }
 
-    public String getInternalAccountString(){
+    String getInternalAccountString(){
         return this.getUsername() + "," + this.getPassword() + "," +
                 this.getEmailAddress();
     }

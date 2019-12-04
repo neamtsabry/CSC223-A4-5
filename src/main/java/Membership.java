@@ -6,23 +6,23 @@ public abstract class Membership {
 
     private LocalDate lastPayment;
 
-    public Membership() {
+    Membership() {
         this.totalRidesLeft = 0;
     }
 
-    public int getTotalRidesLeft() {
+    int getTotalRidesLeft() {
         return totalRidesLeft;
     }
 
-    public void setTotalRidesLeft(int totalRidesLeft) {
+    void setTotalRidesLeft(int totalRidesLeft) {
         this.totalRidesLeft = totalRidesLeft;
     }
 
-    public LocalDate getLastPayment() {
+    LocalDate getLastPayment() {
         return lastPayment;
     }
 
-    public void setLastPayment(LocalDate lastPayment) {
+    void setLastPayment(LocalDate lastPayment) {
         this.lastPayment = lastPayment;
     }
 
@@ -36,6 +36,10 @@ public abstract class Membership {
 
     public boolean checkMaxRidesExceeded() {
         return false;
+    }
+
+    public String getMembershipString(){
+        return null;
     }
 
 }

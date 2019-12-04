@@ -1,10 +1,14 @@
 public class PayAsYouGoMembership extends Membership {
 
-    public PayAsYouGoMembership() {
+    PayAsYouGoMembership() {
         super();
     }
 
     public int getMembershipInt(){
         return 1;
+    }
+
+    public String getMembershipString(){
+        return "Pay Per Ride";
     }
 }
