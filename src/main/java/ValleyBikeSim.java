@@ -120,7 +120,6 @@ public class ValleyBikeSim {
 				maintenance = "y";
 			}
 			String mntReport = rs.getString("mnt_report");
-			assert maintenance != null;
 			Bike bike = new Bike(id, location, stationId, maintenance, mntReport);
 
 			// add to the bike tree
