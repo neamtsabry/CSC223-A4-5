@@ -1,10 +1,6 @@
-import java.text.Format;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.UUID;
 
 public class Ride {

@@ -1,4 +1,4 @@
-public abstract class Account {
+abstract class Account {
 
     /** This field is the username for the customer */
     private String username;
@@ -15,7 +15,7 @@ public abstract class Account {
      * @param password is the password chosen by the user for login
      * @param emailAddress is the email address associated with the user's account
      */
-    public Account(String username, String password, String emailAddress) {
+    Account(String username, String password, String emailAddress) {
         this.username = username;
         this.password = password;
         this.emailAddress = emailAddress;
@@ -25,7 +25,7 @@ public abstract class Account {
      * This is the setter method to update username
      * @param username is the new username input by the user
      */
-    public void setUsername(String username) {
+    void setUsername(String username) {
         this.username = username;
     }
 
@@ -33,7 +33,7 @@ public abstract class Account {
      * This is the setter method to update password
      * @param password is the new password input by the user
      */
-    public void setPassword(String password) {
+    void setPassword(String password) {
         this.password = password;
     }
 
@@ -41,7 +41,7 @@ public abstract class Account {
      * This is the setter method to update email address
      * @param emailAddress is the new email address input by the user
      */
-    public void setEmailAddress(String emailAddress) {
+    void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
 
@@ -49,7 +49,7 @@ public abstract class Account {
      * This is the getter method to access the username associated with the account object
      * @return the username associated with the account object
      */
-    public String getUsername() {
+    String getUsername() {
         return username;
     }
 
@@ -57,7 +57,7 @@ public abstract class Account {
      * This is the getter method to access the password associated with the account object
      * @return the password associated with the account object
      */
-    public String getPassword() {
+    String getPassword() {
         return password;
     }
 
@@ -65,7 +65,7 @@ public abstract class Account {
      * This is the getter method to access the email address associated with the account object
      * @return the email address associated with the account object
      */
-    public String getEmailAddress() {
+    String getEmailAddress() {
         return emailAddress;
     }
 }

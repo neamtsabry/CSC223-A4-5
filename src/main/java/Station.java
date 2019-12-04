@@ -37,7 +37,7 @@ public class Station {
      * @param kiosk                   number of kiosks
      * @param address1                station address
      */
-    public Station(String nameValue,
+    Station(String nameValue,
                    // Integer bikesValue,
                    // Integer availableDocksValue,
                    Integer maintenanceRequestValue,
@@ -49,13 +49,7 @@ public class Station {
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
         this.kioskNumber = kiosk;
-
-        if (kiosk > 0) {
-            this.kioskBoolean = true;
-        } else {
-            this.kioskBoolean = false;
-        }
-
+        this.kioskBoolean = (kiosk > 0);
         this.address = address1;
     }
 
@@ -63,15 +57,14 @@ public class Station {
      * Getters and setters for station object values and fields
      */
 
-    public String getStationString() {
-        String fileInput = this.name + "," + this.getBikes() + "," +
+    String getStationString() {
+        return this.name + "," + this.getBikes() + "," +
                 +this.getAvailableDocks() +
                 "," + this.maintenanceRequest + ","
                 + this.capacity + "," + this.kioskNumber + "," + this.address;
-        return fileInput;
     }
 
-    public String getStationName() {
+    String getStationName() {
         return this.name;
     }
 
@@ -79,67 +72,67 @@ public class Station {
         this.name = newName;
     }
 
-    public int getBikes() {
+    int getBikes() {
         return bikeList.size();
     }
 
 
     // public void setBikes(int newNumBikes) { this.bikes = newNumBikes; }
 
-    public int getAvailableDocks() {
+    int getAvailableDocks() {
         // return this.availableDocks;
         return (this.capacity - bikeList.size());
     }
 
-    public int getMaintenanceRequest() {
+    int getMaintenanceRequest() {
         return this.maintenanceRequest;
     }
 
-    public void setMaintenanceRequest(int newNumRqst) {
+    void setMaintenanceRequest(int newNumRqst) {
         this.maintenanceRequest = newNumRqst;
     }
 
-    public int getCapacity() {
+    int getCapacity() {
         return this.capacity;
     }
 
-    public void setCapacity(int newCap) {
+    void setCapacity(int newCap) {
         this.capacity = newCap;
     }
 
-    public boolean getKioskBoolean() {
+    boolean getKioskBoolean() {
         return this.kioskBoolean;
     }
 
-    public void setKioskBoolean(boolean newKioskBool) {
+    void setKioskBoolean(boolean newKioskBool) {
         this.kioskBoolean = newKioskBool;
     }
 
-    public int getKioskNum() {
+    int getKioskNum() {
         return this.kioskNumber;
     }
 
-    public void setKioskNum(int newKioskNum) {
+    void setKioskNum(int newKioskNum) {
         this.kioskNumber = newKioskNum;
     }
 
-    public String getAddress() {
+    String getAddress() {
         return this.address;
     }
 
-    public void setAddress(String newAdd) {
+    void setAddress(String newAdd) {
         this.address = newAdd;
     }
 
-    public LinkedList<Bike> getBikeList() {
+    LinkedList<Bike> getBikeList() {
         return bikeList;
     }
 
-    public void addToBikeList(Bike bike) {
+    void addToBikeList(Bike bike) {
         bikeList.add(bike);
     }
 
-    public boolean removeFromBikeList(Bike bike) {
+    boolean removeFromBikeList(Bike bike) {
         // find index of bike ID in our linked list
         int bikeIndex = bikeList.indexOf(bike);
 

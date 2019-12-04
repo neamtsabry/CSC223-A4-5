@@ -16,13 +16,13 @@ import java.util.Date;
  */
 public class ValleyBikeSim {
 	/** data structure for keeping track of stations */
-	static Map<Integer, Station> stationsMap = new HashMap<>();
+	private static Map<Integer, Station> stationsMap = new HashMap<>();
 
 	/** data structure for keeping track of bikes */
-	static Map<Integer, Bike> bikesMap = new HashMap<>();
+	public static Map<Integer, Bike> bikesMap = new HashMap<>();
 
 	/** list for storing bike ids of bikes that require maintenance */
-	static Map<Integer, String> mntReqs = new HashMap<>();
+	private static Map<Integer, String> mntReqs = new HashMap<>();
 
 	/** data structure for keeping track of customer accounts */
 	private static Map<String, CustomerAccount> customerAccountMap = new HashMap<>();
@@ -43,10 +43,10 @@ public class ValleyBikeSim {
 		Connection conn = connectToDatabase();
 		if (conn != null) {
 			Statement stmt = conn.createStatement();
-			readCustomerAccountData(conn, stmt);
-			readInternalAccountData(conn, stmt);
-			readStationData(conn, stmt);
-			readBikeData(conn, stmt);
+			readCustomerAccountData(stmt);
+			readInternalAccountData(stmt);
+			readStationData(stmt);
+			readBikeData(stmt);
 			conn.close();
 		} else {
 			System.out.println("Sorry, something went wrong connecting to the ValleyBike Database.");
@@ -57,14 +57,13 @@ public class ValleyBikeSim {
 		ValleyBikeController.initialMenu();
 	}
 
-	public static Connection connectToDatabase() throws SQLException, ClassNotFoundException{
+	private static Connection connectToDatabase() throws SQLException, ClassNotFoundException{
 		Class.forName("org.sqlite.JDBC");
 		String dbURL = "jdbc:sqlite:ValleyBike.db";
-		Connection conn = DriverManager.getConnection(dbURL);
-		return conn;
+		return DriverManager.getConnection(dbURL);
 	}
 
-	private static void readCustomerAccountData(Connection conn, Statement stmt) throws SQLException{
+	private static void readCustomerAccountData(Statement stmt) throws SQLException{
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Customer_Account");
 		while ( rs.next() ) {
 			String username = rs.getString("username");
@@ -80,7 +79,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static void readInternalAccountData(Connection conn, Statement stmt) throws SQLException{
+	private static void readInternalAccountData(Statement stmt) throws SQLException{
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Internal_Account");
 		while ( rs.next() ) {
 			String username = rs.getString("username");
@@ -93,7 +92,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static void readStationData(Connection conn, Statement stmt) throws SQLException{
+	private static void readStationData(Statement stmt) throws SQLException{
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Station");
 		while ( rs.next() ) {
 			int id = rs.getInt("id");
@@ -109,7 +108,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static void readBikeData(Connection conn, Statement stmt) throws SQLException{
+	private static void readBikeData(Statement stmt) throws SQLException{
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Bike");
 		while ( rs.next() ) {
 			int id = rs.getInt("id");
@@ -121,6 +120,7 @@ public class ValleyBikeSim {
 				maintenance = "y";
 			}
 			String mntReport = rs.getString("mnt_report");
+			assert maintenance != null;
 			Bike bike = new Bike(id, location, stationId, maintenance, mntReport);
 
 			// add to the bike tree
@@ -128,7 +128,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void updateCustomerEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException{
+	static void updateCustomerEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET email_address = ? "
 				+ "WHERE username = ?";
 
@@ -148,7 +148,7 @@ public class ValleyBikeSim {
 		System.out.println("Your email address has been successfully updated to " + newEmailAddress);
 	}
 
-	public static void updateCustomerUsername(String username, String newUsername) throws ClassNotFoundException{
+	static void updateCustomerUsername(String username, String newUsername) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET username = ? "
 				+ "WHERE username = ?";
 
@@ -169,7 +169,7 @@ public class ValleyBikeSim {
 
 	}
 
-	public static void updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException{
+	static void updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET password = ? "
 				+ "WHERE username = ?";
 
@@ -189,7 +189,7 @@ public class ValleyBikeSim {
 		System.out.println("Your password has been successfully updated to " + newPassword);
 	}
 
-	public static void updateCustomerCreditCard(String username, String newCreditCard) throws ClassNotFoundException{
+	static void updateCustomerCreditCard(String username, String newCreditCard) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET credit_card = ? "
 				+ "WHERE username = ?";
 
@@ -209,8 +209,24 @@ public class ValleyBikeSim {
 		System.out.println("Your credit card information has been successfully updated to " + newCreditCard);
 	}
 
-	public static void updateCustomerMembership(String username, int newMembership){
-		//TODO update customer membership
+	static void updateCustomerMembership(String username, int newMembership) throws ClassNotFoundException{
+		String sql = "UPDATE Customer_Account SET membership = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setInt(1, newMembership);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update membership in database at this time.");
+		}
+
+		customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
+		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
 	}
 
 	/**
@@ -276,13 +292,14 @@ public class ValleyBikeSim {
 	 *
 	 */
 	static void checkMembershipRenewal() {
+		//TODO when a user creates an account, last payment needs to be set then
 		//check each user's membership to find whether their payment is due
 		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
 			CustomerAccount user = customerAccountMap.get(username);
 			//TODO check all memberships to see whether their payment is due (AM)
 			if (user.getMembership().checkPaymentDue()) {
-				if (ValleyBikeController.isValidCreditCard(username)) {
+				if (ValleyBikeController.isValidCreditCard()) {
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
@@ -307,23 +324,18 @@ public class ValleyBikeSim {
 	/**
 	 * Iterates through tree map and outputs bike data by ID order
 	 * in a nicely formatted table
-	 *
-	 * @throws IOException
-	 * @throws ParseException
 	 */
-	static void viewBikeList() throws IOException, ParseException{
+	static void viewBikeList(){
 		// format table view
 		System.out.format("%-15s%-15s%-15s%-15s%-15s\n", "ID", "Location", "Station ID",
 				"Main. Req", "Main. Report");
 
 		// initiate iterator
-        Iterator<Integer> keyIterator1 = bikesMap.keySet().iterator();
 
 		// while the iterator has a next value
-		while(keyIterator1.hasNext()){
+		for (Integer key : bikesMap.keySet()) {
 			// initiate key for iterator
-            Integer key = (Integer) keyIterator1.next();
-            // use that key to find bike object in bike tree
+			// use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
 
 			// format the view of the bike object values
@@ -350,12 +362,10 @@ public class ValleyBikeSim {
                 "AvDocs", "MainReq", "Capacity", "Kiosk","Name - Address");
 
 		// initiate iterator
-        Iterator<Integer> keyIterator2 = stationsMap.keySet().iterator();
 
 		// while the iterator has a next value
-		while(keyIterator2.hasNext()) {
+		for (Integer key : stationsMap.keySet()) {
 			// initiate key for iterator
-            Integer key = (Integer) keyIterator2.next();
 			// use that key to find station object in station tree
 			Station station = stationsMap.get(key);
 
@@ -386,10 +396,25 @@ public class ValleyBikeSim {
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-    		//if the username does not already exist
+			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, membership, balance) " +
+					"VALUES(?,?,?,?,?,?)";
+
+			try (Connection conn = connectToDatabase();
+				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, customerAccount.getUsername());
+				pstmt.setString(2, customerAccount.getPassword());
+				pstmt.setString(3, customerAccount.getEmailAddress());
+				pstmt.setString(4, customerAccount.getCreditCard());
+				pstmt.setInt(5, customerAccount.getMembership().getMembershipInt());
+				pstmt.setInt(6, customerAccount.getBalance());
+				pstmt.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			}
+
+			//if the username does not already exist
 			//add the new customer account object to customer account map
-    		customerAccountMap.put(customerAccount.getUsername(), customerAccount);
-    		saveCustomerAccountList();
+			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
 
@@ -471,58 +496,6 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * Overwrites old customer account data in csv with updated data from customerAccountMap
-	 *
-	 * @throws IOException
-	 */
-	static void saveCustomerAccountList() throws IOException {
-		// initiate fileWriter and iterator
-		FileWriter customerAccountsWriter = new FileWriter("data-files/customer-account-data.csv");
-		Iterator<String> keyIterator = customerAccountMap.keySet().iterator();
-
-		// write the labels at the beginning of the file
-		customerAccountsWriter.write("Username,Password,Email Address,Credit Card,Membership,Balance");
-
-		// loop through customer accounts and transform customer account object
-		while(keyIterator.hasNext()){
-			String key = keyIterator.next();
-			CustomerAccount customerAccount = customerAccountMap.get(key);
-			customerAccountsWriter.write("\n");
-			customerAccountsWriter.write(customerAccount.getCustomerAccountString());
-		}
-
-		// then end the fileWriter
-		customerAccountsWriter.flush();
-		customerAccountsWriter.close();
-	}
-
-	/**
-	 * Overwrites old internal account data in csv with updated data from internalAccountMap
-	 *
-	 * @throws IOException
-	 */
-	public static void saveInternalAccountList() throws IOException {
-		// initiate fileWriter and iterator
-		FileWriter internalAccountsWriter = new FileWriter("data-files/internal-account-data.csv");
-		Iterator<String> keyIterator = internalAccountMap.keySet().iterator();
-
-		// write the labels at the beginning of the file
-		internalAccountsWriter.write("Username,Password,Email Address");
-
-		// loop through customer accounts and transform customer account object
-		while(keyIterator.hasNext()){
-			String key = keyIterator.next();
-			InternalAccount internalAccount = internalAccountMap.get(key);
-			internalAccountsWriter.write("\n");
-			internalAccountsWriter.write(internalAccount.getInternalAccountString());
-		}
-
-		// then end the fileWriter
-		internalAccountsWriter.flush();
-		internalAccountsWriter.close();
-	}
-
-	/**
 	 * Overwrites old station data in csv with updated data from stationMap
 	 *
 	 * The choice to overwrite all data instead of simply adding new stations
@@ -544,7 +517,7 @@ public class ValleyBikeSim {
 		// loop through station tree and transform station object
 		// to comma separated values for every row
 		while(keyIterator.hasNext()){
-			Integer key = (Integer) keyIterator.next();
+			Integer key = keyIterator.next();
 			Station station = stationsMap.get(key);
 			stationsWriter.write("\n");
 			stationsWriter.write(key.toString() + "," + station.getStationString());
@@ -578,7 +551,7 @@ public class ValleyBikeSim {
 		// loop through bike tree and transform bike object
 		// to comma separated values for every row
 		while(keyIterator.hasNext()){
-			Integer key = (Integer) keyIterator.next();
+			Integer key = keyIterator.next();
 			Bike bike = bikesMap.get(key);
 			bikesWriter.write("\n");
 			bikesWriter.write(bike.getBikeString());
@@ -611,7 +584,7 @@ public class ValleyBikeSim {
 
 		int rides = 0;
 		long totalTime = 0;
-		long averageTime = 0;
+		long averageTime;
 
 		bufferedReader.readLine();
 
@@ -654,11 +627,11 @@ public class ValleyBikeSim {
 	 */
 	static void equalizeStations() throws IOException, ParseException{
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
-		Deque<Bike> extraBikes = new ArrayDeque<Bike>();// Extras contains bike objects
+		Deque<Bike> extraBikes = new ArrayDeque<>();// Extras contains bike objects
 		int idealPercentage = getPercentageData(stationsCapacity);
 
 		// get our bike stack from high percentage stations
-		extraBikes = reassignHighPercentage(stationsCapacity, idealPercentage, extraBikes);
+		reassignHighPercentage(stationsCapacity, idealPercentage, extraBikes);
 
 		// distribute our bike stack to low percentage stations
 		reassignLowPercentage(stationsCapacity, idealPercentage, extraBikes);
@@ -675,10 +648,7 @@ public class ValleyBikeSim {
 		int totalVehicles = 0;
 		int totalCapacity = 0;
 
-        Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
-
-        while(keyIterator.hasNext()){
-            Integer key = (Integer) keyIterator.next();
+		for (Integer key : stationsMap.keySet()) {
 			Station station = stationsMap.get(key);
 
 			int percentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
@@ -687,9 +657,7 @@ public class ValleyBikeSim {
 
 			stationsCapacity.put(key, percentage);
 		}
-		int idealPercentage = (int) (((float) totalVehicles/totalCapacity) * 100);
-
-		return idealPercentage;
+		return (int) (((float) totalVehicles/totalCapacity) * 100);
 	}
 
 	/**
@@ -703,37 +671,33 @@ public class ValleyBikeSim {
 	 */
 	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
 														 int idealPercentage, Deque<Bike> extraBikes){
-		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
 		//Deque<Bike> extraBikes = new ArrayDeque<Bike>();
-		while (capacityIterator.hasNext()){
-			Integer key = (Integer) capacityIterator.next();
-			int percentage = (Integer) stationsCapacity.get(key);
+		for (Integer key : stationsCapacity.keySet()) {
+			int percentage = stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
 
 			Deque<Bike> bikesAtStation = getBikesAtStation(key);
 
-			if((percentage - idealPercentage) > 0){
-                int newPercentage = percentage;
-                //continues to remove vehicles as long as removing a vehicle
-                //moves the percentage closer to ideal percentage
-                while(Math.abs(newPercentage - idealPercentage) >
-                Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
-                        - idealPercentage)){
-                    if(!bikesAtStation.isEmpty()){ // if the station isn't empty
+			if ((percentage - idealPercentage) > 0) {
+				int newPercentage = percentage;
+				//continues to remove vehicles as long as removing a vehicle
+				//moves the percentage closer to ideal percentage
+				while (Math.abs(newPercentage - idealPercentage) >
+						Math.abs(((int) (((float) (station.getBikes() - 1) / station.getCapacity()) * 100))
+								- idealPercentage)) {
+					if (!bikesAtStation.isEmpty()) { // if the station isn't empty
 						// move one bike from station stack to extra stack
-                    	Bike bike = bikesAtStation.pop();
+						Bike bike = bikesAtStation.pop();
 						extraBikes.push(bike);
 						bike.moveStation(0); // set bike's station to 0, or no station
 
-                    	// get bike object from key
+						// get bike object from key
 						// Bike bike = getBikeObj(bikeKey);
-                    	//station.setBikes(station.getBikes() - 1);
-                        //extras.set(0, extras.get(0)+1);
+						//station.setBikes(station.getBikes() - 1);
+						//extras.set(0, extras.get(0)+1);
 
-                    } else {
-                        //extras.set(1, extras.get(1)+1);
-                    }
-                    newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
+					}
+					newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 				}
 			}
 		}
@@ -751,9 +715,7 @@ public class ValleyBikeSim {
 	 */
 	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity,
 											  int idealPercentage, Deque<Bike> extraBikes){
-		Iterator<Integer> capacityIterator = stationsCapacity.keySet().iterator();
-		while (capacityIterator.hasNext()){
-			Integer stationKey = (Integer) capacityIterator.next();
+		for (Integer stationKey : stationsCapacity.keySet()) {
 			Station station = stationsMap.get(stationKey);
 
 			int newPercentage = stationsCapacity.get(stationKey);
@@ -761,16 +723,16 @@ public class ValleyBikeSim {
 			// continues to add vehicles as long as adding a vehicle
 			// moves the percentage closer to ideal percentage
 			// and there are still extra vehicles to add
-			while(Math.abs(newPercentage - idealPercentage) >
+			while (Math.abs(newPercentage - idealPercentage) >
 					Math.abs((int) (((float) (station.getBikes() + 1) /
-							station.getCapacity()) * 100)) - idealPercentage)
-			{
+							station.getCapacity()) * 100)) - idealPercentage) {
 
-				if(!extraBikes.isEmpty()){ // while stack isn't empty
+				if (!extraBikes.isEmpty()) { // while stack isn't empty
 					Bike bike = extraBikes.pop(); // get a bike from our stack
 					bike.moveStation(stationKey); // move this bike to the current station
-					}
-				else { return; } // return when stack is empty
+				} else {
+					return;
+				} // return when stack is empty
 				newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 			}
 		}
@@ -900,7 +862,7 @@ public class ValleyBikeSim {
 	 */
 	static Deque<Bike> getBikesAtStation(int statId){
 		// initiate our bike stack
-		Deque<Bike> bikesAtStation = new ArrayDeque<Bike>();
+		Deque<Bike> bikesAtStation = new ArrayDeque<>();
 		// initiate iterator
 		Iterator bikeKeyIterator = ValleyBikeSim.createIterator(true);
 

@@ -19,7 +19,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    private static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
     /* We add to the menuPath stack whenever we may need to
     remember this landing page in order to return to it.
 
@@ -120,7 +120,7 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    static void createAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void createAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
@@ -155,7 +155,7 @@ public abstract class ValleyBikeController {
      * @throws IOException customer log in and internal log in methods in model throw IOException
      * @throws ParseException customer log in and internal log in methods in model throw ParseException
      */
-    static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         //prompt the user to choose which kind of account they want to log into
 
         System.out.println("\nPlease choose from one of the following menu options:");
@@ -208,7 +208,7 @@ public abstract class ValleyBikeController {
      * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
-    public static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 
         //checks whether user has a rental, and if so whether it exceeds 24 hours
         ValleyBikeSim.checkBikeRented(username);
@@ -375,14 +375,14 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
 
         //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         if (membership == 1) {
             String creditCard = ValleyBikeSim.viewCreditCard(username);
             //check validity of credit card, send them back to home screen if not valid
-            if (!isValidCreditCard(creditCard)) {
+            if (!isValidCreditCard()) {
                 System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
                         " in your account is correct, then try again.");
                 //customerAccountHome(username);
@@ -527,7 +527,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      * @param username for user
      */
-    public static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
         System.out.println("Here's a list of station IDs and their names");
@@ -624,6 +624,7 @@ public abstract class ValleyBikeController {
      * user reports a problem with the bike they checked out
      */
     private static void reportProblem(String username) throws IOException, ParseException {
+        //TODO bikesmap should not be accessed from here
         // prompt user for maintenance report
         System.out.println("Please enter maintenance report or '0' to cancel:");
         input.nextLine();
@@ -925,8 +926,7 @@ public abstract class ValleyBikeController {
             System.out.println(request);
             input.next();
         }
-        Integer value = input.nextInt();
-        return value;
+        return input.nextInt();
     }
 
     /**
@@ -1067,7 +1067,7 @@ public abstract class ValleyBikeController {
         if (creditCard.contentEquals("0")) { returnToLastMenu(null); }
 
         //validates if credit card is correct
-        while (!isValidCreditCard(creditCard)){
+        while (!isValidCreditCard()){
 
             //recursively calls itself until valid credit card input by user
             System.out.println("Credit card is not valid.");
@@ -1128,12 +1128,9 @@ public abstract class ValleyBikeController {
 
     /**
      * Validates credit card number input by user
-     *
-     * @param creditCard is the credit card number input by user
-     *
      * @return true if credit card is valid and false otherwise
      */
-    static boolean isValidCreditCard(String creditCard){
+    static boolean isValidCreditCard(){
         //TODO check credit card validity for every transaction
 
         //90% of the time the method accepts the credit card

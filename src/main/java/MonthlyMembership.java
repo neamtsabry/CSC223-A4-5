@@ -5,7 +5,7 @@ public class MonthlyMembership extends Membership{
 
     private final int maxRides = 20;
 
-    public MonthlyMembership() {
+    MonthlyMembership() {
         super();
     }
 

@@ -28,18 +28,12 @@ public class Bike {
      * @param maintenance boolean, true if bike requires maintenance
      * @param maintenanceReport string report explaining why a bike requires maintenance
      */
-    public Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport){
+    Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport){
         this.id = bikeId;
         this.location = bikeLocation;
-
-
-        if(maintenance.equals("y")) this.mnt = true;
-        else this.mnt = false;
-
+        this.mnt = (maintenance.equals("y"));
         this.mntReport = maintenanceReport;
-
         this.moveStation(stationId);
-
     }
 
     /**
@@ -47,10 +41,9 @@ public class Bike {
      *
      * @return comma separated string of bike data
      */
-    public String getBikeString() {
-        String fileLine = this.id + "," + this.location + "," +
+    String getBikeString() {
+        return this.id + "," + this.location + "," +
                 this.station + "," + this.mnt + "," + this.mntReport;
-        return fileLine;
     }
 
     /**
@@ -59,7 +52,7 @@ public class Bike {
      *
      * @param newStationValue - station ID of the station the bike is moving to
      */
-    public void moveStation(int newStationValue) {
+    void moveStation(int newStationValue) {
         if (! Objects.equals(this.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
             Station oldStation = ValleyBikeSim.getStationObj(this.station); // get old station object
             oldStation.removeFromBikeList(this); // remove bike from station's bike list
@@ -79,44 +72,44 @@ public class Bike {
      * for the bike object
      */
 
-    public int getId(){
+    int getId(){
         return id;
     }
 
-    public void setId(int newId){
+    void setId(int newId){
         this.id = newId;
     }
 
-    public int getStation(){
+    int getStation(){
         return this.station;
     }
 
-    public void setStation(int newStationValue){
+    void setStation(int newStationValue){
         this.station = newStationValue;
     }
 
 
-    public int getBikeLocation(){
+    int getBikeLocation(){
         return this.location;
     }
 
-    public void setBikeLocation(int newBikeLocation){
+    void setBikeLocation(int newBikeLocation){
         this.location = newBikeLocation;
     }
 
-    public boolean getMnt(){
+    boolean getMnt(){
         return mnt;
     }
 
-    public void setMnt(boolean newMnt){
+    void setMnt(boolean newMnt){
         this.mnt = newMnt;
     }
 
-    public String getMntReport(){
+    String getMntReport(){
         return mntReport;
     }
 
-    public void setMntReport(String newMntReport){
+    void setMntReport(String newMntReport){
         this.mntReport = newMntReport;
     }
 }

@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Stack;
 import java.util.UUID;
 
 public class CustomerAccount extends Account{
@@ -59,7 +58,7 @@ public class CustomerAccount extends Account{
      * This is the setter method to update credit card number
      * @param creditCard is the new credit card number entered by the user
      */
-    public void setCreditCard(String creditCard) {
+    void setCreditCard(String creditCard) {
         this.creditCard = creditCard;
     }
 
@@ -67,7 +66,7 @@ public class CustomerAccount extends Account{
      * This is the setter method to update membership
      * @param membership is the new membership type entered by the user
      */
-    public void setMembership(Membership membership) {
+    void setMembership(Membership membership) {
         this.membership = membership;
     }
 
@@ -75,7 +74,7 @@ public class CustomerAccount extends Account{
      * This is the setter method to update balance
      * @param balance is the new balance of the user
      */
-    public void setBalance(int balance) {
+    void setBalance(int balance) {
         this.balance = balance;
     }
 
@@ -83,7 +82,7 @@ public class CustomerAccount extends Account{
      * This is the getter method to access membership type associated with the customer account
      * @return the membership type associated with the customer account
      */
-    public Membership getMembership() {
+    Membership getMembership() {
         return membership;
     }
 
@@ -91,7 +90,7 @@ public class CustomerAccount extends Account{
      * This is the getter method to access the balance associated with the customer account
      * @return the balance associated with the customer account
      */
-    public int getBalance() {
+    int getBalance() {
         return balance;
     }
 
@@ -99,7 +98,7 @@ public class CustomerAccount extends Account{
      * This is the getter method to access the credit card number associated with the customer account
      * @return the credit card number associated with the customer account
      */
-    public String getCreditCard() {
+    String getCreditCard() {
         return creditCard;
     }
 
@@ -108,29 +107,29 @@ public class CustomerAccount extends Account{
      * Each field is separated by a comma, in csv format
      * @return the csv format string with all the fields associated with the customer account
      */
-    public String getCustomerAccountString(){
+    String getCustomerAccountString(){
         return this.getUsername() + "," + this.getPassword() + "," +
                  this.getEmailAddress() + "," + this.getCreditCard() + ","
                 + this.getMembership().getMembershipInt() + "," + this.getBalance();
     }
 
-    public void addNewRide(UUID rideID){
+    void addNewRide(UUID rideID){
         this.rideIdList.add(rideID);
     }
 
-    public Boolean getIsReturned(){
+    Boolean getIsReturned(){
         return this.lastRideIsReturned;
     }
 
-    public void setIsReturned(Boolean isReturnedValue){
+    void setIsReturned(Boolean isReturnedValue){
         this.lastRideIsReturned = isReturnedValue;
     }
 
-    public ArrayList<UUID> getRideIdList() {
+    ArrayList<UUID> getRideIdList() {
         return rideIdList;
     }
 
-    public UUID getLastRideId(){
+    UUID getLastRideId(){
         return rideIdList.get(rideIdList.size()- 1);
     }
 }
