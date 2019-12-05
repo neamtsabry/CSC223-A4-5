@@ -1,7 +1,12 @@
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -126,6 +131,56 @@ public class ValleyBikeSim {
 
 			// add to the bike tree
 			bikesMap.put(id, bike);
+		}
+	}
+
+	private static void readRideData(Statement stmt) throws SQLException, ClassNotFoundException, ParseException {
+		ResultSet rs = stmt.executeQuery("SELECT * FROM Ride");
+		while ( rs.next() ) {
+			String id = rs.getString("ride_id");
+			int bike_id = rs.getInt("bike_id");
+			String username = rs.getString("username");
+			int is_returned = rs.getInt("is_returned");
+
+			//TODO make ride length work
+			long rideLength = rs.getInt("ride_length");
+
+			String start_time_stamp = rs.getString("start_time_stamp");
+			String end_time_stamp = rs.getString("end_time_stamp");
+			float payment = rs.getFloat("payment");
+
+			// change string to unique UUID
+			UUID uuid_id = UUID.fromString(id);
+			// initiate boolean value to false
+			Boolean is_returned_bool = false;
+
+			// if found 1 then set it to true
+			if(is_returned == 1){
+				is_returned_bool = true;
+			}
+
+			// change starting time stamp string to instant
+			Instant start_time_stamp_instant = LocalDateTime.parse(start_time_stamp ,
+					DateTimeFormatter.ofPattern( "hh:mm a, MM/dd/yyy" , Locale.US )
+			).atZone(ZoneId.of( "America/New_York" )).toInstant()  ;
+
+			// initialize end time stamp as nul since the ride could not have been returned
+			Instant end_time_stamp_instant = null;
+
+			// if it was returned, set ending time stamp too
+			if(is_returned_bool){
+				end_time_stamp_instant = LocalDateTime.parse(start_time_stamp ,
+						DateTimeFormatter.ofPattern( "hh:mm a, MM/dd/yyy" , Locale.US )
+				).atZone(ZoneId.of( "America/New_York" )).toInstant()  ;
+			}
+
+			// create new ride object with fields
+			Ride ride = new Ride(uuid_id, bike_id, username,
+					is_returned_bool, start_time_stamp_instant,
+					end_time_stamp_instant);
+
+			// add to the bike tree
+			rideMap.put(uuid_id, ride);
 		}
 	}
 
@@ -546,17 +601,19 @@ public class ValleyBikeSim {
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-			String sql = "INSERT INTO Station(id, name, , req_mnt, capacity, kiosk, address) " +
-					"VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
+					"capacity, kiosk, address) " +
+					"VALUES(?,?, ?, ?, ?, ?, ?)";
 
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setInt(1, id);
 				pstmt.setString(2, station.getStationName());
-				pstmt.setInt(3, station.getMaintenanceRequest());
-				pstmt.setInt(4, station.getCapacity());
-				pstmt.setInt(5, station.getKioskNum());
-				pstmt.setString(6, station.getAddress());
+				pstmt.setInt(3, station.getBikes());
+				pstmt.setInt(4, station.getMaintenanceRequest());
+				pstmt.setInt(5, station.getCapacity());
+				pstmt.setInt(6, station.getKioskNum());
+				pstmt.setString(7, station.getAddress());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
@@ -609,8 +666,8 @@ public class ValleyBikeSim {
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt) " +
-					"VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
+					"VALUES(?,?,?,?,?)";
 
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -618,6 +675,7 @@ public class ValleyBikeSim {
 				pstmt.setInt(2, bike.getBikeLocation());
 				pstmt.setInt(3, bike.getStation());
 				pstmt.setBoolean(4, bike.getMnt());
+				pstmt.setString(5, bike.getMntReport());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
@@ -626,6 +684,35 @@ public class ValleyBikeSim {
 			//if the username does not already exist
 			//add the new customer account object to customer account map
 			bikesMap.put(bike.getId(), bike);
+		}
+	}
+
+	public static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+		//if the username for the new customer account is already in the customer account map
+		if (rideMap.get(ride.getRideId()) != null){
+			//print that the username already exists
+			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
+			//prompt the user to input new account information again or log in
+			ValleyBikeController.initialMenu();
+		} else {
+			String sql = "INSERT INTO Ride(id, location, station_id, req_mnt, mnt_report) " +
+					"VALUES(?,?,?,?,?)";
+
+//			try (Connection conn = connectToDatabase();
+//				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+//				pstmt.setInt(1, bike.getId());
+//				pstmt.setInt(2, bike.getBikeLocation());
+//				pstmt.setInt(3, bike.getStation());
+//				pstmt.setBoolean(4, bike.getMnt());
+//				pstmt.setString(5, bike.getMntReport());
+//				pstmt.executeUpdate();
+//			} catch (SQLException e) {
+//				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+//			}
+
+			//if the username does not already exist
+			//add the new customer account object to customer account map
+//			bikesMap.put(bike.getId(), bike);
 		}
 	}
 

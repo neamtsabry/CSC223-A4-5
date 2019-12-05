@@ -466,9 +466,9 @@ public abstract class ValleyBikeController {
         Ride ride = new Ride(rideId,
                 bikeID,
                 username,
-                false);
-
-        ride.setStartTimeStamp(Instant.now());
+                false,
+                Instant.now(),
+                null);
 
         // Add ride to customer account
         // assume username is always valid
