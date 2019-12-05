@@ -28,7 +28,7 @@ public class Bike {
      * @param maintenance boolean, true if bike requires maintenance
      * @param maintenanceReport string report explaining why a bike requires maintenance
      */
-    Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport){
+    Bike(int bikeId,  int bikeLocation, int stationId, String maintenance, String maintenanceReport) throws ClassNotFoundException {
         this.id = bikeId;
         this.location = bikeLocation;
         this.mnt = (maintenance.equals("y"));
@@ -52,21 +52,34 @@ public class Bike {
      *
      * @param newStationValue - station ID of the station the bike is moving to
      */
-    void moveStation(int newStationValue) {
+    void moveStation(int newStationValue) throws ClassNotFoundException {
         if (! Objects.equals(this.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
             Station oldStation = ValleyBikeSim.getStationObj(this.station); // get old station object
             oldStation.removeFromBikeList(this); // remove bike from station's bike list
         }
-        this.station = newStationValue; // set bike's station to new station
+
+        //TODO is this the right place for this?
+        // by doing this here we have to add the class not found exception
+        // and I was wondering if we could move moveStation to maybe Sim?
+        ValleyBikeSim.updateBikeStationId(this.id, newStationValue);
+
+        // this is already done in update
+//        setStation(newStationValue); // set bike's station to new station
+
         if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
             Station newStation = ValleyBikeSim.getStationObj(this.station); // get new station object
             newStation.addToBikeList(this); // add bike to station's bike list
-            setBikeLocation(0);
+            ValleyBikeSim.updateBikeLocation(this.id, 0);
+            //setBikeLocation(0);
         }
+
         else {
-            setBikeLocation(2);
+            //TODO call updateBikeLocation();
+            //setBikeLocation(2);
+            ValleyBikeSim.updateBikeLocation(this.id, 2);
         }
     }
+
     /**
      * All following methods get and set appropriate fields
      * for the bike object
@@ -87,7 +100,6 @@ public class Bike {
     void setStation(int newStationValue){
         this.station = newStationValue;
     }
-
 
     int getBikeLocation(){
         return this.location;
