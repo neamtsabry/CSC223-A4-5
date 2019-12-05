@@ -461,6 +461,39 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
+	 *
+	 * @throws IOException the initial menu in the controller throws IOException
+	 * @throws ParseException the initial menu in the controller throws ParseException
+	 */
+	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+		//if the username for the new customer account is already in the customer account map
+		if (customerAccountMap.get(internalAccount.getUsername()) != null){
+			//print that the username already exists
+			System.out.println("Internal account with this username already exists.\nPlease try again with another username or log in.");
+			//prompt the user to input new account information again or log in
+			ValleyBikeController.internalAccountHome(username);
+		} else {
+			String sql = "INSERT INTO Internal_Account(username, password, email_address) " +
+					"VALUES(?,?,?)";
+
+			try (Connection conn = connectToDatabase();
+				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setString(1, internalAccount.getUsername());
+				pstmt.setString(2, internalAccount.getPassword());
+				pstmt.setString(3, internalAccount.getEmailAddress());
+				pstmt.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Sorry, something went wrong with adding new internal account to database.");
+			}
+
+			//if the username does not already exist
+			//add the new internal account object to internal account map
+			internalAccountMap.put(internalAccount.getUsername(), internalAccount);
+		}
+	}
+
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
     	Membership membershipType = checkMembershipType(membership);
     	//set date they joined this membership
