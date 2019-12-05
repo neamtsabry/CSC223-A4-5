@@ -376,7 +376,6 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
-
         //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         if (membership == 1) {
@@ -470,13 +469,14 @@ public abstract class ValleyBikeController {
                 Instant.now(),
                 null);
 
+        // add ride to map as well as database
+        ValleyBikeSim.addRide(ride);
+
         // Add ride to customer account
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
         customer.addNewRide(rideId); // add ride to customer account
         customer.setIsReturned(false); // set customer account to show a bike has yet to be returned
-
-        ValleyBikeSim.addToRideMap(rideId, ride);
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
@@ -533,10 +533,9 @@ public abstract class ValleyBikeController {
     private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
-        System.out.println("Here's a list of station IDs and their names");
-
-        // view station list
-        ValleyBikeSim.viewStationList();
+        // View stations
+        System.out.println("STATION LIST:");
+        ValleyBikeSim.viewStationList(); // view station list
 
         // choose station to rent from
         int statId = getResponse("Please enter station to which you're returning the bike " +
@@ -567,15 +566,9 @@ public abstract class ValleyBikeController {
         // move bike to new station
         someBike.moveStation(statId);
 
-        // if returned, then bike location is available and docked
-        someBike.setBikeLocation(0);
-
-        // set bike's station id to the station it's returned to
-        someBike.setStation(statId);
-
-        // set ride to be returned
-        rideObj.setIsReturned(true);
-        rideObj.setEndTimeStamp(Instant.now());
+        // update ride to be returned and set its end timee stamp
+        ValleyBikeSim.updateRideIsReturned(lastRideId, true);
+        ValleyBikeSim.updateRideEndTimeStamp(lastRideId, Instant.now());
 
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
@@ -603,7 +596,12 @@ public abstract class ValleyBikeController {
             long rideLength = rideObj.getRideLength();
             long paymentDue = rideLength * (long) .30;
             double balance = ValleyBikeSim.viewAccountBalance(username) + paymentDue;
-            rideObj.setPayment(paymentDue);
+
+            // already done in update
+            // rideObj.setPayment(paymentDue);
+
+            ValleyBikeSim.updateRidePayment();
+
             //TODO update user balance using balance (AM)
         } else {
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);

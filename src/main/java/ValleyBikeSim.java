@@ -143,7 +143,7 @@ public class ValleyBikeSim {
 			int is_returned = rs.getInt("is_returned");
 
 			//TODO make ride length work
-			long rideLength = rs.getInt("ride_length");
+			long rideLength = rs.getLong("ride_length");
 
 			String start_time_stamp = rs.getString("start_time_stamp");
 			String end_time_stamp = rs.getString("end_time_stamp");
@@ -213,7 +213,7 @@ public class ValleyBikeSim {
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
 			// set the corresponding param
-			pstmt.setInt(2, newBikeLocation);
+			pstmt.setInt(1, newBikeLocation);
 			pstmt.setInt(2, bikeId);
 
 			// update
@@ -225,6 +225,71 @@ public class ValleyBikeSim {
 		bikesMap.get(bikeId).setBikeLocation(newBikeLocation);
 //		System.out.println("Your email address has been successfully updated to " + newBikeLocation);
 	}
+
+	static void updateRideIsReturned(UUID rideId, Boolean isReturned) throws ClassNotFoundException{
+		String sql = "UPDATE Ride SET is_returned = ? "
+				+ "WHERE ride_id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, rideId.toString());
+
+			if(isReturned) pstmt.setInt(2, 1);
+			else pstmt.setInt(2, 0);
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		rideMap.get(rideId).setIsReturned(isReturned);
+	}
+
+	static void updateRideEndTimeStamp(UUID rideId, Instant end_time_stamp) throws ClassNotFoundException{
+		String sql = "UPDATE Ride SET end_time_stamp = ? "
+				+ "WHERE ride_id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, rideId.toString());
+
+			pstmt.setString(2, end_time_stamp.toString());
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		rideMap.get(rideId).setEndTimeStamp(end_time_stamp);
+	}
+
+	static void updateRidePayment(UUID rideId, double payment) throws ClassNotFoundException{
+		String sql = "UPDATE Ride SET payment = ? "
+				+ "WHERE ride_id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, rideId.toString());
+
+			pstmt.setString(2, end_time_stamp.toString());
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		rideMap.get(rideId).setEndTimeStamp(end_time_stamp);
+	}
+
 
 	static void updateCustomerEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET email_address = ? "
@@ -629,76 +694,36 @@ public class ValleyBikeSim {
 	}
 
 	public static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
-		//if the username for the new customer account is already in the customer account map
 		if (stationsMap.get(id) != null){
-			//print that the username already exists
 			System.out.println("Station with this id already exists.\nPlease try again with another username or log in.");
-			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
 					"capacity, kiosk, address) " +
-					"VALUES(?,?, ?, ?, ?, ?, ?)";
+					"VALUES(?,?,?,?,?,?,?,?)";
 
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setInt(1, id);
 				pstmt.setString(2, station.getStationName());
 				pstmt.setInt(3, station.getBikes());
-				pstmt.setInt(4, station.getMaintenanceRequest());
-				pstmt.setInt(5, station.getCapacity());
-				pstmt.setInt(6, station.getKioskNum());
-				pstmt.setString(7, station.getAddress());
+				pstmt.setInt(4, station.getAvailableDocks());
+				pstmt.setInt(5, station.getMaintenanceRequest());
+				pstmt.setInt(6, station.getCapacity());
+				pstmt.setInt(7, station.getKioskNum());
+				pstmt.setString(8, station.getAddress());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
 
-			//if the username does not already exist
-			//add the new customer account object to customer account map
 			stationsMap.put(id, station);
 		}
 	}
 
-	/**
-	 * Overwrites old station data in csv with updated data from stationMap
-	 *
-	 * The choice to overwrite all data instead of simply adding new stations
-	 * to existing file was made because recording rides can update information
-	 * in both old and added stations, and it was important to make sure those updates
-	 * were reflected in the new saved list as well
-	 *
-	 * @throws IOException
-	 */
-//	static void saveStationList() throws IOException {
-//		// initiate fileWriter and iterator
-//		FileWriter stationsWriter = new FileWriter("data-files/station-data.csv");
-//		Iterator<Integer> keyIterator = stationsMap.keySet().iterator();
-//
-//		// write the labels at the beginning of the file
-//		stationsWriter.write("ID,Name,Bikes,Available Docks,"
-//				+ "Maintenance Request,Capacity,Kiosk,Address");
-//
-//		// loop through station tree and transform station object
-//		// to comma separated values for every row
-//		while(keyIterator.hasNext()){
-//			Integer key = keyIterator.next();
-//			Station station = stationsMap.get(key);
-//			stationsWriter.write("\n");
-//			stationsWriter.write(key.toString() + "," + station.getStationString());
-//		}
-//
-//		// then end the fileWriter
-//		stationsWriter.flush();
-//		stationsWriter.close();
-//	}
-
 	public static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
-		//if the username for the new customer account is already in the customer account map
 		if (stationsMap.get(bike.getId()) != null){
-			//print that the username already exists
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
-			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
 			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
@@ -716,74 +741,45 @@ public class ValleyBikeSim {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
 
-			//if the username does not already exist
-			//add the new customer account object to customer account map
 			bikesMap.put(bike.getId(), bike);
 		}
 	}
 
 	public static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
-		//if the username for the new customer account is already in the customer account map
 		if (rideMap.get(ride.getRideId()) != null){
-			//print that the username already exists
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
-			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-			String sql = "INSERT INTO Ride(id, location, station_id, req_mnt, mnt_report) " +
-					"VALUES(?,?,?,?,?)";
+			String sql = "INSERT INTO Ride(ride_id, bike_id, username, is_returned, " +
+					"ride_length, start_time_stamp, end_time_stamp, payment) " +
+					"VALUES(?,?,?,?,?, ?, ?, ?)";
 
-//			try (Connection conn = connectToDatabase();
-//				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//				pstmt.setInt(1, bike.getId());
-//				pstmt.setInt(2, bike.getBikeLocation());
-//				pstmt.setInt(3, bike.getStation());
-//				pstmt.setBoolean(4, bike.getMnt());
-//				pstmt.setString(5, bike.getMntReport());
-//				pstmt.executeUpdate();
-//			} catch (SQLException e) {
-//				System.out.println("Sorry, something went wrong with adding new customer account to database.");
-//			}
+			try (Connection conn = connectToDatabase();
+				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				String ride_id = ride.getRideId().toString();
+				pstmt.setString(1, ride_id);
+				pstmt.setInt(2, ride.getBikeId());
+				pstmt.setString(3, ride.getUsername());
 
-			//if the username does not already exist
-			//add the new customer account object to customer account map
-//			bikesMap.put(bike.getId(), bike);
+				int is_returned_int = 0;
+
+				if(ride.getIsReturned()){
+					is_returned_int = 1;
+				}
+
+				pstmt.setInt(5, is_returned_int);
+				pstmt.setLong(6, ride.getRideLength());
+				pstmt.setString(7, ride.getStartTimeStamp().toString());
+				pstmt.setString(8, ride.getEndTimeStamp().toString());
+
+				pstmt.executeUpdate();
+			} catch (SQLException e) {
+				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			}
+
+			rideMap.put(ride.getRideId(), ride);
 		}
 	}
-
-	/**
-	 * Overwrites old bike data in external csv file with updated data from
-	 * bike tree map
-	 *
-	 * The choice to overwrite all data instead of simply adding new bikes
-	 * to existing file was made because recording rides can update information
-	 * in both old and added bikes, and it was important to make sure those updates
-	 * were reflected in the new saved list as well
-	 *
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-//	static void saveBikeList() throws IOException, ParseException{
-//		// initiate fileWriter and iterator
-//		FileWriter bikesWriter = new FileWriter("data-files/bikeData.csv");
-//		Iterator<Integer> keyIterator = bikesMap.keySet().iterator();
-//
-//		// write the labels at the beginning of the file
-//		bikesWriter.write("ID,Location,StationId,Req_Mnt,Mnt_Report");
-//
-//		// loop through bike tree and transform bike object
-//		// to comma separated values for every row
-//		while(keyIterator.hasNext()){
-//			Integer key = keyIterator.next();
-//			Bike bike = bikesMap.get(key);
-//			bikesWriter.write("\n");
-//			bikesWriter.write(bike.getBikeString());
-//		}
-//
-//		// then end the fileWriter
-//		bikesWriter.flush();
-//		bikesWriter.close();
-//	}
 
 	/**
      * We are not currently using this method.
