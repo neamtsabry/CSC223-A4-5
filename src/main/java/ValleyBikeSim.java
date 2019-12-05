@@ -318,7 +318,7 @@ public class ValleyBikeSim {
 		Boolean isReturned = customer.getIsReturned();
 		if (!isReturned) {
 			UUID ride = customer.getLastRideId();
-			if (rideMap.get(ride).is24hours()) {
+			if (rideMap.get(ride).isRented24Hours()) {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
@@ -336,7 +336,7 @@ public class ValleyBikeSim {
 	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
 	 *
 	 */
-	static void checkMembershipRenewal() throws ClassNotFoundException {
+	static void checkMembershipRenewalTime() throws ClassNotFoundException {
 		//check each user's membership to find whether their payment is due
 		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
