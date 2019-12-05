@@ -225,7 +225,9 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update membership in database at this time.");
 		}
 
+		//update membership type associated with user and date representing start of membership
 		customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
+		customerAccountMap.get(username).getMembership().setMemberSince(LocalDate.now());
 		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
 	}
 
@@ -277,7 +279,7 @@ public class ValleyBikeSim {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO how do we save the $150? does it go into their account balance? (AM)
+				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -291,8 +293,7 @@ public class ValleyBikeSim {
 	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
 	 *
 	 */
-	static void checkMembershipRenewal() {
-		//TODO when a user creates an account, last payment needs to be set then
+	static void checkMembershipRenewal() throws ClassNotFoundException {
 		//check each user's membership to find whether their payment is due
 		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
@@ -303,18 +304,17 @@ public class ValleyBikeSim {
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
-						//TODO how would membership payment be reflected? (AM)
 					} else if (user.getMembership().getMembershipInt() == 3) {
 						//yearly things
 						user.getMembership().setTotalRidesLeft(260);
-						//TODO how would membership payment be reflected? (AM)
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
+					//ASSUMPTION: In a real system, here emails would be sent out to all members whose memberships
+                    // have just been renewed, letting them know their card was charged
 				} else {
 					//if credit card cannot be charged, reset membership to pay-as-you-go
-					Membership paygMembership = checkMembershipType(1);
-					user.setMembership(paygMembership);
-					//Assumption: In a real system, here we would send out emails notifying users that
+                    updateCustomerMembership(username, 1);
+					//ASSUMPTION: In a real system, here we would send out emails notifying users that
 					//they had been switched to a PAYG member because their credit card was not valid
 				}
 			}
@@ -420,6 +420,8 @@ public class ValleyBikeSim {
 
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
     	Membership membershipType = checkMembershipType(membership);
+    	//set date they joined this membership
+    	membershipType.setMemberSince(LocalDate.now());
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
 		ValleyBikeSim.addCustomerAccount(customerAccount);
