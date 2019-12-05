@@ -5,6 +5,7 @@ public abstract class Membership {
     private int totalRidesLeft;
 
     private LocalDate lastPayment;
+    private LocalDate memberSince;
 
     Membership() {
         this.totalRidesLeft = 0;
@@ -24,6 +25,14 @@ public abstract class Membership {
 
     void setLastPayment(LocalDate lastPayment) {
         this.lastPayment = lastPayment;
+    }
+
+    LocalDate getMemberSince() {
+        return memberSince;
+    }
+
+    void setMemberSince(LocalDate memberSince) {
+        this.memberSince = memberSince;
     }
 
     public int getMembershipInt(){

@@ -100,7 +100,7 @@ public class Ride {
     }
 
     // checks if it's been 24 hours since user rented bike or not
-    public Boolean is24hours() throws ParseException, InterruptedException {
+    public Boolean isRented24Hours() throws ParseException, InterruptedException {
         Instant now =  Instant.now();
 
         //testing start time stamp

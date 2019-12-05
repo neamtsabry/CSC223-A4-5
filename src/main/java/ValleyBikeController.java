@@ -75,7 +75,7 @@ public abstract class ValleyBikeController {
         //TODO exit option on all menus
 
         //check whether it's time to renew customer's memberships
-        ValleyBikeSim.checkMembershipRenewal();
+        ValleyBikeSim.checkMembershipRenewalTime();
 
         System.out.print("\nPlease choose from one of the following menu options: \n"
                 + "1. Create Customer Account\n"
