@@ -600,7 +600,7 @@ public abstract class ValleyBikeController {
             // already done in update
             // rideObj.setPayment(paymentDue);
 
-            ValleyBikeSim.updateRidePayment();
+            ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
 
             //TODO update user balance using balance (AM)
         } else {

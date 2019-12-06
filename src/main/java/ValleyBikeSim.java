@@ -147,7 +147,7 @@ public class ValleyBikeSim {
 
 			String start_time_stamp = rs.getString("start_time_stamp");
 			String end_time_stamp = rs.getString("end_time_stamp");
-			float payment = rs.getFloat("payment");
+			double payment = rs.getDouble("payment");
 
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
@@ -276,10 +276,10 @@ public class ValleyBikeSim {
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			// set the corresponding param
-			pstmt.setString(1, rideId.toString());
+			pstmt.setDouble(1, payment);
 
-			pstmt.setString(2, end_time_stamp.toString());
+			// set the corresponding param
+			pstmt.setString(2, rideId.toString());
 
 			// update
 			pstmt.executeUpdate();
@@ -287,7 +287,7 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update email address in database at this time.");
 		}
 
-		rideMap.get(rideId).setEndTimeStamp(end_time_stamp);
+		rideMap.get(rideId).setPayment(payment);
 	}
 
 
