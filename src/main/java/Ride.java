@@ -29,15 +29,17 @@ public class Ride {
     // null if isReturned is false
     private Instant endTimeStamp;
 
-    //TODO ??
     private double payment;
 
     public Ride(UUID rideIdVal, int bikeIdVal, String usernameVal,
-                Boolean isReturnedVal) throws ParseException {
+                Boolean isReturnedVal, Instant startTimeStampVal,
+                Instant endTimeStampVal) throws ParseException {
         this.rideId = rideIdVal;
         this.bikeId = bikeIdVal;
         this.username = usernameVal;
         this.isReturned = isReturnedVal;
+        this.startTimeStamp = startTimeStampVal;
+        this.endTimeStamp = endTimeStampVal;
     }
 
     public void setRideId(UUID rideId) {
