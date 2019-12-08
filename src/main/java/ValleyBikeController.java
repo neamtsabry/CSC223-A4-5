@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    private static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    private static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
     /* We add to the menuPath stack whenever we may need to
     remember this landing page in order to return to it.
 
@@ -71,7 +72,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //TODO back menu on all menus
         //TODO exit option on all menus
 
@@ -121,7 +122,7 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    private static void CreateCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void CreateCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
@@ -162,7 +163,7 @@ public abstract class ValleyBikeController {
      * @throws IOException customer log in and internal log in methods in model throw IOException
      * @throws ParseException customer log in and internal log in methods in model throw ParseException
      */
-    private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt the user to choose which kind of account they want to log into
 
         System.out.println("\nPlease choose from one of the following menu options:");
@@ -215,7 +216,7 @@ public abstract class ValleyBikeController {
      * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
-    static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 
         //checks whether user has a rental, and if so whether it exceeds 24 hours
         ValleyBikeSim.checkBikeRented(username);
@@ -233,7 +234,8 @@ public abstract class ValleyBikeController {
         System.out.println("5. Report a problem\n"
                 + "6. View total number of rides\n"
                 + "7. View average ride time\n"
-                + "8. View your most popular ride time."
+                + "8. View your most popular ride time.\n"
+                + "9. Delete account.\n"
                 + "0. Log out\n" +
                 "Please enter your selection (0-5):");
 
@@ -272,6 +274,16 @@ public abstract class ValleyBikeController {
             case 5:
                 reportProblem(username);
                 break;
+            case 6:
+                break;
+            case 7:
+                //TODO
+                break;
+            case 8:
+                break;
+            case 9:
+                ValleyBikeSim.disableCustomerAccount(username);
+                break;
             case 0:
                 //return to homepage to log out
                 //TODO save data when logging out
@@ -286,7 +298,7 @@ public abstract class ValleyBikeController {
         customerAccountHome(username);
     }
 
-    private static void createInternalAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void createInternalAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
         //TODO Grace
@@ -333,7 +345,7 @@ public abstract class ValleyBikeController {
      *
      * @param username is the unique username associated with the customer account
      */
-    private static void editCustomerAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+    private static void editCustomerAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //TODO save edited fields
         //TODO add a return to customer home option
         //TODO recursively call itself to edit multiple fields
@@ -400,7 +412,7 @@ public abstract class ValleyBikeController {
         editCustomerAccount(username);
     }
 
-    private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+    private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //TODO add a return to customer home option
         //TODO handle edge case of not entering int
         //TODO Grace
@@ -446,7 +458,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         if (membership == 1) {
@@ -571,7 +583,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      * @param username for user
      */
-    private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
         // View stations
@@ -725,7 +737,7 @@ public abstract class ValleyBikeController {
      * @throws IOException addStation, addBike, equalizeStations and initialMenu throw IOException
      * @throws ParseException addStation, addBike, equalizeStations and initialMenu throw ParseException
      */
-    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt user to pick option from main internal menu
 
         System.out.print("\n Choose from the following: \n"
@@ -756,7 +768,7 @@ public abstract class ValleyBikeController {
                 createInternalAccount();
                 break;
             case 2:
-                //TODO edit internal account
+                editInternalAccount(username);
                 break;
             case 3:
                 //TODO view customer balances
@@ -786,6 +798,13 @@ public abstract class ValleyBikeController {
                 //equalize stations
                 ValleyBikeSim.equalizeStations();
                 break;
+            case 11:
+                break;
+            case 12:
+                //TODO
+                break;
+            case 13:
+                break;
             case 0:
                 //go to initial menu to log out
                 initialMenu();
@@ -803,7 +822,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException {
+    private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // use helper function to check input is valid and save it
         int id = getResponse("Please enter the ID for this station:");
 
@@ -869,7 +888,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException {
+    private static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // get new bike's id
         int id = getResponse("Please enter the bike's ID");
 
@@ -975,7 +994,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid username input by user
      */
-    private static String enterUsername() throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+    private static String enterUsername() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompts user to input username
         System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel:");
         String username = input.nextLine();
@@ -1006,7 +1025,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid password input by user
      */
-    private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+    private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompts user to input password
         System.out.println("Enter password (must be between 6-14 characters) or '0' to cancel:");
         String password = input.nextLine();
@@ -1036,7 +1055,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid email address input by user
      */
-    private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+    private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         // TODO let user know how to make valid email address
         //prompts user to input email address
         System.out.println("Enter email address or '0' to cancel:");
@@ -1067,7 +1086,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid credit card input by user
      */
-    private static String enterCreditCard() throws ParseException, InterruptedException, IOException, ClassNotFoundException{
+    private static String enterCreditCard() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompts user to input email address
         System.out.println("Enter credit card number or '0' to cancel:");
         String creditCard = input.nextLine();
@@ -1095,7 +1114,7 @@ public abstract class ValleyBikeController {
      *
      * @return membership string input by user
      */
-    private static int enterMembership() throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+    private static int enterMembership() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
         //TODO validate membership input
         System.out.println("Choose membership type: \n" +
