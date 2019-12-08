@@ -26,7 +26,7 @@ public class Station {
     private String address;
 
     // list of bike ids associated with station
-    private LinkedList<Bike> bikeList = new LinkedList<>();
+    private LinkedList<Integer> bikeList = new LinkedList<>();
 
     /**
      * Constructor to create a new station object
@@ -124,12 +124,12 @@ public class Station {
         this.address = newAdd;
     }
 
-    LinkedList<Bike> getBikeList() {
+    LinkedList<Integer> getBikeList() {
         return bikeList;
     }
 
     void addToBikeList(Bike bike) {
-        bikeList.add(bike);
+        bikeList.add(bike.getId());
     }
 
     boolean removeFromBikeList(Bike bike) {
