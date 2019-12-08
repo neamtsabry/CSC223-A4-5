@@ -90,7 +90,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                CreateCustomerAccount();
+//                CreateCustomerAccount();
+                viewCustomerActivity();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -776,7 +777,7 @@ public abstract class ValleyBikeController {
                 //TODO view customer balances
                 break;
             case 4:
-                //TODO view customer activity
+                viewCustomerActivity();
                 break;
             case 5:
                 //add station to station list
@@ -815,6 +816,43 @@ public abstract class ValleyBikeController {
         //if function call finishes and returns to internal account menu
         //call account menu again
         internalAccountHome(username);
+    }
+
+    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException {
+        // view all customers' usernames
+        ValleyBikeSim.viewAllCustomers();
+
+        // ask user to input customer username
+        System.out.println("Please input a customer's username to view their activity");
+        String username = input.nextLine();
+
+        // check for '0' input and return to previous menu
+        if (username.contentEquals("0")) { returnToLastMenu(null); }
+
+        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+
+        while( customer == null){
+            // ask user to input customer username
+            System.out.println("Username entered does not exist.");
+            System.out.println("Please input a customer's username to view their activity");
+            username = input.nextLine();
+            customer = ValleyBikeSim.getCustomerObj(username);
+        }
+
+        ArrayList<UUID> rideList = customer.getRideIdList();
+
+        if(rideList.size() > 0){
+            System.out.format("%-10s\n", "Customer username");
+
+            for(UUID rideId : rideList){
+                Ride rideObj = ValleyBikeSim.getRideObj(rideId);
+
+
+            }
+        } else{
+            System.out.println("This customer has not started any rides yet.");
+        }
+
     }
 
     /**
@@ -1170,12 +1208,14 @@ public abstract class ValleyBikeController {
      */
     static boolean isValidCreditCard(String ccNumber){
         if (ccNumber == null) {
+            System.out.println("null");
             return false;
         }
 
         try {
-            int num = Integer.parseInt(ccNumber);
+            double num = Double.parseDouble(ccNumber);
         } catch (NumberFormatException nfe) {
+            System.out.println("error with numeber");
             return false;
         }
 
@@ -1186,6 +1226,7 @@ public abstract class ValleyBikeController {
             return Math.random() <= 0.95;
         }
 
+        System.out.println("all else");
         return false;
     }
 

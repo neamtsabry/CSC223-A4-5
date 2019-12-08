@@ -89,8 +89,10 @@ public class ValleyBikeSim {
 				}
 			}
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
+
 			//TODO Here's where are null pointer is coming from!
 			System.out.println(customerAccount.getMembership().getLastPayment());
+
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
 		}
@@ -702,24 +704,18 @@ public class ValleyBikeSim {
 		return customerAccountMap.get(username).getCreditCard();
 	}
 
-    static void viewAllCustomers(String username) {
-        // format table view
-        System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
-                "AvDocs", "MainReq", "Capacity", "Kiosk", "Name - Address");
+    static void viewAllCustomers() {
+	    if(customerAccountMap.size() > 0){
+            // format table view
+            System.out.format("%-20s\n", "Customer username");
 
-        // Get list iterator of bikes at station
-//        LinkedList<Integer> bikeList = stationFrom.getBikeList();
-//        ListIterator<Integer> bikesAtStation = bikeList.listIterator();
-//
-//        // Print bikes at station
-//        while(bikesAtStation.hasNext()){
-//            int bikeInt = bikesAtStation.next();
-//            System.out.format("%-10s%-10d\n", bikeInt);
-//        }
-
-        // while the iterator has a next value
-//        for (Integer key : stationsMap.keySet()) {
-//        }
+            // while the iterator has a next value
+            for (String username : customerAccountMap.keySet()) {
+                System.out.format("%-20s\n", username);
+            }
+        } else {
+            System.out.println("There are no customers using our services yet.");
+        }
     }
 
 	/**
