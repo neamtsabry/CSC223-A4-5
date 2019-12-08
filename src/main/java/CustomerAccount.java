@@ -13,7 +13,7 @@ public class CustomerAccount extends Account{
     private int balance;
 
     // stack of ride ids user has
-    private ArrayList<UUID> rideIdList = new ArrayList<>();
+    private ArrayList<UUID> rideIdList;
 
     private boolean lastRideIsReturned;
 
@@ -35,6 +35,7 @@ public class CustomerAccount extends Account{
         this.balance = 0;
         this.lastRideIsReturned = true;
         this.enabled = true;
+        this.rideIdList = new ArrayList<>();
     }
 
     /**
@@ -46,7 +47,7 @@ public class CustomerAccount extends Account{
      * @param membership is the membership type that the customer is paying for
      * @param balance is the money that the customer has available in their account
      */
-    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, int balance, boolean lastRideIsReturned, boolean enabled) {
+    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, int balance, boolean lastRideIsReturned, boolean enabled, ArrayList<UUID> rideIdList) {
         //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
@@ -54,6 +55,7 @@ public class CustomerAccount extends Account{
         this.balance = balance;
         this.lastRideIsReturned = lastRideIsReturned;
         this.enabled = enabled;
+        this.rideIdList = rideIdList;
     }
 
     /**
@@ -130,5 +132,9 @@ public class CustomerAccount extends Account{
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String rideIdListToString(){
+        return rideIdList.toString().replaceAll("\\[", "").replaceAll("\\]","");
     }
 }

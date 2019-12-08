@@ -229,7 +229,8 @@ public abstract class ValleyBikeController {
         System.out.println("5. Report a problem\n"
                 + "6. View total number of rides\n"
                 + "7. View average ride time\n"
-                + "8. View your most popular ride time."
+                + "8. View your most popular ride time.\n"
+                + "9. Delete account.\n"
                 + "0. Log out\n" +
                 "Please enter your selection (0-5):");
 
@@ -267,6 +268,16 @@ public abstract class ValleyBikeController {
                 break;
             case 5:
                 reportProblem(username);
+                break;
+            case 6:
+                break;
+            case 7:
+                //TODO
+                break;
+            case 8:
+                break;
+            case 9:
+                //TODO disable account
                 break;
             case 0:
                 //return to homepage to log out
@@ -752,7 +763,7 @@ public abstract class ValleyBikeController {
                 createInternalAccount();
                 break;
             case 2:
-                //TODO edit internal account
+                editInternalAccount(username);
                 break;
             case 3:
                 //TODO view customer balances
@@ -781,6 +792,13 @@ public abstract class ValleyBikeController {
             case 10:
                 //equalize stations
                 ValleyBikeSim.equalizeStations();
+                break;
+            case 11:
+                break;
+            case 12:
+                //TODO
+                break;
+            case 13:
                 break;
             case 0:
                 //go to initial menu to log out

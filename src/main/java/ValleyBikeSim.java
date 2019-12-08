@@ -1,6 +1,4 @@
-
 import java.io.*;
-import java.math.BigDecimal;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -79,7 +77,14 @@ public class ValleyBikeSim {
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
 			int balance = Integer.parseInt(rs.getString("balance"));
-			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1);
+			String rideIdString = rs.getString("ride_id_string");
+			ArrayList<UUID> rideIdList = new ArrayList<>();
+			if (rideIdString != null) {
+				for (String ride : rideIdString.split(",")) {
+					rideIdList.add(UUID.fromString(ride));
+				}
+			}
+			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
 
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
@@ -134,6 +139,11 @@ public class ValleyBikeSim {
 			// add to the bike tree
 			bikesMap.put(id, bike);
 		}
+	}
+
+	static void disableCustomerAccount(String username){
+		CustomerAccount customerAccount = customerAccountMap.get(username);
+		//TODO
 	}
 
 	private static void readRideData(Statement stmt) throws SQLException, ClassNotFoundException, ParseException {
@@ -349,7 +359,10 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update username in database at this time.");
 		}
 
-		customerAccountMap.get(username).setUsername(newUsername);
+		CustomerAccount customerAccount = customerAccountMap.get(username);
+		customerAccount.setUsername(newUsername);
+		customerAccountMap.remove(username);
+		customerAccountMap.put(newUsername, customerAccount);
 		System.out.println("Your username has been successfully updated to " + newUsername);
 
 	}
@@ -370,7 +383,10 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update username in database at this time.");
 		}
 
-		internalAccountMap.get(username).setUsername(newUsername);
+		InternalAccount internalAccount = internalAccountMap.get(username);
+		internalAccount.setUsername(newUsername);
+		internalAccountMap.remove(username);
+		internalAccountMap.put(newUsername, internalAccount);
 		System.out.println("Your username has been successfully updated to " + newUsername);
 
 	}
