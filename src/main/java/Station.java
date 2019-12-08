@@ -26,7 +26,7 @@ public class Station {
     private String address;
 
     // list of bike ids associated with station
-    private LinkedList<Bike> bikeList = new LinkedList<>();
+    private LinkedList<Integer> bikeList = new LinkedList<>();
 
     /**
      * Constructor to create a new station object
@@ -51,6 +51,24 @@ public class Station {
         this.kioskNumber = kiosk;
         this.kioskBoolean = (kiosk > 0);
         this.address = address1;
+        this.bikeList = new LinkedList<>();
+    }
+
+    Station(String nameValue,
+            // Integer bikesValue,
+            // Integer availableDocksValue,
+            Integer maintenanceRequestValue,
+            Integer capacityValue,
+            Integer kiosk, String address1, LinkedList<Integer> bikeList) {
+        this.name = nameValue;
+        // this.bikes = bikesValue;
+        // this.availableDocks = availableDocksValue;
+        this.maintenanceRequest = maintenanceRequestValue;
+        this.capacity = capacityValue;
+        this.kioskNumber = kiosk;
+        this.kioskBoolean = (kiosk > 0);
+        this.address = address1;
+        this.bikeList = bikeList;
     }
 
     /**
@@ -124,12 +142,12 @@ public class Station {
         this.address = newAdd;
     }
 
-    LinkedList<Bike> getBikeList() {
+    LinkedList<Integer> getBikeList() {
         return bikeList;
     }
 
     void addToBikeList(Bike bike) {
-        bikeList.add(bike);
+        bikeList.add(bike.getId());
     }
 
     boolean removeFromBikeList(Bike bike) {
@@ -142,6 +160,10 @@ public class Station {
         // remove bike from list and return true
         bikeList.remove(bikeIndex);
         return true;
+    }
+
+    public String getBikeListToString(){
+        return bikeList.toString().replaceAll("\\[", "").replaceAll("\\]","");
     }
 
 }
