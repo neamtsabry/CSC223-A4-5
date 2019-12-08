@@ -90,7 +90,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                CreateCustomerAccount();
+//                CreateCustomerAccount();
+                viewCustomerActivity();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -763,6 +764,7 @@ public abstract class ValleyBikeController {
             System.out.println("Not a valid input \n");
             internalAccountHome(username);
         }
+
         int num = input.nextInt();
         switch(num) {
             case 1:
@@ -775,7 +777,7 @@ public abstract class ValleyBikeController {
                 //TODO view customer balances
                 break;
             case 4:
-                //TODO view customer activity
+                viewCustomerActivity();
                 break;
             case 5:
                 //add station to station list
@@ -814,6 +816,43 @@ public abstract class ValleyBikeController {
         //if function call finishes and returns to internal account menu
         //call account menu again
         internalAccountHome(username);
+    }
+
+    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException {
+        // view all customers' usernames
+        ValleyBikeSim.viewAllCustomers();
+
+        // ask user to input customer username
+        System.out.println("Please input a customer's username to view their activity");
+        String username = input.nextLine();
+
+        // check for '0' input and return to previous menu
+        if (username.contentEquals("0")) { returnToLastMenu(null); }
+
+        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+
+        while( customer == null){
+            // ask user to input customer username
+            System.out.println("Username entered does not exist.");
+            System.out.println("Please input a customer's username to view their activity");
+            username = input.nextLine();
+            customer = ValleyBikeSim.getCustomerObj(username);
+        }
+
+        ArrayList<UUID> rideList = customer.getRideIdList();
+
+        if(rideList.size() > 0){
+            System.out.format("%-10s\n", "Customer username");
+
+            for(UUID rideId : rideList){
+                Ride rideObj = ValleyBikeSim.getRideObj(rideId);
+
+
+            }
+        } else{
+            System.out.println("This customer has not started any rides yet.");
+        }
+
     }
 
     /**
@@ -891,6 +930,7 @@ public abstract class ValleyBikeController {
      */
     private static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // get new bike's id
+        //TODO GRACE validate length of bike id
         int id = getResponse("Please enter the bike's ID");
 
         // if the bike already exists
@@ -1167,23 +1207,26 @@ public abstract class ValleyBikeController {
      * https://github.com/eix128/gnuc-credit-card-checker/blob/master/CCCheckerPro/src/com/gnuc/java/ccc/Luhn.java
      */
     static boolean isValidCreditCard(String ccNumber){
-        if(ccNumber.length() > 0 && ccNumber.length() <17){
-            int sum = 0;
-            boolean alternate = false;
-            for (int i = ccNumber.length() - 1; i >= 0; i--) {
-                int n = Integer.parseInt(ccNumber.substring(i, i + 1));
-                if (alternate) {
-                    n *= 2;
-                    if (n > 9)
-                    {
-                        n = (n % 10) + 1;
-                    }
-                }
-                sum += n;
-                alternate = !alternate;
-            }
-            return (sum % 10 == 0);
+        if (ccNumber == null) {
+            System.out.println("null");
+            return false;
         }
+
+        try {
+            double num = Double.parseDouble(ccNumber);
+        } catch (NumberFormatException nfe) {
+            System.out.println("error with numeber");
+            return false;
+        }
+
+        if(ccNumber.length() == 16){
+            //90% of the time the method accepts the credit card
+            //10% of the time the method rejects the credit card
+            //This method makes a random decision and is not a real credit card validator
+            return Math.random() <= 0.95;
+        }
+
+        System.out.println("all else");
         return false;
     }
 

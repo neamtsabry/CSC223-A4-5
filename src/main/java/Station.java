@@ -32,8 +32,6 @@ public class Station {
      * @param address1                station address
      */
     Station(String nameValue,
-                   // Integer bikesValue,
-                   // Integer availableDocksValue,
                    Integer maintenanceRequestValue,
                    Integer capacityValue,
                    Integer kiosk, String address1) {

@@ -103,8 +103,10 @@ public class ValleyBikeSim {
 			}
 			//create customer account from info
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
+
 			//TODO Here's where are null pointer is coming from!
 			System.out.println(customerAccount.getMembership().getLastPayment());
+
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
 		}
@@ -875,6 +877,20 @@ public class ValleyBikeSim {
 		return customerAccountMap.get(username).getCreditCard();
 	}
 
+    static void viewAllCustomers() {
+	    if(customerAccountMap.size() > 0){
+            // format table view
+            System.out.format("%-20s\n", "Customer username");
+
+            // while the iterator has a next value
+            for (String username : customerAccountMap.keySet()) {
+                System.out.format("%-20s\n", username);
+            }
+        } else {
+            System.out.println("There are no customers using our services yet.");
+        }
+    }
+
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
 	 * gone on for too long (in which caase they are charged)
@@ -1338,12 +1354,11 @@ public class ValleyBikeSim {
 	 */
 	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
 														 int idealPercentage, Deque<Bike> extraBikes) throws ClassNotFoundException {
-		//Deque<Bike> extraBikes = new ArrayDeque<Bike>();
 		for (Integer key : stationsCapacity.keySet()) {
 			int percentage = stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
 
-			Deque<Bike> bikesAtStation = getBikesAtStation(key);
+			LinkedList<Integer> bikesAtStation = station.getBikeList();
 
 			if ((percentage - idealPercentage) > 0) {
 				int newPercentage = percentage;
@@ -1354,14 +1369,11 @@ public class ValleyBikeSim {
 								- idealPercentage)) {
 					if (!bikesAtStation.isEmpty()) { // if the station isn't empty
 						// move one bike from station stack to extra stack
-						Bike bike = bikesAtStation.pop();
+						int bikeID = bikesAtStation.pop();
+						Bike bike = getBikeObj(bikeID);
 						extraBikes.push(bike);
 						bike.moveStation(0); // set bike's station to 0, or no station
 
-						// get bike object from key
-						// Bike bike = getBikeObj(bikeKey);
-						//station.setBikes(station.getBikes() - 1);
-						//extras.set(0, extras.get(0)+1);
 						newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 					}
 				}
@@ -1505,6 +1517,7 @@ public class ValleyBikeSim {
 	 *
 	 */
 	static Deque<Bike> getBikesAtStation(int statId){
+		//TODO We don't need this method!!!
 		// initiate our bike stack
 		Deque<Bike> bikesAtStation = new ArrayDeque<>();
 		// initiate iterator
