@@ -406,8 +406,7 @@ public abstract class ValleyBikeController {
 
         // if station doesn't exist or doesn't have any bikes
         while((stationFrom == null)||(Objects.equals(stationFrom.getBikes(), 0))) {
-            if (stationFrom == null) {
-            System.out.println("The station ID entered does not exist in our system.");}
+            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
 
             //if station doesn't have bikes, equalize stations and have user re-select station
             else if (Objects.equals(stationFrom.getBikes(), 0)) {
@@ -623,8 +622,7 @@ public abstract class ValleyBikeController {
      * @param username for user
      * user reports a problem with the bike they checked out
      */
-    private static void reportProblem(String username) throws IOException, ParseException {
-        //TODO bikesmap should not be accessed from here
+    private static void reportProblem(String username) throws IOException, ParseException, ClassNotFoundException {
         // prompt user for maintenance report
         System.out.println("Please enter maintenance report or '0' to cancel:");
         input.nextLine();
@@ -642,10 +640,14 @@ public abstract class ValleyBikeController {
         // if user entered 0, return to menu
         if (Objects.equals(bikeId, 0)){ return; }
 
-        while (! ValleyBikeSim.bikesMap.containsKey(bikeId)){ //input is not a bike ID
+        Bike someBike = ValleyBikeSim.getBikeObj(bikeId); // get bike object or null from bike ID
+
+        while (someBike != null){ //input is not a bike ID
             System.out.println("The bike ID entered does not exist in our system. Please try again.");
             bikeId = getResponse("Please enter the ID of the bike you" +
                     " are experiencing problems with ('11') or '0' to cancel:");
+
+            someBike = ValleyBikeSim.getBikeObj(bikeId);
 
             // if user entered 0, return to menu
             if (Objects.equals(bikeId, 0)){
@@ -657,20 +659,19 @@ public abstract class ValleyBikeController {
         // add to maintenance requests
         ValleyBikeSim.addToMntRqs(bikeId, mntReport);
 
-
         // get bike object
         Bike bike = ValleyBikeSim.getBikeObj(bikeId);
 
         // set bike's maintenance report and maintenance to true
-        bike.setMnt(true);
-        bike.setMntReport(mntReport);
+        ValleyBikeSim.updateBikeRqMnt(bikeId, true);
+        ValleyBikeSim.updateBikeMntReport(bikeId, mntReport);
 
         // bike is now out of commission until fixed
-        bike.setBikeLocation(1);
+        ValleyBikeSim.updateBikeLocation(bikeId, 1);
 
         // increase maintenance requests for the station
         Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
-        statObj.setMaintenanceRequest(statObj.getMaintenanceRequest()+1);
+        ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
 
         // let user know the process is done
         System.out.println("Maintenance report has been successfully filed!");
@@ -789,7 +790,6 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String address = input.nextLine();
 
-        System.out.println("Station has been added!");
         // confirmation
         System.out.println("Are you sure you want to add a station with the info entered?(y/n)");
         String confirm = input.nextLine();
@@ -865,40 +865,8 @@ public abstract class ValleyBikeController {
         // initiate maintenance report string
         String mntReport = " ";
 
-        // if it does require maintenance
-//        if(mnt.toLowerCase().equalsIgnoreCase("y")){
-//            // prompt user to enter maintenance report
-//            System.out.println("Please enter maintenance report:");
-//            input.nextLine();
-//            mntReport = input.nextLine();
-//
-//            // this increases the bike's station maintenance requests
-//            station.setMaintenanceRequest(station.getMaintenanceRequest()+1);
-//
-//        }
-
-        // give appropriate choices for bike's location
-//        System.out.println("Please pick one of the following choices for the " +
-//                "status of the bike:\n" +
-//                "0: Docked/available at station\n" +
-//                "2: Docked/out of commission\n");
-
         // assume bike starts off as available
         int bikeLocation = 0;
-
-        // while the answer is not between the options, keep prompting user
-//        while(!(bikeLocation == 0 | bikeLocation == 2)){
-//            System.out.println("Your answer has to be either 0 or 2");
-//
-//            // give appropriate choices for bike's location
-//            System.out.println("Please pick one of the following choices for the " +
-//                    "status of the bike:\n" +
-//                    "0: Docked/available at station\n" +
-//                    "1: Docked/out of commission\n");
-//            bikeLocation = getResponse("Please enter one of the above options:");
-//        }
-
-
 
         // create new bike object based on user's inputs
         Bike bikeOb = new Bike(

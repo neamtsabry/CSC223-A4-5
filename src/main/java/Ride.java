@@ -40,6 +40,10 @@ public class Ride {
         this.isReturned = isReturnedVal;
         this.startTimeStamp = startTimeStampVal;
         this.endTimeStamp = endTimeStampVal;
+
+        if(endTimeStamp != null){
+            this.getRideLength();
+        }
     }
 
     public void setRideId(UUID rideId) {
@@ -79,8 +83,14 @@ public class Ride {
     }
 
     public long getRideLength() {
-        this.rideLength = Duration.between(getStartTimeStamp(), getEndTimeStamp()).toDays();
+        if(this.isReturned){
+            this.rideLength = Duration.between(getStartTimeStamp(), getEndTimeStamp()).toHours();
+        }
         return this.rideLength;
+    }
+
+    public void setRideLength(long newRideLength) {
+        this.rideLength = newRideLength;
     }
 
     public void setPayment(double payment) {
