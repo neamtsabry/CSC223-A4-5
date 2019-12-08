@@ -52,7 +52,7 @@ public class Bike {
 
         if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
             Station newStation = ValleyBikeSim.getStationObj(this.station); // get new station object
-            ValleyBikeSim.updateStationBikeList(this.station, this.id);
+            ValleyBikeSim.addBikeToStation(this.station, this.id);
             ValleyBikeSim.updateBikeLocation(this.id, 0);
         }
 
