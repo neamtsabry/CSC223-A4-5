@@ -972,7 +972,7 @@ public abstract class ValleyBikeController {
         );
 
         // update database and station object with bike list
-        ValleyBikeSim.updateStationBikeList(stationId, id);
+        ValleyBikeSim.addBikeToStation(stationId, id);
 
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
