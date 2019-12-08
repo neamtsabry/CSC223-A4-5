@@ -474,7 +474,6 @@ public class ValleyBikeSim {
 	}
 
 	static void updateRideIdList(String username, UUID rideId) throws ClassNotFoundException{
-		//TODO neamat implement in correct place, this method also updates the customer map obj
 		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
 				+ "WHERE username = ?";
 		customerAccountMap.get(username).getRideIdList().add(rideId);
@@ -491,6 +490,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
+        getCustomerObj(username).addNewRide(rideId);
 		System.out.println("Your ride has been successfully added to your history.");
 	}
 
