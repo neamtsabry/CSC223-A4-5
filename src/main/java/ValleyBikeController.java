@@ -891,6 +891,7 @@ public abstract class ValleyBikeController {
      */
     private static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // get new bike's id
+        //TODO GRACE validate length of bike id
         int id = getResponse("Please enter the bike's ID");
 
         // if the bike already exists
