@@ -634,9 +634,20 @@ public class ValleyBikeSim {
 		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
 	}
 
-	static int viewTotalRides(String username) throws ClassNotFoundException{
+	static int viewTotalRides(String username){
 		return customerAccountMap.get(username).getRideIdList().size();
 	}
+
+	static int viewAverageRideTime(String username){
+		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
+		int totalRideTime = 0;
+		for (UUID ride: rideIdList){
+			totalRideTime += rideMap.get(ride).getRideLength();
+		}
+		return totalRideTime/rideIdList.size();
+	}
+
+
 
 	/**
 	 * View the account balance associated with a user's account
