@@ -139,6 +139,7 @@ public abstract class ValleyBikeController {
 
         //once all the required fields have been input by the user, create new customer account
         //Assumption: initially the balance in customer account is always 0
+        //TODO set last Payment to null?
         ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
 
         //Let the user know the account has been successfully created
@@ -380,12 +381,11 @@ public abstract class ValleyBikeController {
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         if (membership == 1) {
             String creditCard = ValleyBikeSim.viewCreditCard(username);
-            //check validity of credit card, send them back to home screen if not valid
-            if (!isValidCreditCard()) {
+            //check validity of credit card, send them back to home menu if not valid
+            if (!isValidCreditCard(creditCard)) {
                 System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
                         " in your account is correct, then try again.");
-                //customerAccountHome(username);
-                return;
+                return; // return to customerAccountHome
             }
         } //if there is no problem, continue with rental
 
@@ -1067,7 +1067,7 @@ public abstract class ValleyBikeController {
         if (creditCard.contentEquals("0")) { returnToLastMenu(null); }
 
         //validates if credit card is correct
-        while (!isValidCreditCard()){
+        while (!isValidCreditCard(creditCard)){
 
             //recursively calls itself until valid credit card input by user
             System.out.println("Credit card is not valid.");
@@ -1130,7 +1130,7 @@ public abstract class ValleyBikeController {
      * Validates credit card number input by user
      * @return true if credit card is valid and false otherwise
      */
-    static boolean isValidCreditCard(){
+    static boolean isValidCreditCard(String creditcard){
         //TODO check credit card validity for every transaction
 
         //90% of the time the method accepts the credit card

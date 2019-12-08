@@ -463,7 +463,7 @@ public class ValleyBikeSim {
 			CustomerAccount user = customerAccountMap.get(username);
 			//TODO check all memberships to see whether their payment is due (AM)
 			if (user.getMembership().checkPaymentDue()) {
-				if (ValleyBikeController.isValidCreditCard()) {
+				if (ValleyBikeController.isValidCreditCard(user.getCreditCard())) {
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
@@ -618,6 +618,10 @@ public class ValleyBikeSim {
     	Membership membershipType = checkMembershipType(membership);
     	//set date they joined this membership
     	membershipType.setMemberSince(LocalDate.now());
+
+    	//TODO GRACE check on this!
+    	membershipType.setLastPayment(LocalDate.now());
+    	//TODO: Pay for monthly and yearly membership
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
 		ValleyBikeSim.addCustomerAccount(customerAccount);
