@@ -541,7 +541,7 @@ public class ValleyBikeSim {
 			CustomerAccount user = customerAccountMap.get(username);
 			//TODO check all memberships to see whether their payment is due (AM)
 			if (user.getMembership().checkPaymentDue()) {
-				if (ValleyBikeController.isValidCreditCard()) {
+				if (ValleyBikeController.isValidCreditCard(user.getCreditCard())) {
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
@@ -690,6 +690,19 @@ public class ValleyBikeSim {
 			//add the new internal account object to internal account map
 			internalAccountMap.put(internalAccount.getUsername(), internalAccount);
 		}
+	}
+
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    	Membership membershipType = checkMembershipType(membership);
+    	//set date they joined this membership
+		membershipType.setMemberSince(LocalDate.now());
+		// Below is just a "band-aid" until we set the initial payment; it just assumes the first month/year were paid
+    	membershipType.setLastPayment(LocalDate.now());
+    	//TODO: Pay for monthly and yearly membership
+    	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
+		//add customer account to customer account map
+		ValleyBikeSim.addCustomerAccount(customerAccount);
+
 	}
 
 	static Membership checkMembershipType(int membership){
