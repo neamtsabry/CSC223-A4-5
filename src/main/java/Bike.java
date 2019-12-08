@@ -37,16 +37,6 @@ public class Bike {
     }
 
     /**
-     * Get a comma separated string for bike's data
-     *
-     * @return comma separated string of bike data
-     */
-    String getBikeString() {
-        return this.id + "," + this.location + "," +
-                this.station + "," + this.mnt + "," + this.mntReport;
-    }
-
-    /**
      * Move a bike to a different (or no) station
      * Also sets station data to match this move
      *
@@ -58,24 +48,15 @@ public class Bike {
             oldStation.removeFromBikeList(this); // remove bike from station's bike list
         }
 
-        //TODO is this the right place for this?
-        // by doing this here we have to add the class not found exception
-        // and I was wondering if we could move moveStation to maybe Sim?
         ValleyBikeSim.updateBikeStationId(this.id, newStationValue);
-
-        // this is already done in update
-//        setStation(newStationValue); // set bike's station to new station
 
         if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
             Station newStation = ValleyBikeSim.getStationObj(this.station); // get new station object
-            newStation.addToBikeList(this); // add bike to station's bike list
+            ValleyBikeSim.updateStationBikeList(this.station, this.id);
             ValleyBikeSim.updateBikeLocation(this.id, 0);
-            //setBikeLocation(0);
         }
 
         else {
-            //TODO call updateBikeLocation();
-            //setBikeLocation(2);
             ValleyBikeSim.updateBikeLocation(this.id, 2);
         }
     }

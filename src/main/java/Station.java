@@ -4,12 +4,6 @@ public class Station {
     // station name
     private String name;
 
-    // number of bikes in station
-    // private int bikes;
-
-    // number of available docks
-    // private int availableDocks;
-
     // number of maintenance requests
     private int maintenanceRequest;
 
@@ -26,7 +20,7 @@ public class Station {
     private String address;
 
     // list of bike ids associated with station
-    private LinkedList<Integer> bikeList = new LinkedList<>();
+    private LinkedList<Integer> bikeList;
 
     /**
      * Constructor to create a new station object
@@ -67,17 +61,6 @@ public class Station {
         this.kioskBoolean = (kiosk > 0);
         this.address = address1;
         this.bikeList = bikeList;
-    }
-
-    /**
-     * Getters and setters for station object values and fields
-     */
-
-    String getStationString() {
-        return this.name + "," + this.getBikes() + "," +
-                +this.getAvailableDocks() +
-                "," + this.maintenanceRequest + ","
-                + this.capacity + "," + this.kioskNumber + "," + this.address;
     }
 
     String getStationName() {
@@ -144,8 +127,8 @@ public class Station {
         return bikeList;
     }
 
-    void addToBikeList(Bike bike) {
-        bikeList.add(bike.getId());
+    void addToBikeList(int bikeId) {
+        bikeList.add(bikeId);
     }
 
     boolean removeFromBikeList(Bike bike) {
