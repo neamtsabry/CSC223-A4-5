@@ -702,6 +702,26 @@ public class ValleyBikeSim {
 		return customerAccountMap.get(username).getCreditCard();
 	}
 
+    static void viewAllCustomers(String username) {
+        // format table view
+        System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
+                "AvDocs", "MainReq", "Capacity", "Kiosk", "Name - Address");
+
+        // Get list iterator of bikes at station
+//        LinkedList<Integer> bikeList = stationFrom.getBikeList();
+//        ListIterator<Integer> bikesAtStation = bikeList.listIterator();
+//
+//        // Print bikes at station
+//        while(bikesAtStation.hasNext()){
+//            int bikeInt = bikesAtStation.next();
+//            System.out.format("%-10s%-10d\n", bikeInt);
+//        }
+
+        // while the iterator has a next value
+//        for (Integer key : stationsMap.keySet()) {
+//        }
+    }
+
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
 	 * gone on for too long (in which caase they are charged)
