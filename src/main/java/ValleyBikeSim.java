@@ -89,7 +89,8 @@ public class ValleyBikeSim {
 				}
 			}
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
-			//TODO Here's where are null pointer is coming from!
+			//TODO AG - Here's where our null pointer is coming from! getLastPayment field is not being updated when we read in account data, so it stays null...
+			//TODO AG - We also have to read in max rides for memberships
 			System.out.println(customerAccount.getMembership().getLastPayment());
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
@@ -908,16 +909,16 @@ public class ValleyBikeSim {
 
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
     	Membership membershipType = checkMembershipType(membership);
-
+		// CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
     	//set date they joined this membership
 		membershipType.setMemberSince(LocalDate.now());
-		// Below is just a "band-aid" until we set the initial payment; it just assumes the first month/year were paid
+		// set their last account payment date to today
     	membershipType.setLastPayment(LocalDate.now());
-    	//TODO: Pay for monthly and yearly membership
+    	//TODO: fake paying for monthly and yearly membership
 
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
-		ValleyBikeSim.addCustomerAccount(customerAccount);
+		addCustomerAccount(customerAccount);
 
 	}
 

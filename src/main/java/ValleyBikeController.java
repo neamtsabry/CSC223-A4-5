@@ -53,7 +53,7 @@ public abstract class ValleyBikeController {
             case 1:
                 initialMenu();
             case 11:
-                CreateCustomerAccount();
+                createCustomerAccount();
             case 12:
                 logIn();
             case 21:
@@ -90,7 +90,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                CreateCustomerAccount();
+                createCustomerAccount();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -122,11 +122,11 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    private static void CreateCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void createCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
-        //TODO Check if username already exists right away
+        //TODO GB - Check if username already exists right away
 
         //remember this menu in case we need to return
         menuPath.push(1);
@@ -140,15 +140,14 @@ public abstract class ValleyBikeController {
 
         //once all the required fields have been input by the user, create new customer account
         //Assumption: initially the balance in customer account is always 0
-        //TODO set last Payment to null?
         ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
-        Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
+        // Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
         //set date they joined this membership
-        membershipType.setMemberSince(LocalDate.now());
-        membershipType.setLastPayment(LocalDate.now());
-        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
+        // membershipType.setMemberSince(LocalDate.now());
+        // membershipType.setLastPayment(LocalDate.now());
+        //CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
         //add customer account to customer account map
-        ValleyBikeSim.addCustomerAccount(customerAccount);
+        // ValleyBikeSim.addCustomerAccount(customerAccount);
 
         //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
@@ -1174,16 +1173,21 @@ public abstract class ValleyBikeController {
         }
 
         try {
-            int num = Integer.parseInt(ccNumber);
+            Double num = Double.parseDouble(ccNumber);
         } catch (NumberFormatException nfe) {
+            System.out.println("not a number");
             return false;
         }
-
-        if(ccNumber.length() == 16){
+        int ccLength = ccNumber.length();
+        if(ccLength == 16){
+            System.out.println("is a number of length 16");
             //90% of the time the method accepts the credit card
             //10% of the time the method rejects the credit card
             //This method makes a random decision and is not a real credit card validator
             return Math.random() <= 0.95;
+        }
+        else{
+            System.out.println("not length 16");
         }
 
         return false;
