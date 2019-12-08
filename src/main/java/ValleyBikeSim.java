@@ -117,8 +117,14 @@ public class ValleyBikeSim {
 			int capacity = rs.getInt("capacity");
 			int kiosk= rs.getInt("kiosk");
 			String address = rs.getString("address");
-			Station station = new Station(name, reqMnt, capacity, kiosk, address);
-
+			String bikeString = rs.getString("bike_string");
+			LinkedList<Integer> bikeList = new LinkedList<>();
+			if (bikeString != null) {
+				for (String bikeId : bikeString.split(",")) {
+					bikeList.add(Integer.parseInt(bikeId));
+				}
+			}
+			Station station = new Station(name, reqMnt, capacity, kiosk, address, bikeList);
 			// add to the station tree
 			stationsMap.put(id,station);
 		}
