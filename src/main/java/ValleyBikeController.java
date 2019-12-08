@@ -763,6 +763,7 @@ public abstract class ValleyBikeController {
             System.out.println("Not a valid input \n");
             internalAccountHome(username);
         }
+
         int num = input.nextInt();
         switch(num) {
             case 1:
@@ -1167,23 +1168,23 @@ public abstract class ValleyBikeController {
      * https://github.com/eix128/gnuc-credit-card-checker/blob/master/CCCheckerPro/src/com/gnuc/java/ccc/Luhn.java
      */
     static boolean isValidCreditCard(String ccNumber){
-        if(ccNumber.length() > 0 && ccNumber.length() <17){
-            int sum = 0;
-            boolean alternate = false;
-            for (int i = ccNumber.length() - 1; i >= 0; i--) {
-                int n = Integer.parseInt(ccNumber.substring(i, i + 1));
-                if (alternate) {
-                    n *= 2;
-                    if (n > 9)
-                    {
-                        n = (n % 10) + 1;
-                    }
-                }
-                sum += n;
-                alternate = !alternate;
-            }
-            return (sum % 10 == 0);
+        if (ccNumber == null) {
+            return false;
         }
+
+        try {
+            int num = Integer.parseInt(ccNumber);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+
+        if(ccNumber.length() == 16){
+            //90% of the time the method accepts the credit card
+            //10% of the time the method rejects the credit card
+            //This method makes a random decision and is not a real credit card validator
+            return Math.random() <= 0.95;
+        }
+
         return false;
     }
 
