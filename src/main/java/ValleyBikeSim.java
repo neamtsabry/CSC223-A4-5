@@ -1148,7 +1148,10 @@ public class ValleyBikeSim {
 			int percentage = stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
 
-			Deque<Bike> bikesAtStation = getBikesAtStation(key);
+			LinkedList<Integer> bikesAtStation = station.getBikeList();
+
+
+			// Deque<Bike> bikesAtStation = getBikesAtStation(key);
 
 			if ((percentage - idealPercentage) > 0) {
 				int newPercentage = percentage;
@@ -1159,7 +1162,8 @@ public class ValleyBikeSim {
 								- idealPercentage)) {
 					if (!bikesAtStation.isEmpty()) { // if the station isn't empty
 						// move one bike from station stack to extra stack
-						Bike bike = bikesAtStation.pop();
+						int bikeID = bikesAtStation.pop();
+						Bike bike = getBikeObj(bikeID);
 						extraBikes.push(bike);
 						bike.moveStation(0); // set bike's station to 0, or no station
 
@@ -1310,6 +1314,7 @@ public class ValleyBikeSim {
 	 *
 	 */
 	static Deque<Bike> getBikesAtStation(int statId){
+		//TODO We don't need this method!!!
 		// initiate our bike stack
 		Deque<Bike> bikesAtStation = new ArrayDeque<>();
 		// initiate iterator
