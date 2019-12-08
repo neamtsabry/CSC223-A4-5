@@ -1109,6 +1109,7 @@ public class ValleyBikeSim {
 			String sql = "INSERT INTO Internal_Account(username, password, email_address) " +
 					"VALUES(?,?,?)";
 
+			//add new internal account to database
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setString(1, internalAccount.getUsername());
@@ -1125,6 +1126,19 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * create customer account object
+	 * @param username username of new customer account
+	 * @param password password of new customer account
+	 * @param emailAddress email address of new customer account
+	 * @param creditCard credit card of new customer account
+	 * @param membership membership type of new customer account
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchAlgorithmException
+	 */
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
     	Membership membershipType = checkMembershipType(membership);
 		// CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
@@ -1134,31 +1148,35 @@ public class ValleyBikeSim {
     	membershipType.setLastPayment(LocalDate.now());
     	//TODO: fake paying for monthly and yearly membership
 
+		//create instance of customer object
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
 		addCustomerAccount(customerAccount);
-
 	}
 
+	/**
+	 * returns membership type based on membership int
+	 * @param membership int (1,2,3) representing membership type
+	 * @return membership object corresponding to integer input
+	 */
 	static Membership checkMembershipType(int membership){
-    	if (membership == 1){
+    	if (membership == 1){ //if int 1, membership is PAYG
     		return new PayAsYouGoMembership();
 		}
-    	if (membership == 2){
+    	if (membership == 2){ //if int 2, membership is Monthly
     		return new MonthlyMembership();
 		}
-    	if (membership == 3){
+    	if (membership == 3){ //if int 3, membership is Yearly
     		return new YearlyMembership();
 		}
+    	//if incorrect input, return null
     	return null;
 	}
 
 	/**
 	 * Verify username and password when a customer logs in to their account
-	 *
 	 * @param username is the username input by the user to log in
 	 * @param password is the password input by the user to log in
-	 *
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
@@ -1183,10 +1201,8 @@ public class ValleyBikeSim {
 
 	/**
 	 * Verify username and password when an internal staff logs in to their account
-	 *
 	 * @param username is the username input by the user to log in
 	 * @param password is the password input by the user to log in
-	 *
 	 * @throws IOException the initial menu and user account home method in the controller throw IOException
 	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
 	 */
@@ -1209,15 +1225,26 @@ public class ValleyBikeSim {
 		ValleyBikeController.internalAccountHome(username);
 	}
 
+	/**
+	 * add new station to system
+	 * @param station station instance to be added to system
+	 * @param id id of new station
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchAlgorithmException
+	 */
 	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		if (stationsMap.get(id) != null){
+		if (stationsMap.get(id) != null){ //if station id already exists, inform user
 			System.out.println("Station with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
-		} else {
+		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
 					"capacity, kiosk, address) " +
 					"VALUES(?,?,?,?,?,?,?,?)";
 
+			//add station to database
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setInt(1, id);
@@ -1232,19 +1259,30 @@ public class ValleyBikeSim {
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
-
+			//add station to station map
 			stationsMap.put(id, station);
 		}
 	}
 
+	/**
+	 * add new bike to system
+	 * @param bike new bike object to add to system
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchAlgorithmException
+	 */
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		if (stationsMap.get(bike.getId()) != null){
+		if (stationsMap.get(bike.getId()) != null){ //if bike id already in system, inform user
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
+			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 			ValleyBikeController.initialMenu();
-		} else {
+		} else { //if bike valid, add to system
 			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
 					"VALUES(?,?,?,?,?)";
 
+			//add bike to database
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setInt(1, bike.getId());
@@ -1257,14 +1295,25 @@ public class ValleyBikeSim {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
 
+			//add bike to bike map
 			bikesMap.put(bike.getId(), bike);
 		}
 	}
 
+	/**
+	 * add a new ride to the system
+	 * @param ride ride object to add
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
+	 * @throws NoSuchAlgorithmException
+	 */
 	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		if (rideMap.get(ride.getRideId()) != null){
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
+			//TODO is this the message you want to say? Do you want to return to initial menu? NS
 		} else {
 			String sql = "INSERT INTO Ride(ride_id, bike_id, username, is_returned, " +
 					"ride_length, start_time_stamp, end_time_stamp, payment) " +
