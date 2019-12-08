@@ -37,16 +37,6 @@ public class Bike {
     }
 
     /**
-     * Get a comma separated string for bike's data
-     *
-     * @return comma separated string of bike data
-     */
-//    String getBikeString() {
-//        return this.id + "," + this.location + "," +
-//                this.station + "," + this.mnt + "," + this.mntReport;
-//    }
-
-    /**
      * Move a bike to a different (or no) station
      * Also sets station data to match this move
      *
@@ -62,7 +52,7 @@ public class Bike {
 
         if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
             Station newStation = ValleyBikeSim.getStationObj(this.station); // get new station object
-            newStation.addToBikeList(this); // add bike to station's bike list
+            ValleyBikeSim.updateStationBikeList(this.station, this.id);
             ValleyBikeSim.updateBikeLocation(this.id, 0);
         }
 
