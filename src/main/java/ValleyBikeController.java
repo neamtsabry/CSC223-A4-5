@@ -145,6 +145,7 @@ public abstract class ValleyBikeController {
         Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
         //set date they joined this membership
         membershipType.setMemberSince(LocalDate.now());
+        membershipType.setLastPayment(LocalDate.now());
         CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
         //add customer account to customer account map
         ValleyBikeSim.addCustomerAccount(customerAccount);
@@ -509,13 +510,13 @@ public abstract class ValleyBikeController {
         System.out.format("%-10s%-10s\n", "Bike ID");
 
         // Get list iterator of bikes at station
-        LinkedList<Bike> bikeList = stationFrom.getBikeList();
-        ListIterator<Bike> bikesAtStation = bikeList.listIterator();
+        LinkedList<Integer> bikeList = stationFrom.getBikeList();
+        ListIterator<Integer> bikesAtStation = bikeList.listIterator();
 
         // Print bikes at station
         while(bikesAtStation.hasNext()){
-            Bike bike = bikesAtStation.next();
-            System.out.format("%-10s%-10d\n", bike.getId());
+            int bikeInt = bikesAtStation.next();
+            System.out.format("%-10s%-10d\n", bikeInt);
         }
 
         // Choose bike to rent

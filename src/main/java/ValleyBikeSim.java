@@ -89,7 +89,8 @@ public class ValleyBikeSim {
 				}
 			}
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
-
+			//TODO Here's where are null pointer is coming from!
+			System.out.println(customerAccount.getMembership().getLastPayment());
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
 		}
