@@ -90,8 +90,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-//                CreateCustomerAccount();
-                viewCustomerActivity();
+                CreateCustomerAccount();
+                //viewCustomerActivity();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -143,13 +143,6 @@ public abstract class ValleyBikeController {
         //Assumption: initially the balance in customer account is always 0
         //TODO set last Payment to null?
         ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
-        Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
-        //set date they joined this membership
-        membershipType.setMemberSince(LocalDate.now());
-        membershipType.setLastPayment(LocalDate.now());
-        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
-        //add customer account to customer account map
-        ValleyBikeSim.addCustomerAccount(customerAccount);
 
         //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
