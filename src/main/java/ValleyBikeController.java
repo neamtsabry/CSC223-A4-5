@@ -276,9 +276,10 @@ public abstract class ValleyBikeController {
                 reportProblem(username);
                 break;
             case 6:
+                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
                 break;
             case 7:
-                //TODO
+                System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
                 break;
             case 8:
                 break;
@@ -287,7 +288,6 @@ public abstract class ValleyBikeController {
                 break;
             case 0:
                 //return to homepage to log out
-                //TODO save data when logging out
                 initialMenu();
                 break;
             default:
