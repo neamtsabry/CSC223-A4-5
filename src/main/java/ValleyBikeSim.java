@@ -76,8 +76,10 @@ public class ValleyBikeSim {
 			String emailAddress = rs.getString("email_address");
 			String creditCard = rs.getString("credit_card");
 			Membership membership = checkMembershipType(rs.getInt("membership"));
+			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
+			int enabled = rs.getInt("enabled");
 			int balance = Integer.parseInt(rs.getString("balance"));
-			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance);
+			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1);
 
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
@@ -311,6 +313,26 @@ public class ValleyBikeSim {
 		System.out.println("Your email address has been successfully updated to " + newEmailAddress);
 	}
 
+	static void updateInternalEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException{
+		String sql = "UPDATE Internal_Account SET email_address = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newEmailAddress);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		internalAccountMap.get(username).setEmailAddress(newEmailAddress);
+		System.out.println("Your email address has been successfully updated to " + newEmailAddress);
+	}
+
 	static void updateCustomerUsername(String username, String newUsername) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET username = ? "
 				+ "WHERE username = ?";
@@ -332,6 +354,27 @@ public class ValleyBikeSim {
 
 	}
 
+	static void updateInternalUsername(String username, String newUsername) throws ClassNotFoundException{
+		String sql = "UPDATE Internal_Account SET username = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newUsername);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update username in database at this time.");
+		}
+
+		internalAccountMap.get(username).setUsername(newUsername);
+		System.out.println("Your username has been successfully updated to " + newUsername);
+
+	}
+
 	static void updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET password = ? "
 				+ "WHERE username = ?";
@@ -349,6 +392,26 @@ public class ValleyBikeSim {
 		}
 
 		customerAccountMap.get(username).setPassword(newPassword);
+		System.out.println("Your password has been successfully updated to " + newPassword);
+	}
+
+	static void updateInternalPassword(String username, String newPassword) throws ClassNotFoundException{
+		String sql = "UPDATE Internal_Account SET password = ? "
+				+ "WHERE username = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newPassword);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update password in database at this time.");
+		}
+
+		internalAccountMap.get(username).setPassword(newPassword);
 		System.out.println("Your password has been successfully updated to " + newPassword);
 	}
 
@@ -392,6 +455,21 @@ public class ValleyBikeSim {
 		customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
 		customerAccountMap.get(username).getMembership().setMemberSince(LocalDate.now());
 		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
+	}
+
+	static void viewTotalRides(String username) throws ClassNotFoundException{
+		String sql = "";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update membership in database at this time.");
+		}
 	}
 
 	/**
@@ -617,9 +695,8 @@ public class ValleyBikeSim {
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
     	Membership membershipType = checkMembershipType(membership);
     	//set date they joined this membership
-    	membershipType.setMemberSince(LocalDate.now());
-
-    	//TODO GRACE check on this!
+		membershipType.setMemberSince(LocalDate.now());
+		// Below is just a "band-aid" until we set the initial payment; it just assumes the first month/year were paid
     	membershipType.setLastPayment(LocalDate.now());
     	//TODO: Pay for monthly and yearly membership
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);

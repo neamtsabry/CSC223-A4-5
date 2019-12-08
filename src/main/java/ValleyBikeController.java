@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -51,7 +52,7 @@ public abstract class ValleyBikeController {
             case 1:
                 initialMenu();
             case 11:
-                createAccount();
+                CreateCustomerAccount();
             case 12:
                 logIn();
             case 21:
@@ -88,7 +89,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                createAccount();
+                CreateCustomerAccount();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -120,11 +121,10 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    private static void createAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+    private static void CreateCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
-        //TODO separate create customer account and create internal account method and implement them in the correct places
         //TODO Check if username already exists right away
 
         //remember this menu in case we need to return
@@ -141,6 +141,12 @@ public abstract class ValleyBikeController {
         //Assumption: initially the balance in customer account is always 0
         //TODO set last Payment to null?
         ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
+        Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
+        //set date they joined this membership
+        membershipType.setMemberSince(LocalDate.now());
+        CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
+        //add customer account to customer account map
+        ValleyBikeSim.addCustomerAccount(customerAccount);
 
         //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
@@ -225,6 +231,9 @@ public abstract class ValleyBikeController {
         else { System.out.println("4. Return bike"); }
 
         System.out.println("5. Report a problem\n"
+                + "6. View total number of rides\n"
+                + "7. View average ride time\n"
+                + "8. View your most popular ride time."
                 + "0. Log out\n" +
                 "Please enter your selection (0-5):");
 
@@ -275,6 +284,28 @@ public abstract class ValleyBikeController {
 
         //if function call finished and returned to this page, keep calling menu again until log out/exit
         customerAccountHome(username);
+    }
+
+    private static void createInternalAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException{
+        //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
+        //i.e. only internal staff can create new internal accounts
+        //TODO Grace
+        //TODO Check if username already exists right away
+
+        //each field has its own method which calls itself until a valid input is entered
+        String username = enterUsername();
+        String password = enterPassword();
+        String emailAddress = enterEmail();
+
+        InternalAccount internalAccount = new InternalAccount(username, password, emailAddress);
+        ValleyBikeSim.addInternalAccount(internalAccount, username);
+
+        //Let the user know the account has been successfully created
+        System.out.println("Internal account successfully created!");
+
+        menuPath.pop();// we no longer need to remember this menu
+
+        internalAccountHome(username);
     }
 
     /**
@@ -367,6 +398,45 @@ public abstract class ValleyBikeController {
         }
         //if function call finished and returned to this page, keep calling home again until 'return to menu' is chosen
         editCustomerAccount(username);
+    }
+
+    private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException {
+        //TODO add a return to customer home option
+        //TODO handle edge case of not entering int
+        //TODO Grace
+        //prompt user to choose which field they want to edit
+
+        System.out.println("\nPlease choose from one of the following menu options:\n" +
+                "1. Edit username.\n" +
+                "2. Edit password.\n" +
+                "3. Edit email address.\n" +
+                "0. Return to account home." +
+                "Please enter your selection (0-5):");
+        int edit = input.nextInt();
+        input.nextLine();
+        switch (edit){
+            case 1:
+                //edit username
+                String newUsername = enterUsername();
+                ValleyBikeSim.updateInternalUsername(username, newUsername);
+                break;
+            case 2:
+                //edit password
+                String newPassword = enterPassword();
+                ValleyBikeSim.updateInternalPassword(username, newPassword);
+                break;
+            case 3:
+                //edit email address
+                String newEmail = enterEmail();
+                ValleyBikeSim.updateInternalEmailAddress(username, newEmail);
+                break;
+            case 0:
+                return;
+            default:
+                System.out.println("That is not a valid input. Please try again.");
+        }
+        //if function call finished and returned to this page, keep calling home again until 'return to menu' is chosen
+        editInternalAccount(username);
     }
 
     /**
@@ -494,34 +564,6 @@ public abstract class ValleyBikeController {
             System.out.println();
         }
     }
-
-    /**
-     * User has bike checked out and can either return bike or report a problem with the bike
-     * @param: int userID- the unique id associated with the user
-     * @param: bikeID- unique ID associated with the bike that the user has checked out
-     */
-//    private static void bikeRented(String username, int bikeID, int rideID) throws IOException, ParseException {
-//        // view options to either return bike or report problem
-//        System.out.println("Hope you enjoyed your bike ride! \n"
-//                + "1. Return bike\n"
-//                + "2. Report a problem\n");
-//        // get response
-//        int num = getResponse("Please enter your selection (1-2):");
-//
-//        switch(num) {
-//            case 1:
-//                //return bike
-//                returnBike(username, bikeID, rideID);
-//                break;
-//            case 2:
-//                //report a problem
-//                reportProblem(username, bikeID);
-//                break;
-//            default:
-//                bikeRented(username, bikeID, rideID);
-//                break;
-//        }
-//    }
 
     /**
      * Prompts user for ride enough to return a bike
@@ -695,7 +737,10 @@ public abstract class ValleyBikeController {
                 + "7. View station list \n"
                 + "8. View bike list \n"
                 + "9. Edit/Resolve maintenance requests \n"
-                + "10. Equalize stations (Coming Soon!) \n"
+                + "10. Equalize stations\n"
+                + "11. View total number of users\n"
+                + "12. View total number of maintenance requests\n"
+                + "13. View most popular ride time of the day\n"
                 + "0. Log out \n");
         System.out.println("Please enter your selection (1-9):");
 
@@ -707,7 +752,7 @@ public abstract class ValleyBikeController {
         int num = input.nextInt();
         switch(num) {
             case 1:
-                //TODO create new internal account
+                createInternalAccount();
                 break;
             case 2:
                 //TODO edit internal account
@@ -855,50 +900,14 @@ public abstract class ValleyBikeController {
 
         Station station = ValleyBikeSim.getStationObj(stationId);
 
-        // prompt user if it requires maintenance
-//        System.out.println("Does it require maintenance? (y/n): ");
-//        input.nextLine();
-
         // assume bike starts off as not needing maintenance
         String mnt = "n";
 
         // initiate maintenance report string
         String mntReport = " ";
 
-        // if it does require maintenance
-//        if(mnt.toLowerCase().equalsIgnoreCase("y")){
-//            // prompt user to enter maintenance report
-//            System.out.println("Please enter maintenance report:");
-//            input.nextLine();
-//            mntReport = input.nextLine();
-//
-//            // this increases the bike's station maintenance requests
-//            station.setMaintenanceRequest(station.getMaintenanceRequest()+1);
-//
-//        }
-
-        // give appropriate choices for bike's location
-//        System.out.println("Please pick one of the following choices for the " +
-//                "status of the bike:\n" +
-//                "0: Docked/available at station\n" +
-//                "2: Docked/out of commission\n");
-
         // assume bike starts off as available
         int bikeLocation = 0;
-
-        // while the answer is not between the options, keep prompting user
-//        while(!(bikeLocation == 0 | bikeLocation == 2)){
-//            System.out.println("Your answer has to be either 0 or 2");
-//
-//            // give appropriate choices for bike's location
-//            System.out.println("Please pick one of the following choices for the " +
-//                    "status of the bike:\n" +
-//                    "0: Docked/available at station\n" +
-//                    "1: Docked/out of commission\n");
-//            bikeLocation = getResponse("Please enter one of the above options:");
-//        }
-
-
 
         // create new bike object based on user's inputs
         Bike bikeOb = new Bike(
