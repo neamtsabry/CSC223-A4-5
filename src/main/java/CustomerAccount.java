@@ -134,7 +134,15 @@ public class CustomerAccount extends Account{
         this.enabled = enabled;
     }
 
-    public String rideIdListToString(){
+    public String getRideIdListToString(){
         return rideIdList.toString().replaceAll("\\[", "").replaceAll("\\]","");
+    }
+
+    public void setLastRideIsReturned(boolean lastRideIsReturned) {
+        this.lastRideIsReturned = lastRideIsReturned;
+    }
+
+    public boolean isLastRideIsReturned() {
+        return lastRideIsReturned;
     }
 }

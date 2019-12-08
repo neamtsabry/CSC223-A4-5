@@ -473,6 +473,54 @@ public class ValleyBikeSim {
 
 	}
 
+	static void updateRideIdList(String username, UUID rideId) throws ClassNotFoundException{
+		//TODO neamat implement in correct place, this method also updates the customer map obj
+		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
+				+ "WHERE username = ?";
+		customerAccountMap.get(username).getRideIdList().add(rideId);
+		String rideIdString = customerAccountMap.get(username).getRideIdListToString();
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, rideIdString);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not add ride id to list in database at this time.");
+		}
+		System.out.println("Your ride has been successfully added to your history.");
+	}
+
+	static void updateLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException{
+		//TODO neamat implement in correct place, this method also updates the customer map obj
+		String sql = "UPDATE Customer_Account SET last_ride_is_returned = ? "
+				+ "WHERE username = ?";
+
+		int lastRideReturnedInt;
+		if (lastRideisReturned){
+			lastRideReturnedInt = 1;
+		} else {
+			lastRideReturnedInt = 0;
+		}
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setInt(1, lastRideReturnedInt);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not add ride id to list in database at this time.");
+		}
+		customerAccountMap.get(username).setLastRideIsReturned(lastRideisReturned);
+		System.out.println("Your ride has been successfully added to your history.");
+	}
+
 	static void updateInternalUsername(String username, String newUsername) throws ClassNotFoundException{
 		String sql = "UPDATE Internal_Account SET username = ? "
 				+ "WHERE username = ?";
