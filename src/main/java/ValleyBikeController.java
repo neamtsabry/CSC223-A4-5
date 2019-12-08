@@ -141,13 +141,6 @@ public abstract class ValleyBikeController {
         //once all the required fields have been input by the user, create new customer account
         //Assumption: initially the balance in customer account is always 0
         ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
-        // Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
-        //set date they joined this membership
-        // membershipType.setMemberSince(LocalDate.now());
-        // membershipType.setLastPayment(LocalDate.now());
-        //CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
-        //add customer account to customer account map
-        // ValleyBikeSim.addCustomerAccount(customerAccount);
 
         //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
@@ -775,7 +768,7 @@ public abstract class ValleyBikeController {
                 //TODO view customer balances
                 break;
             case 4:
-                //TODO view customer activity
+                viewCustomerActivity();
                 break;
             case 5:
                 //add station to station list
@@ -814,6 +807,43 @@ public abstract class ValleyBikeController {
         //if function call finishes and returns to internal account menu
         //call account menu again
         internalAccountHome(username);
+    }
+
+    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException {
+        // view all customers' usernames
+        ValleyBikeSim.viewAllCustomers();
+
+        // ask user to input customer username
+        System.out.println("Please input a customer's username to view their activity");
+        String username = input.nextLine();
+
+        // check for '0' input and return to previous menu
+        if (username.contentEquals("0")) { returnToLastMenu(null); }
+
+        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+
+        while( customer == null){
+            // ask user to input customer username
+            System.out.println("Username entered does not exist.");
+            System.out.println("Please input a customer's username to view their activity");
+            username = input.nextLine();
+            customer = ValleyBikeSim.getCustomerObj(username);
+        }
+
+        ArrayList<UUID> rideList = customer.getRideIdList();
+
+        if(rideList.size() > 0){
+            System.out.format("%-10s\n", "Customer username");
+
+            for(UUID rideId : rideList){
+                Ride rideObj = ValleyBikeSim.getRideObj(rideId);
+
+
+            }
+        } else{
+            System.out.println("This customer has not started any rides yet.");
+        }
+
     }
 
     /**
@@ -940,7 +970,7 @@ public abstract class ValleyBikeController {
         );
 
         // update database and station object with bike list
-        ValleyBikeSim.updateStationBikeList(stationId, id);
+        ValleyBikeSim.addBikeToStation(stationId, id);
 
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
@@ -1169,6 +1199,7 @@ public abstract class ValleyBikeController {
      */
     static boolean isValidCreditCard(String ccNumber){
         if (ccNumber == null) {
+            System.out.println("null");
             return false;
         }
 
@@ -1180,7 +1211,6 @@ public abstract class ValleyBikeController {
         }
         int ccLength = ccNumber.length();
         if(ccLength == 16){
-            System.out.println("is a number of length 16");
             //90% of the time the method accepts the credit card
             //10% of the time the method rejects the credit card
             //This method makes a random decision and is not a real credit card validator
@@ -1190,6 +1220,7 @@ public abstract class ValleyBikeController {
             System.out.println("not length 16");
         }
 
+        System.out.println("all else");
         return false;
     }
 
