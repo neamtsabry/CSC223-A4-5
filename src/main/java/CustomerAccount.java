@@ -17,6 +17,8 @@ public class CustomerAccount extends Account{
 
     private boolean lastRideIsReturned;
 
+    private boolean enabled;
+
     /**
      * This is the constructor to create a new user account with balance = 0
      * @param username is the username input by the user
@@ -31,8 +33,8 @@ public class CustomerAccount extends Account{
         this.creditCard = creditCard;
         this.membership = membership;
         this.balance = 0;
-
         this.lastRideIsReturned = true;
+        this.enabled = true;
     }
 
     /**
@@ -44,14 +46,14 @@ public class CustomerAccount extends Account{
      * @param membership is the membership type that the customer is paying for
      * @param balance is the money that the customer has available in their account
      */
-    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, int balance) {
+    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, int balance, boolean lastRideIsReturned, boolean enabled) {
         //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
         this.membership = membership;
         this.balance = balance;
-
-        this.lastRideIsReturned = true;
+        this.lastRideIsReturned = lastRideIsReturned;
+        this.enabled = enabled;
     }
 
     /**
@@ -102,17 +104,6 @@ public class CustomerAccount extends Account{
         return creditCard;
     }
 
-    /**
-     * This method returns a string with all the fields associated with the customer account
-     * Each field is separated by a comma, in csv format
-     * @return the csv format string with all the fields associated with the customer account
-     */
-    String getCustomerAccountString(){
-        return this.getUsername() + "," + this.getPassword() + "," +
-                 this.getEmailAddress() + "," + this.getCreditCard() + ","
-                + this.getMembership().getMembershipInt() + "," + this.getBalance();
-    }
-
     void addNewRide(UUID rideID){
         this.rideIdList.add(rideID);
     }
@@ -131,5 +122,13 @@ public class CustomerAccount extends Account{
 
     UUID getLastRideId(){
         return rideIdList.get(rideIdList.size()- 1);
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }
