@@ -137,6 +137,10 @@ public abstract class ValleyBikeController {
         String creditCard = enterCreditCard();
         int membership = enterMembership();
 
+        //once all the required fields have been input by the user, create new customer account
+        //Assumption: initially the balance in customer account is always 0
+        //TODO set last Payment to null?
+        ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
         Membership membershipType = ValleyBikeSim.checkMembershipType(membership);
         //set date they joined this membership
         membershipType.setMemberSince(LocalDate.now());
@@ -458,12 +462,11 @@ public abstract class ValleyBikeController {
         int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
         if (membership == 1) {
             String creditCard = ValleyBikeSim.viewCreditCard(username);
-            //check validity of credit card, send them back to home screen if not valid
-            if (!isValidCreditCard()) {
+            //check validity of credit card, send them back to home menu if not valid
+            if (!isValidCreditCard(creditCard)) {
                 System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
                         " in your account is correct, then try again.");
-                //customerAccountHome(username);
-                return;
+                return; // return to customerAccountHome
             }
         } //if there is no problem, continue with rental
 
@@ -484,8 +487,7 @@ public abstract class ValleyBikeController {
 
         // if station doesn't exist or doesn't have any bikes
         while((stationFrom == null)||(Objects.equals(stationFrom.getBikes(), 0))) {
-            if (stationFrom == null) {
-            System.out.println("The station ID entered does not exist in our system.");}
+            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
 
             //if station doesn't have bikes, equalize stations and have user re-select station
             else if (Objects.equals(stationFrom.getBikes(), 0)) {
@@ -673,8 +675,7 @@ public abstract class ValleyBikeController {
      * @param username for user
      * user reports a problem with the bike they checked out
      */
-    private static void reportProblem(String username) throws IOException, ParseException {
-        //TODO bikesmap should not be accessed from here
+    private static void reportProblem(String username) throws IOException, ParseException, ClassNotFoundException {
         // prompt user for maintenance report
         System.out.println("Please enter maintenance report or '0' to cancel:");
         input.nextLine();
@@ -692,10 +693,14 @@ public abstract class ValleyBikeController {
         // if user entered 0, return to menu
         if (Objects.equals(bikeId, 0)){ return; }
 
-        while (! ValleyBikeSim.bikesMap.containsKey(bikeId)){ //input is not a bike ID
+        Bike someBike = ValleyBikeSim.getBikeObj(bikeId); // get bike object or null from bike ID
+
+        while (someBike != null){ //input is not a bike ID
             System.out.println("The bike ID entered does not exist in our system. Please try again.");
             bikeId = getResponse("Please enter the ID of the bike you" +
                     " are experiencing problems with ('11') or '0' to cancel:");
+
+            someBike = ValleyBikeSim.getBikeObj(bikeId);
 
             // if user entered 0, return to menu
             if (Objects.equals(bikeId, 0)){
@@ -707,20 +712,19 @@ public abstract class ValleyBikeController {
         // add to maintenance requests
         ValleyBikeSim.addToMntRqs(bikeId, mntReport);
 
-
         // get bike object
         Bike bike = ValleyBikeSim.getBikeObj(bikeId);
 
         // set bike's maintenance report and maintenance to true
-        bike.setMnt(true);
-        bike.setMntReport(mntReport);
+        ValleyBikeSim.updateBikeRqMnt(bikeId, true);
+        ValleyBikeSim.updateBikeMntReport(bikeId, mntReport);
 
         // bike is now out of commission until fixed
-        bike.setBikeLocation(1);
+        ValleyBikeSim.updateBikeLocation(bikeId, 1);
 
         // increase maintenance requests for the station
         Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
-        statObj.setMaintenanceRequest(statObj.getMaintenanceRequest()+1);
+        ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
 
         // let user know the process is done
         System.out.println("Maintenance report has been successfully filed!");
@@ -839,7 +843,7 @@ public abstract class ValleyBikeController {
         Integer maintenanceRequest = 0;
 
         // prompt capacity for station
-        Integer capacity = getResponse("What is the station's capacity?");
+        Integer capacity = getResponseBetween(5, 37, "What is the station's capacity?");
 
         // number of kiosks
         Integer kiosk = getResponse("How many kiosks?");
@@ -849,7 +853,6 @@ public abstract class ValleyBikeController {
         input.nextLine();
         String address = input.nextLine();
 
-        System.out.println("Station has been added!");
         // confirmation
         System.out.println("Are you sure you want to add a station with the info entered?(y/n)");
         String confirm = input.nextLine();
@@ -884,7 +887,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void addBike() throws IOException, ParseException, ClassNotFoundException {
+    private static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException {
         // get new bike's id
         int id = getResponse("Please enter the bike's ID");
 
@@ -934,7 +937,7 @@ public abstract class ValleyBikeController {
         );
         station.addToBikeList(bikeOb);
         // add to bike tree structure
-        ValleyBikeSim.addNewBike(id, bikeOb);
+        ValleyBikeSim.addBike(bikeOb);
     }
 
     /**
@@ -1091,7 +1094,7 @@ public abstract class ValleyBikeController {
         if (creditCard.contentEquals("0")) { returnToLastMenu(null); }
 
         //validates if credit card is correct
-        while (!isValidCreditCard()){
+        while (!isValidCreditCard(creditCard)){
 
             //recursively calls itself until valid credit card input by user
             System.out.println("Credit card is not valid.");
@@ -1154,7 +1157,7 @@ public abstract class ValleyBikeController {
      * Validates credit card number input by user
      * @return true if credit card is valid and false otherwise
      */
-    static boolean isValidCreditCard(){
+    static boolean isValidCreditCard(String creditcard){
         //TODO check credit card validity for every transaction
 
         //90% of the time the method accepts the credit card

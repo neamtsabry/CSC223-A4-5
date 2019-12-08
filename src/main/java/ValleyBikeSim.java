@@ -22,7 +22,7 @@ public class ValleyBikeSim {
 	private static Map<Integer, Station> stationsMap = new HashMap<>();
 
 	/** data structure for keeping track of bikes */
-	public static Map<Integer, Bike> bikesMap = new HashMap<>();
+	private static Map<Integer, Bike> bikesMap = new HashMap<>();
 
 	/** list for storing bike ids of bikes that require maintenance */
 	private static Map<Integer, String> mntReqs = new HashMap<>();
@@ -49,6 +49,7 @@ public class ValleyBikeSim {
 			readCustomerAccountData(stmt);
 			readInternalAccountData(stmt);
 			readStationData(stmt);
+			readBikeData(stmt);
 			readBikeData(stmt);
 			conn.close();
 		} else {
@@ -127,7 +128,7 @@ public class ValleyBikeSim {
 			int location = rs.getInt("location");
 			int stationId = rs.getInt("station_id");
 			int reqMnt = rs.getInt("req_mnt");
-			String maintenance = null;
+			String maintenance = "n";
 
 			if (reqMnt == 1){
 				maintenance = "y";
@@ -153,10 +154,7 @@ public class ValleyBikeSim {
 			int bike_id = rs.getInt("bike_id");
 			String username = rs.getString("username");
 			int is_returned = rs.getInt("is_returned");
-
-			//TODO make ride length work
 			long rideLength = rs.getLong("ride_length");
-
 			String start_time_stamp = rs.getString("start_time_stamp");
 			String end_time_stamp = rs.getString("end_time_stamp");
 			double payment = rs.getDouble("payment");
@@ -164,7 +162,7 @@ public class ValleyBikeSim {
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
 			// initiate boolean value to false
-			Boolean is_returned_bool = false;
+			boolean is_returned_bool = false;
 
 			// if found 1 then set it to true
 			if(is_returned == 1){
@@ -181,7 +179,7 @@ public class ValleyBikeSim {
 
 			// if it was returned, set ending time stamp too
 			if(is_returned_bool){
-				end_time_stamp_instant = LocalDateTime.parse(start_time_stamp ,
+				end_time_stamp_instant = LocalDateTime.parse(end_time_stamp ,
 						DateTimeFormatter.ofPattern( "hh:mm a, MM/dd/yyy" , Locale.US )
 				).atZone(ZoneId.of( "America/New_York" )).toInstant()  ;
 			}
@@ -191,9 +189,32 @@ public class ValleyBikeSim {
 					is_returned_bool, start_time_stamp_instant,
 					end_time_stamp_instant);
 
+			ride.setRideLength(rideLength);
+			updateRidePayment(uuid_id, payment);
+
 			// add to the bike tree
 			rideMap.put(uuid_id, ride);
 		}
+	}
+
+	static void updateStationMntRqsts(int stationId, int mntRqsts) throws ClassNotFoundException{
+		String sql = "UPDATE Station SET trq_mnt = ? "
+				+ "WHERE id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setInt(2, mntRqsts);
+			pstmt.setInt(2, stationId);
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update bike's station id in database at this time.");
+		}
+
+		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
 	}
 
 	static void updateBikeStationId(int bikeId, int newStationId) throws ClassNotFoundException{
@@ -204,17 +225,16 @@ public class ValleyBikeSim {
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
 			// set the corresponding param
-			pstmt.setInt(2, newStationId);
+			pstmt.setInt(1, newStationId);
 			pstmt.setInt(2, bikeId);
 
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not update email address in database at this time.");
+			System.out.println("Sorry, could not update bike's station id in database at this time.");
 		}
 
 		bikesMap.get(bikeId).setStation(newStationId);
-//		System.out.println("Your email address has been successfully updated to " + newBikeLocation);
 	}
 
 	static void updateBikeLocation(int bikeId, int newBikeLocation) throws ClassNotFoundException{
@@ -231,11 +251,54 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not update email address in database at this time.");
+			System.out.println("Sorry, could not update bike location in database at this time.");
 		}
 
 		bikesMap.get(bikeId).setBikeLocation(newBikeLocation);
-//		System.out.println("Your email address has been successfully updated to " + newBikeLocation);
+	}
+
+	static void updateBikeRqMnt(int bikeId, boolean req_mnt) throws ClassNotFoundException{
+		String sql = "UPDATE Bike SET req_mnt = ? "
+				+ "WHERE id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// change boolean to binary
+			int req_mnt_int = 0;
+			if(req_mnt) req_mnt_int = 1;
+
+			// set the corresponding param
+			pstmt.setInt(1, req_mnt_int);
+			pstmt.setInt(2, bikeId);
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update bike maintenance in database at this time.");
+		}
+
+		bikesMap.get(bikeId).setMnt(req_mnt);
+	}
+
+	static void updateBikeMntReport(int bikeId, String mnt_report) throws ClassNotFoundException{
+		String sql = "UPDATE Bike SET mnt_report = ? "
+				+ "WHERE id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, mnt_report);
+			pstmt.setInt(2, bikeId);
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update bike maintenance report in database at this time.");
+		}
+
+		bikesMap.get(bikeId).setMntReport(mnt_report);
 	}
 
 	static void updateRideIsReturned(UUID rideId, Boolean isReturned) throws ClassNotFoundException{
@@ -557,7 +620,7 @@ public class ValleyBikeSim {
 			CustomerAccount user = customerAccountMap.get(username);
 			//TODO check all memberships to see whether their payment is due (AM)
 			if (user.getMembership().checkPaymentDue()) {
-				if (ValleyBikeController.isValidCreditCard()) {
+				if (ValleyBikeController.isValidCreditCard(user.getCreditCard())) {
 					if (user.getMembership().getMembershipInt() == 2) {
 						//monthly things
 						user.getMembership().setTotalRidesLeft(20);
@@ -587,8 +650,6 @@ public class ValleyBikeSim {
 		System.out.format("%-15s%-15s%-15s%-15s%-15s\n", "ID", "Location", "Station ID",
 				"Main. Req", "Main. Report");
 
-		// initiate iterator
-
 		// while the iterator has a next value
 		for (Integer key : bikesMap.keySet()) {
 			// initiate key for iterator
@@ -608,17 +669,14 @@ public class ValleyBikeSim {
 
 	/**
 	 * Loops through station objects in stations map data structure
-     * formats them to a table view for the user
-     *
-	 * @throws IOException
+	 * formats them to a table view for the user
+	 *
 	 * @throws ParseException
 	 */
-    static void viewStationList() throws IOException, ParseException{
+    static void viewStationList() {
 		// format table view
         System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
                 "AvDocs", "MainReq", "Capacity", "Kiosk","Name - Address");
-
-		// initiate iterator
 
 		// while the iterator has a next value
 		for (Integer key : stationsMap.keySet()) {
@@ -708,6 +766,21 @@ public class ValleyBikeSim {
 		}
 	}
 
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+    	Membership membershipType = checkMembershipType(membership);
+
+    	//set date they joined this membership
+		membershipType.setMemberSince(LocalDate.now());
+		// Below is just a "band-aid" until we set the initial payment; it just assumes the first month/year were paid
+    	membershipType.setLastPayment(LocalDate.now());
+    	//TODO: Pay for monthly and yearly membership
+
+    	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
+		//add customer account to customer account map
+		ValleyBikeSim.addCustomerAccount(customerAccount);
+
+	}
+
 	static Membership checkMembershipType(int membership){
     	if (membership == 1){
     		return new PayAsYouGoMembership();
@@ -777,7 +850,7 @@ public class ValleyBikeSim {
 		ValleyBikeController.internalAccountHome(username);
 	}
 
-	public static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 		if (stationsMap.get(id) != null){
 			System.out.println("Station with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
@@ -805,7 +878,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 		if (stationsMap.get(bike.getId()) != null){
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
@@ -829,7 +902,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	public static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
+	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException {
 		if (rideMap.get(ride.getRideId()) != null){
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
@@ -925,10 +998,8 @@ public class ValleyBikeSim {
 	 * However it does not prioritize stations further from the ideal percentage first
 	 *
 	 *
-	 * @throws IOException
-	 * @throws ParseException
 	 */
-	static void equalizeStations() throws IOException, ParseException, ClassNotFoundException {
+	static void equalizeStations() throws ClassNotFoundException {
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
 		Deque<Bike> extraBikes = new ArrayDeque<>();// Extras contains bike objects
 		int idealPercentage = getPercentageData(stationsCapacity);
@@ -1045,7 +1116,7 @@ public class ValleyBikeSim {
 	 * in need of maintenance then setting them to not require
 	 * maintenance anymore
 	 */
-	static void resolveMntReqs(){
+	static void resolveMntReqs() throws ClassNotFoundException {
 		// if there are maintenance requests
 		if(mntReqs != null) {
 			System.out.println("Here's a list of bike iDs in need of maintenance and their reports.");
@@ -1054,15 +1125,18 @@ public class ValleyBikeSim {
 				// view each id
 				System.out.format("%-5d%-20s\n", entry.getKey(), entry.getValue());
 
+				int bikeId = entry.getKey();
+
 				// get bike object
-				Bike bike = bikesMap.get(entry.getKey());
+				Bike bike = bikesMap.get(bikeId);
 
 				// set bike maintenance values to none
-				bike.setMnt(false);
-				bike.setMntReport("");
+				updateBikeRqMnt(bikeId, false);
+				updateBikeMntReport(bikeId, "n");
 
 				// bike now available for customers
 				bike.setBikeLocation(0);
+				updateBikeLocation(bikeId, 0);
 
                 // get station object as well
                 Station stat = stationsMap.get(bike.getStation());
@@ -1071,7 +1145,7 @@ public class ValleyBikeSim {
                 int originalMntRqs = stat.getMaintenanceRequest();
 
                 // decrease it by one
-                stat.setMaintenanceRequest(originalMntRqs -1 );
+				updateStationMntRqsts(bike.getStation(), originalMntRqs -1 );
 			}
 
 			// done resolving, so clear the list
@@ -1095,17 +1169,6 @@ public class ValleyBikeSim {
 		return stationsMap.get(key);
 	}
 
-	/**
-	 * Helper method for controller class to add new station object
-	 * to stations tree data structure
-	 *
-	 * @param id station id
-	 * @param stationOb station object
-	 */
-	static void addNewStation(int id, Station stationOb){
-		stationsMap.put(id, stationOb);
-	}
-
 	static CustomerAccount getCustomerObj(String key){
 	    return customerAccountMap.get(key);
     }
@@ -1120,20 +1183,6 @@ public class ValleyBikeSim {
 		return bikesMap.get(key);
 	}
 
-	/**
-	 * Helper method for controller class to add new bike object
-	 * to bikes tree data structure
-	 * @param id station id
-	 * @param bikeObj bike object
-	 */
-	static void addNewBike(int id, Bike bikeObj){
-		bikesMap.put(id, bikeObj);
-	}
-
-	static void addToRideMap(UUID rideID, Ride rideObj){
-	    rideMap.put(rideID, rideObj);
-    }
-
     static Ride getRideObj(UUID key){
 	    return rideMap.get(key);
     }
@@ -1147,7 +1196,7 @@ public class ValleyBikeSim {
 	 *         if not, we're returning a stationsMap iterator.
 	 *
 	 */
-	static Iterator createIterator(Boolean isBike){
+	private static Iterator createIterator(Boolean isBike){
 		if(isBike){
 			return bikesMap.keySet().iterator();
 		} else{
