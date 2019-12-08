@@ -51,6 +51,24 @@ public class Station {
         this.kioskNumber = kiosk;
         this.kioskBoolean = (kiosk > 0);
         this.address = address1;
+        this.bikeList = new LinkedList<>();
+    }
+
+    Station(String nameValue,
+            // Integer bikesValue,
+            // Integer availableDocksValue,
+            Integer maintenanceRequestValue,
+            Integer capacityValue,
+            Integer kiosk, String address1, LinkedList<Integer> bikeList) {
+        this.name = nameValue;
+        // this.bikes = bikesValue;
+        // this.availableDocks = availableDocksValue;
+        this.maintenanceRequest = maintenanceRequestValue;
+        this.capacity = capacityValue;
+        this.kioskNumber = kiosk;
+        this.kioskBoolean = (kiosk > 0);
+        this.address = address1;
+        this.bikeList = bikeList;
     }
 
     /**
@@ -142,6 +160,10 @@ public class Station {
         // remove bike from list and return true
         bikeList.remove(bikeIndex);
         return true;
+    }
+
+    public String getBikeListToString(){
+        return bikeList.toString().replaceAll("\\[", "").replaceAll("\\]","");
     }
 
 }
