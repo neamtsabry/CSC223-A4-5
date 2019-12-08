@@ -963,10 +963,10 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    public void resolveData() throws IOException, ParseException {
-        String dataFile = input.next();
-        ValleyBikeSim.resolveData(dataFile);
-    }
+//    public void resolveData() throws IOException, ParseException {
+//        String dataFile = input.next();
+//        ValleyBikeSim.resolveData(dataFile);
+//    }
 
     /**
      * Prompts user to input username
@@ -1109,7 +1109,6 @@ public abstract class ValleyBikeController {
         // check for '0' input and return to previous menu
         if (Objects.equals(num, 0)) { returnToLastMenu(null); }
 
-
         return num;
     }
 
@@ -1120,8 +1119,9 @@ public abstract class ValleyBikeController {
      *
      * @return true if username is valid and false otherwise
      */
-    private static boolean isValidUsername(String username){
-        return username.length() >= 6 && username.length() <= 14;
+    public static boolean isValidUsername(String username){
+        if(username != null) return username.length() >= 6 && username.length() <= 14;
+        return false;
     }
 
     /**
@@ -1131,21 +1131,37 @@ public abstract class ValleyBikeController {
      *
      * @return true if password is valid and false otherwise
      */
-    private static boolean isValidPassword(String password){
-        return password.length() >= 6 && password.length() <= 14;
+    public static boolean isValidPassword(String password){
+        if(password != null) return password.length() >= 6 && password.length() <= 14;
+        return false;
     }
 
     /**
      * Validates credit card number input by user
      * @return true if credit card is valid and false otherwise
+     *
+     * Citation for following code:
+     * https://github.com/eix128/gnuc-credit-card-checker/blob/master/CCCheckerPro/src/com/gnuc/java/ccc/Luhn.java
      */
-    static boolean isValidCreditCard(String creditcard){
-        //TODO check credit card validity for every transaction
-
-        //90% of the time the method accepts the credit card
-        //10% of the time the method rejects the credit card
-        //This method makes a random decision and is not a real credit card validator
-        return Math.random() <= 0.95;
+    static boolean isValidCreditCard(String ccNumber){
+        if(ccNumber.length() > 0 && ccNumber.length() <17){
+            int sum = 0;
+            boolean alternate = false;
+            for (int i = ccNumber.length() - 1; i >= 0; i--) {
+                int n = Integer.parseInt(ccNumber.substring(i, i + 1));
+                if (alternate) {
+                    n *= 2;
+                    if (n > 9)
+                    {
+                        n = (n % 10) + 1;
+                    }
+                }
+                sum += n;
+                alternate = !alternate;
+            }
+            return (sum % 10 == 0);
+        }
+        return false;
     }
 
     /**
@@ -1154,8 +1170,10 @@ public abstract class ValleyBikeController {
      * @param emailAddress is the email address input by the user
      *
      * @return true if email address is valid and false otherwise
+     *
+     * //note made this public for the sake of testing
      */
-    private static boolean isValidEmail(String emailAddress) {
+    public static boolean isValidEmail(String emailAddress) {
         //regular expression to check format of the email address string input by user
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +

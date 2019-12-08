@@ -1222,6 +1222,11 @@ public class ValleyBikeSim {
 		return stationsMap.containsKey(key);
 	}
 
+    /**
+     * checks if a bike exists in our map with the parameter id
+     * @param key bike id
+     * @return  true if bike with id exists
+     */
 	static Boolean bikesMapContains(int key){
 		return bikesMap.containsKey(key);
 	}
