@@ -1181,15 +1181,11 @@ public class ValleyBikeSim {
 	 */
 	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
 														 int idealPercentage, Deque<Bike> extraBikes) throws ClassNotFoundException {
-		//Deque<Bike> extraBikes = new ArrayDeque<Bike>();
 		for (Integer key : stationsCapacity.keySet()) {
 			int percentage = stationsCapacity.get(key);
 			Station station = stationsMap.get(key);
 
 			LinkedList<Integer> bikesAtStation = station.getBikeList();
-
-
-			// Deque<Bike> bikesAtStation = getBikesAtStation(key);
 
 			if ((percentage - idealPercentage) > 0) {
 				int newPercentage = percentage;
@@ -1205,10 +1201,6 @@ public class ValleyBikeSim {
 						extraBikes.push(bike);
 						bike.moveStation(0); // set bike's station to 0, or no station
 
-						// get bike object from key
-						// Bike bike = getBikeObj(bikeKey);
-						//station.setBikes(station.getBikes() - 1);
-						//extras.set(0, extras.get(0)+1);
 						newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 					}
 				}
