@@ -120,6 +120,7 @@ public class ValleyBikeSim {
 			String address = rs.getString("address");
 			String bikeString = rs.getString("bike_string");
 			LinkedList<Integer> bikeList = new LinkedList<>();
+
 			if (bikeString != null) {
 				for (String bikeId : bikeString.split(",")) {
 					bikeList.add(Integer.parseInt(bikeId));
@@ -246,6 +247,27 @@ public class ValleyBikeSim {
 
 		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
 	}
+
+    static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
+        String sql = "UPDATE Station SET bike_string = ? "
+                + "WHERE id = ?";
+        stationsMap.get(stationId).addToBikeList(bikeId);
+        String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
+
+        try (Connection conn = connectToDatabase();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // set the corresponding param
+            pstmt.setString(1, bikeIdsString);
+            pstmt.setInt(2, bikeId);
+            // update
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Sorry, could not add ride id to list in database at this time.");
+        }
+
+        System.out.println("Your ride has been successfully added to your history.");
+    }
 
 	static void updateBikeStationId(int bikeId, int newStationId) throws ClassNotFoundException{
 		String sql = "UPDATE Bike SET station_id = ? "
@@ -481,10 +503,9 @@ public class ValleyBikeSim {
 	}
 
 	static void updateRideIdList(String username, UUID rideId) throws ClassNotFoundException{
-		//TODO neamat implement in correct place, this method also updates the customer map obj
 		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
 				+ "WHERE username = ?";
-		customerAccountMap.get(username).getRideIdList().add(rideId);
+		customerAccountMap.get(username).addNewRide(rideId);
 		String rideIdString = customerAccountMap.get(username).getRideIdListToString();
 
 		try (Connection conn = connectToDatabase();
@@ -498,6 +519,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
+
 		System.out.println("Your ride has been successfully added to your history.");
 	}
 
@@ -1338,6 +1360,11 @@ public class ValleyBikeSim {
 		return stationsMap.containsKey(key);
 	}
 
+    /**
+     * checks if a bike exists in our map with the parameter id
+     * @param key bike id
+     * @return  true if bike with id exists
+     */
 	static Boolean bikesMapContains(int key){
 		return bikesMap.containsKey(key);
 	}
