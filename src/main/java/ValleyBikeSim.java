@@ -53,7 +53,7 @@ public class ValleyBikeSim {
 			readInternalAccountData(stmt);
 			readStationData(stmt);
 			readBikeData(stmt);
-			readBikeData(stmt);
+			readRideData(stmt);
 			conn.close();
 		} else {
 			System.out.println("Sorry, something went wrong connecting to the ValleyBike Database.");
@@ -633,19 +633,8 @@ public class ValleyBikeSim {
 		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
 	}
 
-	static void viewTotalRides(String username) throws ClassNotFoundException{
-		String sql = "";
-
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-			// set the corresponding param
-			pstmt.setString(1, username);
-			// update
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not update membership in database at this time.");
-		}
+	static int viewTotalRides(String username) throws ClassNotFoundException{
+		return customerAccountMap.get(username).getRideIdList().size();
 	}
 
 	/**
