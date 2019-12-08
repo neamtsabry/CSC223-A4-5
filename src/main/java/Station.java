@@ -4,12 +4,6 @@ public class Station {
     // station name
     private String name;
 
-    // number of bikes in station
-    // private int bikes;
-
-    // number of available docks
-    // private int availableDocks;
-
     // number of maintenance requests
     private int maintenanceRequest;
 
