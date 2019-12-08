@@ -15,13 +15,13 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 
 ## How to import this project into Eclipse
 
-There are a lot of steps here! Don't try to memorize them, just practice. Whenever you click next, or open a menu, see if you can read it, guess what you should do next, and confirm with these steps. Doing it this way will help you get through it quicker for future assignments.
+There are a lot of steps here! Don't try to memorize them, just practice. Whenever you click next, or open a menu, see if you can read it, guess what you should do next, and confirm with these steps.
 
 1. Go to the "File" menu and choose "Import"
 2. Expand the Git Folder and choose "Projects from Git"
 3. Click "Next"
 4. Choose "Clone URI"
-5. Copy and paste [https://github.com/amgrubb/CSC223-ValleyBikeSim.git](https://github.com/amgrubb/CSC223-ValleyBikeSim.git) into the URI field.
+5. Copy and paste [https://github.com/neamtsabry/CSC223-A4-5](https://github.com/neamtsabry/CSC223-A4-5) into the URI field.
 6. Click "Next"
 7. Wait for it to find "master"
 8. Click "Next"
@@ -32,7 +32,7 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 13. Click "Finish"
 14. Right-Click on the new project that showed up in the "Package Explorer" on the left. Select "Configure > Convert to Maven Project".
 
-## Connect to the database
+## Connect to the database with Eclipse
 
 1. Download the sqlite-jdbc-3.27.2.1.jar file from this link: https://bitbucket.org/xerial/sqlite-jdbc/downloads/
 2. Right click on your project
