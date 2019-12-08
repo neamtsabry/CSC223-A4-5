@@ -672,8 +672,7 @@ public class ValleyBikeSim {
 	static void updateRideIdList(String username, UUID rideId) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
 				+ "WHERE username = ?";
-		//add new ride to customer's ride list
-		customerAccountMap.get(username).addNewRide(rideId);
+
 		String rideIdString = customerAccountMap.get(username).getRideIdListToString();
 
 		//update customer's ride list in database
@@ -689,13 +688,15 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
 
+		//add new ride to customer's ride list
+		customerAccountMap.get(username).addNewRide(rideId);
 		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	/**
-	 * 
-	 * @param username
-	 * @param lastRideisReturned
+	 * update field in customer account that states whether they currently have a rental
+	 * @param username username of account to update
+	 * @param lastRideisReturned boolean representing whether last bike was returned
 	 * @throws ClassNotFoundException
 	 */
 	static void updateLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException{
@@ -710,6 +711,7 @@ public class ValleyBikeSim {
 			lastRideReturnedInt = 0;
 		}
 
+		//update field in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -721,14 +723,22 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
+		//update field in customer account map
 		customerAccountMap.get(username).setLastRideIsReturned(lastRideisReturned);
 		System.out.println("Your ride has been successfully added to your history.");
 	}
 
+	/**
+	 * updates username of internal account
+	 * @param username username of account to update
+	 * @param newUsername new internal username
+	 * @throws ClassNotFoundException
+	 */
 	static void updateInternalUsername(String username, String newUsername) throws ClassNotFoundException{
 		String sql = "UPDATE Internal_Account SET username = ? "
 				+ "WHERE username = ?";
 
+		//update username in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -741,6 +751,7 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update username in database at this time.");
 		}
 
+		//update internal account username in internal account map
 		InternalAccount internalAccount = internalAccountMap.get(username);
 		internalAccount.setUsername(newUsername);
 		internalAccountMap.remove(username);
@@ -749,10 +760,17 @@ public class ValleyBikeSim {
 
 	}
 
+	/**
+	 * update customer account password
+	 * @param username username of account to update
+	 * @param newPassword new password for account
+	 * @throws ClassNotFoundException
+	 */
 	static void updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET password = ? "
 				+ "WHERE username = ?";
 
+		//update customer password in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -765,14 +783,22 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update password in database at this time.");
 		}
 
+		//update customer password in customer map
 		customerAccountMap.get(username).setPassword(newPassword);
 		System.out.println("Your password has been successfully updated to " + newPassword);
 	}
 
+	/**
+	 * update password for intenal account
+	 * @param username username for internal account to update
+	 * @param newPassword new password for account
+	 * @throws ClassNotFoundException
+	 */
 	static void updateInternalPassword(String username, String newPassword) throws ClassNotFoundException{
 		String sql = "UPDATE Internal_Account SET password = ? "
 				+ "WHERE username = ?";
 
+		//update internal password in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -785,14 +811,22 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update password in database at this time.");
 		}
 
+		//update password in internal account map
 		internalAccountMap.get(username).setPassword(newPassword);
 		System.out.println("Your password has been successfully updated to " + newPassword);
 	}
 
+	/**
+	 * update credit card for customer account
+	 * @param username username of account to update
+	 * @param newCreditCard new credit card
+	 * @throws ClassNotFoundException
+	 */
 	static void updateCustomerCreditCard(String username, String newCreditCard) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET credit_card = ? "
 				+ "WHERE username = ?";
 
+		//update credit card for customer in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -805,14 +839,22 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update credit card information in database at this time.");
 		}
 
+		//update customer credit card in customer account map
 		customerAccountMap.get(username).setCreditCard(newCreditCard);
 		System.out.println("Your credit card information has been successfully updated to " + newCreditCard);
 	}
 
+	/**
+	 * update membership type for customer
+	 * @param username username of account to update
+	 * @param newMembership new membership type for account
+	 * @throws ClassNotFoundException
+	 */
 	static void updateCustomerMembership(String username, int newMembership) throws ClassNotFoundException{
 		String sql = "UPDATE Customer_Account SET membership = ? "
 				+ "WHERE username = ?";
 
+		//update membership type in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -831,26 +873,37 @@ public class ValleyBikeSim {
 		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
 	}
 
-	static int viewTotalRides(String username){
-		return customerAccountMap.get(username).getRideIdList().size();
-	}
-
-	static int viewAverageRideTime(String username){
-		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
-		int totalRideTime = 0;
-		for (UUID ride: rideIdList){
-			totalRideTime += rideMap.get(ride).getRideLength();
-		}
-		return totalRideTime/rideIdList.size();
-	}
-
 
 
 	/**
+	 * get average length of ride taken by a user
+	 * @param username username of account whose rides to view and average
+	 * @return the average ride length for the customer
+	 */
+	static int viewAverageRideTime(String username){
+		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
+		int totalRideTime = 0;
+		//get total ride time
+		for (UUID ride: rideIdList){
+			totalRideTime += rideMap.get(ride).getRideLength();
+		}
+		//divide total ride time by number of rides to get average ride time
+		return totalRideTime/rideIdList.size();
+	}
+
+	/**
+	 * get length of ride list for a customer
+	 * @param username username of account whose rides will be viewed
+	 * @return return the size of a customer's ride list
+	 */
+	static int viewTotalRides(String username){
+		return customerAccountMap.get(username).getRideIdList().size();
+		//TODO rename to get rideListLength ? NS
+	}
+
+	/**
 	 * View the account balance associated with a user's account
-	 *
 	 * @param username the unique username associated with the customer account
-	 *
 	 * @return the balance associate with the account accessed through the username
 	 */
 	static double viewAccountBalance(String username) {
@@ -859,7 +912,6 @@ public class ValleyBikeSim {
 
 	/**
 	 * View the membership type associated with a user's account
-	 *
 	 * @param username the unique username associated with the customer account
 	 * @return the membership type associated with the account accessed through the username
 	 */
@@ -869,7 +921,6 @@ public class ValleyBikeSim {
 
 	/**
 	 * View the credit card associated with a user's account
-	 *
 	 * @param username the unique username associated with the customer account
 	 * @return the credit card number with the account accessed through the username
 	 */
@@ -877,7 +928,11 @@ public class ValleyBikeSim {
 		return customerAccountMap.get(username).getCreditCard();
 	}
 
+	/**
+	 * print formatted list of all customers
+	 */
     static void viewAllCustomers() {
+    	//if there exist customers, print
 	    if(customerAccountMap.size() > 0){
             // format table view
             System.out.format("%-20s\n", "Customer username");
@@ -886,7 +941,7 @@ public class ValleyBikeSim {
             for (String username : customerAccountMap.keySet()) {
                 System.out.format("%-20s\n", username);
             }
-        } else {
+        } else { //if no customers, say so
             System.out.println("There are no customers using our services yet.");
         }
     }
@@ -894,7 +949,6 @@ public class ValleyBikeSim {
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
 	 * gone on for too long (in which caase they are charged)
-	 *
 	 * @param username is the unique username associated with the customer account
 	 */
 	static void checkBikeRented(String username) throws ParseException, InterruptedException {
@@ -920,7 +974,6 @@ public class ValleyBikeSim {
 	/**
 	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
 	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
-	 *
 	 */
 	static void checkMembershipRenewalTime() throws ClassNotFoundException {
 		//check each user's membership to find whether their payment is due
@@ -979,7 +1032,6 @@ public class ValleyBikeSim {
 	/**
 	 * Loops through station objects in stations map data structure
 	 * formats them to a table view for the user
-	 *
 	 * @throws ParseException
 	 */
     static void viewStationList() {
@@ -1006,9 +1058,7 @@ public class ValleyBikeSim {
 
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
-	 *
 	 * @param customerAccount this is the new customer account object to be added to the map
-	 *
 	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
@@ -1023,6 +1073,7 @@ public class ValleyBikeSim {
 			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, membership, balance) " +
 					"VALUES(?,?,?,?,?,?)";
 
+			//add customer account to database
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				pstmt.setString(1, customerAccount.getUsername());
@@ -1044,7 +1095,6 @@ public class ValleyBikeSim {
 
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
-	 *
 	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
