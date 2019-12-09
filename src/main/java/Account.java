@@ -1,3 +1,7 @@
+/**
+ * abstract class that customer account and internal account classes
+ * will extend, allowing for less redundant code
+ */
 abstract class Account {
 
     /** This field is the username for the customer */

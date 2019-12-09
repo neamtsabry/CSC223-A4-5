@@ -1046,7 +1046,7 @@ public abstract class ValleyBikeController {
     }
 
     //TODO do we really need both ^ getResponseBetween and isIntBetween??
-    
+
     /**
      * Helper method to check if input is between two values
      *

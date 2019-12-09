@@ -1,6 +1,10 @@
 import java.util.*;
 
+/**
+ * station class represents a station in the system
+ */
 public class Station {
+
     // station name
     private String name;
 
@@ -23,7 +27,7 @@ public class Station {
     private LinkedList<Integer> bikeList;
 
     /**
-     * Constructor to create a new station object
+     * Constructor to create a new station object that has no bikes
      *
      * @param nameValue               station name
      * @param maintenanceRequestValue number of maintenance requests
@@ -46,6 +50,15 @@ public class Station {
         this.bikeList = new LinkedList<>();
     }
 
+    /**
+     * Constructor to create a new station object that has bikes
+     * @param nameValue name of station
+     * @param maintenanceRequestValue number of maintenance requests
+     * @param capacityValue the station capacity
+     * @param kiosk number of kiosks
+     * @param address1 station address
+     * @param bikeList list of bikes at station
+     */
     Station(String nameValue,
             // Integer bikesValue,
             // Integer availableDocksValue,
@@ -63,74 +76,124 @@ public class Station {
         this.bikeList = bikeList;
     }
 
+    /**
+     * returns name of station
+     */
     String getStationName() {
         return this.name;
     }
 
+    /**
+     * sets name of station
+     */
     public void setStationName(String newName) {
         this.name = newName;
     }
 
+    /**
+     * returns number of bikes at station
+     */
     int getBikes() {
         return bikeList.size();
     }
 
-
-    // public void setBikes(int newNumBikes) { this.bikes = newNumBikes; }
-
+    /**
+     * calculates number of available docks
+     */
     int getAvailableDocks() {
         // return this.availableDocks;
         return (this.capacity - bikeList.size());
     }
 
+    /**
+     * return number of maint reqs
+     */
     int getMaintenanceRequest() {
         return this.maintenanceRequest;
     }
 
+    /**
+     * set new number of maint reqs
+     */
     void setMaintenanceRequest(int newNumRqst) {
         this.maintenanceRequest = newNumRqst;
     }
 
+    /**
+     * return capacity of station
+     */
     int getCapacity() {
         return this.capacity;
     }
 
+    /**
+     * set capacity of station
+     */
     void setCapacity(int newCap) {
         this.capacity = newCap;
     }
 
+    /**
+     * return whether station has kiosk
+     */
     boolean getKioskBoolean() {
         return this.kioskBoolean;
     }
 
+    /**
+     * set whether station has kiosk
+     */
     void setKioskBoolean(boolean newKioskBool) {
         this.kioskBoolean = newKioskBool;
     }
 
+    /**
+     * return number of kiosks at station
+     */
     int getKioskNum() {
         return this.kioskNumber;
     }
 
+    /**
+     * set number of kiosks at station
+     */
     void setKioskNum(int newKioskNum) {
         this.kioskNumber = newKioskNum;
     }
 
+    /**
+     * return address of station
+     */
     String getAddress() {
         return this.address;
     }
 
+    /**
+     * set address of station
+     */
     void setAddress(String newAdd) {
         this.address = newAdd;
     }
 
+    /**
+     * returns list of bikes at station
+     */
     LinkedList<Integer> getBikeList() {
         return bikeList;
     }
 
+    /**
+     * adds a bike to the bike list at station
+     */
     void addToBikeList(int bikeId) {
         bikeList.add(bikeId);
     }
 
+    /**
+     * removes a bike from bike list at station
+     * @param bike bike to be removed from station
+     * @return boolean representing whether operation was successful
+     */
     boolean removeFromBikeList(Bike bike) {
         // find index of bike ID in our linked list
         int bikeIndex = bikeList.indexOf(bike);
@@ -143,6 +206,9 @@ public class Station {
         return true;
     }
 
+    /**
+     * returns the bike list converted to a printable string
+     */
     public String getBikeListToString(){
         return bikeList.toString().replaceAll("\\[", "").replaceAll("\\]","");
     }
