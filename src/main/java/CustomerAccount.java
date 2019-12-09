@@ -118,10 +118,6 @@ public class CustomerAccount extends Account{
         return this.lastRideIsReturned;
     }
 
-    void setIsReturned(Boolean isReturnedValue){
-        this.lastRideIsReturned = isReturnedValue;
-    }
-
     ArrayList<UUID> getRideIdList() {
         return rideIdList;
     }
