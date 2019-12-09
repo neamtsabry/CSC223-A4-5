@@ -1117,8 +1117,8 @@ public class ValleyBikeSim {
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, membership, balance) " +
-					"VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, balance, last_ride_is_returned, enabled, ride_id_string) " +
+					"VALUES(?,?,?,?,?,?,?,?)";
 
 			//add customer account to database
 			try (Connection conn = connectToDatabase();
@@ -1127,8 +1127,10 @@ public class ValleyBikeSim {
 				pstmt.setString(2, customerAccount.getPassword());
 				pstmt.setString(3, customerAccount.getEmailAddress());
 				pstmt.setString(4, customerAccount.getCreditCard());
-				pstmt.setInt(5, customerAccount.getMembership().getMembershipInt());
-				pstmt.setInt(6, customerAccount.getBalance());
+				pstmt.setInt(5, customerAccount.getBalance());
+				pstmt.setInt(6, booleanToInt(customerAccount.getIsReturned()));
+				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
+				pstmt.setString(8, customerAccount.getRideIdListToString());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
@@ -1138,6 +1140,10 @@ public class ValleyBikeSim {
 			//add the new customer account object to customer account map
 			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
+	}
+
+	private static int booleanToInt(boolean myBoolean) {
+		return myBoolean ? 1 : 0;
 	}
 
 	/**
