@@ -12,7 +12,8 @@ public abstract class ValleyBikeController {
     /** initialize input of type scanner */
     private static Scanner input = new Scanner(System.in);
 
-    private static Deque<Integer> menuPath = new ArrayDeque<Integer>();
+    /** initialize stack that remembers menu path to assist in back-tracking */
+    private static Deque<Integer> menuPath = new ArrayDeque<>();
 
     /**
      * Checks where user was last by checking our menuPath stack
@@ -73,9 +74,6 @@ public abstract class ValleyBikeController {
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
     static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-        //TODO back menu on all menus
-        //TODO exit option on all menus
-
         //check whether it's time to renew customer's memberships
         ValleyBikeSim.checkMembershipRenewalTime();
 
@@ -101,7 +99,6 @@ public abstract class ValleyBikeController {
                 input.close();
 
                 //TODO save customer account list and internal account list
-
                 // save bike and station data
 //                ValleyBikeSim.saveBikeList();
 //                ValleyBikeSim.saveStationList();
@@ -221,6 +218,8 @@ public abstract class ValleyBikeController {
                 + "2. View account balance\n"
                 + "3. View station list");
 
+        //if customer does not have a bike rented, allow option to rent
+        //otherwise, give option to return
         if (customer.getIsReturned()) { System.out.println("4. Rent a bike"); }
         else { System.out.println("4. Return bike"); }
 
@@ -258,7 +257,7 @@ public abstract class ValleyBikeController {
             case 4:
                 // if customer has no ongoing rentals, help user rent a bike
                 if (customer.getIsReturned()) { rentBike(username); }
-                else {
+                else { //else, user can return a bike
                     UUID lastRideId = customer.getLastRideId();
                     returnBike(username, lastRideId);
                 } // if customer has ongoing rental, help user return bike
@@ -286,11 +285,18 @@ public abstract class ValleyBikeController {
                 customerAccountHome(username);
                 break;
         }
-
         //if function call finished and returned to this page, keep calling menu again until log out/exit
         customerAccountHome(username);
     }
 
+    /**
+     * prompts user to enter inputs that will allow creation of new internal account
+     * @throws IOException
+     * @throws ParseException
+     * @throws InterruptedException
+     * @throws ClassNotFoundException
+     * @throws NoSuchAlgorithmException
+     */
     private static void createInternalAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
@@ -302,6 +308,7 @@ public abstract class ValleyBikeController {
         String password = enterPassword();
         String emailAddress = enterEmail();
 
+        //create new internal account object from inputs
         InternalAccount internalAccount = new InternalAccount(username, password, emailAddress);
         ValleyBikeSim.addInternalAccount(internalAccount, username);
 
@@ -310,20 +317,23 @@ public abstract class ValleyBikeController {
 
         menuPath.pop();// we no longer need to remember this menu
 
+        //go to internal account home page
         internalAccountHome(username);
     }
 
     /**
-     * Menu page for editing customer account information
+     * Displays customer account information
      *
      * @param username is the unique username associated with the customer account
      */
     private static void viewCustomerAccount(String username) {
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+        //print current customer info
         System.out.println("\nCUSTOMER ACCOUNT INFORMATION:" +
                 "\nUsername: " + customer.getUsername());
         System.out.print("Password: ");
         for (int i=0; i<customer.getPassword().length(); i++){
+            //prints password represented as asterisks
             System.out.print("*");
         }
         System.out.println("\nEmail Address: " + customer.getEmailAddress());
