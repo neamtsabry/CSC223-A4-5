@@ -33,7 +33,8 @@ public abstract class ValleyBikeController {
         12 - log in menu
 
     2 - customer account home
-        21 - edit account info
+        21 - create new internal account
+        edit account info
         22 - view account balance
         23 - view station list
         241 - rent bike
@@ -56,6 +57,8 @@ public abstract class ValleyBikeController {
                 createCustomerAccount();
             case 12:
                 logIn();
+            case 2:
+                internalAccountHome(username);
             case 21:
                 editCustomerAccount(username);
             case 3:
@@ -99,19 +102,14 @@ public abstract class ValleyBikeController {
             case 0:
                 //exit program
                 input.close();
-
-                //TODO save customer account list and internal account list
-
-                // save bike and station data
-//                ValleyBikeSim.saveBikeList();
-//                ValleyBikeSim.saveStationList();
-
                 System.exit(0);
                 break;
             default:
                 System.out.println("That is an invalid option. Please try again.");
                 initialMenu();
         }
+        //if function call finished and returned to this page, keep calling menu
+        initialMenu();
     }
 
     /**
@@ -126,15 +124,13 @@ public abstract class ValleyBikeController {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
-        //TODO GB - Check if username already exists right away
-
         //remember this menu in case we need to return
         menuPath.push(1);
 
         //each field has its own method which calls itself until a valid input is entered
-        String username = enterUsername();
-        String password = enterPassword();
-        String emailAddress = enterEmail();
+        String username = enterUsername(null);
+        String password = enterPassword(null);
+        String emailAddress = enterEmail(null);
         String creditCard = enterCreditCard();
         int membership = enterMembership();
 
@@ -147,6 +143,8 @@ public abstract class ValleyBikeController {
 
         menuPath.pop();// we no longer need to remember this menu
 
+        //instead of returning to previous menu,
+        // we move these new customers to their home menu
         customerAccountHome(username);
     }
 
@@ -158,7 +156,7 @@ public abstract class ValleyBikeController {
      */
     private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt the user to choose which kind of account they want to log into
-
+//TODO GB - make menu lines shorter vertically
         System.out.println("\nPlease choose from one of the following menu options:");
         int logIn = getResponse("1. Log in to customer account.\n" +
                 "2. Log in to internal account.\n" +
@@ -166,9 +164,9 @@ public abstract class ValleyBikeController {
                 "Please enter your selection (0-2):");
         input.nextLine();
 
-        //if user wants to log out take them to initial menu to log out
+        //if user wants to log out take them back to initial menu
         if (logIn == 0){
-            initialMenu();
+            return;
         }
 
         //this is not inside the switch case because if it is in the switch case,
@@ -180,9 +178,15 @@ public abstract class ValleyBikeController {
             logIn();
         }
 
+        // push log in menu to our stack in case we want to return
+        menuPath.push(0);
+
+//TODO validate that username exists in the system right away!
         //prompt the user to input their username and password
-        String username = enterUsername();
-        String password = enterPassword();
+        String username = enterUsername(null);
+        String password = enterPassword(null);
+
+        menuPath.pop();// we no longer need to remember this menu
 
         switch (logIn){
             case 1:
@@ -291,26 +295,27 @@ public abstract class ValleyBikeController {
         customerAccountHome(username);
     }
 
-    private static void createInternalAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void createInternalAccount(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
         //TODO Grace
-        //TODO Check if username already exists right away
+
+        //add the internal home menu to our stack in case we need to return to it
+        menuPath.push(2);
 
         //each field has its own method which calls itself until a valid input is entered
-        String username = enterUsername();
-        String password = enterPassword();
-        String emailAddress = enterEmail();
+        String newUsername = enterUsername(username);
+        String password = enterPassword(username);
+        String emailAddress = enterEmail(username);
 
-        InternalAccount internalAccount = new InternalAccount(username, password, emailAddress);
-        ValleyBikeSim.addInternalAccount(internalAccount, username);
+        InternalAccount internalAccount = new InternalAccount(newUsername, password, emailAddress);
+        ValleyBikeSim.addInternalAccount(internalAccount, newUsername);
 
         //Let the user know the account has been successfully created
         System.out.println("Internal account successfully created!");
 
         menuPath.pop();// we no longer need to remember this menu
-
-        internalAccountHome(username);
+        return;
     }
 
     /**
@@ -327,8 +332,7 @@ public abstract class ValleyBikeController {
             System.out.print("*");
         }
         System.out.println("\nEmail Address: " + customer.getEmailAddress());
-        //TODO Must validate CC is 16 characters long for this 'last 4 #s of cc' substring to work
-        //System.out.println("Credit Card: " + customer.getCreditCard().substring(11));
+        System.out.println("Credit Card: " + customer.getCreditCard().substring(11));
         System.out.println("Membership: " + customer.getMembership().getMembershipString());
     }
 
@@ -361,7 +365,7 @@ public abstract class ValleyBikeController {
                 menuPath.push(21);
 
                 //edit username
-                String newUsername = enterUsername();
+                String newUsername = enterUsername(null);
                 ValleyBikeSim.updateCustomerUsername(username, newUsername);
                 break;
             case 2:
@@ -369,7 +373,7 @@ public abstract class ValleyBikeController {
                 menuPath.push(21);
 
                 //edit password
-                String newPassword = enterPassword();
+                String newPassword = enterPassword(null);
                 ValleyBikeSim.updateCustomerPassword(username, newPassword);
                 break;
             case 3:
@@ -377,7 +381,7 @@ public abstract class ValleyBikeController {
                 menuPath.push(21);
 
                 //edit email address
-                String newEmail = enterEmail();
+                String newEmail = enterEmail(null);
                 ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
                 break;
             case 4:
@@ -422,17 +426,17 @@ public abstract class ValleyBikeController {
         switch (edit){
             case 1:
                 //edit username
-                String newUsername = enterUsername();
+                String newUsername = enterUsername(null);
                 ValleyBikeSim.updateInternalUsername(username, newUsername);
                 break;
             case 2:
                 //edit password
-                String newPassword = enterPassword();
+                String newPassword = enterPassword(null);
                 ValleyBikeSim.updateInternalPassword(username, newPassword);
                 break;
             case 3:
                 //edit email address
-                String newEmail = enterEmail();
+                String newEmail = enterEmail(null);
                 ValleyBikeSim.updateInternalEmailAddress(username, newEmail);
                 break;
             case 0:
@@ -759,7 +763,7 @@ public abstract class ValleyBikeController {
         int num = input.nextInt();
         switch(num) {
             case 1:
-                createInternalAccount();
+                createInternalAccount(username);
                 break;
             case 2:
                 editInternalAccount(username);
@@ -1041,11 +1045,14 @@ public abstract class ValleyBikeController {
     /**
      * Prompts user to input username
      * Validates if username is between 6-14 characters
-     * Recursively calls itself until valid username input by user
+     * Loops until valid username input by user
+     *
+     * @param creator - internal username for person creating the internal account
+     *               this string is null for customer account creation
      *
      * @return valid username input by user
      */
-    private static String enterUsername() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterUsername(String creator) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
@@ -1053,7 +1060,7 @@ public abstract class ValleyBikeController {
             username = input.nextLine();
 
             // check for '0' input and return to previous menu
-            if (username.contentEquals("0")) { returnToLastMenu(null); }
+            if (username.contentEquals("0")) { returnToLastMenu(creator); }
 
         } while (!isValidUsername(username)); //validates that username is between 6-14 characters and unique in our system
 
@@ -1066,9 +1073,12 @@ public abstract class ValleyBikeController {
      * Validates if password is between 6-14 characters
      * Recursively calls itself until valid password input by user
      *
+     * @param creator - internal username for person creating the internal account
+     *                this string is null for customer account creation
+     *
      * @return valid password input by user
      */
-    private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterPassword(String creator) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String password;
         do {//loops until user inputs 0 or valid password
             //prompts user to input password
@@ -1076,7 +1086,8 @@ public abstract class ValleyBikeController {
             password = input.nextLine();
 
             // check for '0' input and return to previous menu
-            if (password.contentEquals("0")) { returnToLastMenu(null); }
+            // creator string is null for customer account creation
+            if (password.contentEquals("0")) { returnToLastMenu(creator); }
 
         } while (!isValidPassword(password)); //validates that password is between 6-14 characters
 
@@ -1089,9 +1100,12 @@ public abstract class ValleyBikeController {
      * Validates if email address is in correct format
      * Recursively calls itself until valid email address input by user
      *
+     * @param creator - internal username for person creating the internal account
+     *                this string is null for customer account creation
+     *
      * @return valid email address input by user
      */
-    private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterEmail(String creator) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String emailAddress;
         do {//loops until user inputs 0 or valid password
             //prompts user to input email address
@@ -1099,7 +1113,7 @@ public abstract class ValleyBikeController {
             emailAddress = input.nextLine();
 
             // check for '0' input and return to previous menu
-            if (emailAddress.contentEquals("0")) { returnToLastMenu(null); }
+            if (emailAddress.contentEquals("0")) { returnToLastMenu(creator); }
 
         } while (!isValidEmail(emailAddress)); //validates that email address is in correct format
 
@@ -1166,11 +1180,15 @@ public abstract class ValleyBikeController {
      */
     public static boolean isValidUsername(String username){
         if((username==null)||(username.length()<6)||(username.length()>14)){
-            System.out.println("Username is not the correct string. Please try again.");
+            System.out.println("Username is not the correct length. " +
+                    "Make sure you are entering a username between 6 and 14 characters long. " +
+                    "Please try again.");
             return false;
         }
-        else if(ValleyBikeSim.customerMapContains(username)){
-            System.out.println("Username is already in use. Please try again.");
+        else if(ValleyBikeSim.accountMapsContain(username, 3)){
+            // we chose to demand unique usernames within our system as a whole;
+            // no usernames can match, even between customer and internal accounts
+            System.out.println("This username already exists within our system. Please try again.");
             return false;
         }
         return true;

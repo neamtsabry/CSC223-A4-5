@@ -945,12 +945,33 @@ public class ValleyBikeSim {
 	}
 
     /**
-     * helper method for ValleyBikeController.isValidUsername()
+     * helper method to check if username exists in either
+	 * the customer account map, the internal account map, or both
+	 *
+	 * @param username - the username input by user
+	 * @param num - specifies which map we will look for the username in
+	 *            1 - customer account map
+	 *            2 - internal account map
+	 *            3 - both customer and internal maps
+	 *
+	 * @return true if username is in the map(s) specified and false otherwise
+	 *
      */
-    static boolean customerMapContains(String username) {
-        if (customerAccountMap.containsKey(username)){
-            return true;
-        }
+    static boolean accountMapsContain(String username, int num) {
+    	switch (num){
+			case 1: //search customer map
+				if (customerAccountMap.containsKey(username)){
+					return true;
+				}
+			case 2: //search internal map
+				if (internalAccountMap.containsKey(username)){
+					return true;
+				}
+			case 3: //search both maps
+				if (customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username)){
+				return true;
+			}
+		}
         return false;
     }
 
@@ -1209,14 +1230,14 @@ public class ValleyBikeSim {
 			//print that the account does not exist
 			System.out.println("This account does not exist.");
 			//take the user back to the initial menu
-			ValleyBikeController.initialMenu();
+			return;
 		}
 		//if the username exists but the password entered by the user does not match the password associated with that username
 		if (!password.equals(internalAccountMap.get(username).getPassword())) {
 			//print incorrect password
 			System.out.println("Incorrect password.");
 			//take the user back to the initial menu
-			ValleyBikeController.initialMenu();
+			return;
 		}
 		//if the username and password both match with associated customer account object, lead the user to internal account home
 		ValleyBikeController.internalAccountHome(username);
