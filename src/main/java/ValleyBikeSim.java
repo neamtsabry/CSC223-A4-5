@@ -944,6 +944,16 @@ public class ValleyBikeSim {
 		}
 	}
 
+    /**
+     * helper method for ValleyBikeController.isValidUsername()
+     */
+    static boolean customerMapContains(String username) {
+        if (customerAccountMap.containsKey(username)){
+            return true;
+        }
+        return false;
+    }
+
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
 	 * gone on for too long (in which caase they are charged)

@@ -1011,6 +1011,22 @@ public abstract class ValleyBikeController {
     }
 
     /**
+     * Helper method to validate input is between two values
+     *
+     * @param num - the number to be validated
+     * @param a - the smallest value accepted for num
+     * @param b - the largest value accepted for num
+     * @return return true if a <= num <= b
+     */
+    static boolean isIntBetween(int num, int a, int b){
+        while(num < a || num > b){
+            System.out.println("That is not a valid response. Please try again.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * We are not currently using this method.
      * Calls ValleyBikeSim's resolveData method to resolve ride data
      *
@@ -1030,26 +1046,16 @@ public abstract class ValleyBikeController {
      * @return valid username input by user
      */
     private static String enterUsername() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        //prompts user to input username
-        System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel:");
-        String username = input.nextLine();
-
-        // check for '0' input and return to previous menu
-        if (username.contentEquals("0")) { returnToLastMenu(null); }
-
-        //validates if username is between 6-24 characters
-        while (!isValidUsername(username)){
-
-            //recursively calls itself until valid username input by user
-            System.out.println("Username is not the correct length. Please try again.");
-
+        String username;
+        do {//loops until user inputs 0 or valid username
             //prompts user to input username
-            System.out.println("Enter username (must be between 6-14 characters):");
+            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel:");
             username = input.nextLine();
 
-        }
+            // check for '0' input and return to previous menu
+            if (username.contentEquals("0")) { returnToLastMenu(null); }
 
-
+        } while (!isValidUsername(username)); //validates that username is between 6-14 characters and unique in our system
 
         //return valid username input by user
         return username;
@@ -1063,23 +1069,16 @@ public abstract class ValleyBikeController {
      * @return valid password input by user
      */
     private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        //prompts user to input password
-        System.out.println("Enter password (must be between 6-14 characters) or '0' to cancel:");
-        String password = input.nextLine();
-
-        // check for '0' input and return to previous menu
-        if (password.contentEquals("0")) { returnToLastMenu(null); }
-
-        //validates if password is between 6-24 characters
-        while (!isValidPassword(password)){
-
-            //recursively calls itself until valid password input by user
-            System.out.println("Password is not valid.");
-
+        String password;
+        do {//loops until user inputs 0 or valid password
             //prompts user to input password
-            System.out.println("Enter password (must be between 6-14 characters):");
+            System.out.println("Enter password (must be between 6-14 characters) or '0' to cancel:");
             password = input.nextLine();
-        }
+
+            // check for '0' input and return to previous menu
+            if (password.contentEquals("0")) { returnToLastMenu(null); }
+
+        } while (!isValidPassword(password)); //validates that password is between 6-14 characters
 
         //return valid password input by user
         return password;
@@ -1093,24 +1092,16 @@ public abstract class ValleyBikeController {
      * @return valid email address input by user
      */
     private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        // TODO let user know how to make valid email address
-        //prompts user to input email address
-        System.out.println("Enter email address or '0' to cancel:");
-        String emailAddress = input.nextLine();
-
-        // check for '0' input and return to previous menu
-        if (emailAddress.contentEquals("0")) { returnToLastMenu(null); }
-
-        //validates if email address is in correct format
-        while (!isValidEmail(emailAddress)){
-
-            //recursively calls itself until valid email address input by user
-            System.out.println("Email address is not valid.");
-
+        String emailAddress;
+        do {//loops until user inputs 0 or valid password
             //prompts user to input email address
-            System.out.println("Enter email address:");
+            System.out.println("Enter email address (name@site.com) or '0' to cancel:");
             emailAddress = input.nextLine();
-        }
+
+            // check for '0' input and return to previous menu
+            if (emailAddress.contentEquals("0")) { returnToLastMenu(null); }
+
+        } while (!isValidEmail(emailAddress)); //validates that email address is in correct format
 
         //return valid email address input by user
         return emailAddress;
@@ -1124,23 +1115,18 @@ public abstract class ValleyBikeController {
      * @return valid credit card input by user
      */
     private static String enterCreditCard() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        //prompts user to input email address
-        System.out.println("Enter credit card number or '0' to cancel:");
-        String creditCard = input.nextLine();
-
-        // check for '0' input and return to previous menu
-        if (creditCard.contentEquals("0")) { returnToLastMenu(null); }
-
-        //validates if credit card is correct
-        while (!isValidCreditCard(creditCard)){
-
-            //recursively calls itself until valid credit card input by user
-            System.out.println("Credit card is not valid.");
-
-            //prompts user to input email address
-            System.out.println("Enter credit card number:");
+        String creditCard;
+        do {//loops until user inputs 0 or valid password
+            //prompts user to input credit card
+            System.out.println("Enter credit card number" +
+                    " (must be a 14 digit number with no spaces or dashes)" +
+                    " or '0' to cancel:");
             creditCard = input.nextLine();
-        }
+
+            // check for '0' input and return to previous menu
+            if (creditCard.contentEquals("0")) { returnToLastMenu(null); }
+
+        } while (!isValidCreditCard(creditCard)); //validates the credit card is correct
 
         //return valid credit card input by user
         return creditCard;
@@ -1152,19 +1138,22 @@ public abstract class ValleyBikeController {
      * @return membership string input by user
      */
     private static int enterMembership() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        //TODO membership needs to be choose an option between monthly, yearly, pay-as-you-go
-        //TODO validate membership input
-        System.out.println("Choose membership type: \n" +
-                "1. Pay-as-you-go Membership \n" +
-                "2. Monthly Membership \n" +
-                "3. Yearly Membership");
-        //prompt the user to pick an int option
-        int num = getResponse("Please enter your selection (1-3) or '0' to go back:");
-        input.nextLine();
+        int num;
+        do {//loops until user inputs int 0-3
+            System.out.println("Choose membership type: \n" +
+                    "1. Pay-as-you-go Membership \n" +
+                    "2. Monthly Membership \n" +
+                    "3. Yearly Membership");
+            //prompt the user to pick an int option
+            num = getResponse("Please enter your selection (1-3) or '0' to cancel:");
+            input.nextLine();
 
-        // check for '0' input and return to previous menu
-        if (Objects.equals(num, 0)) { returnToLastMenu(null); }
+            // check for '0' input and return to previous menu
+            if (Objects.equals(num, 0)) { returnToLastMenu(null); }
 
+        } while (!isIntBetween(num, 1, 3)); //validates input between 1 and 3 (0 is accounted for previously)
+
+        //return membership input by user
         return num;
     }
 
@@ -1176,8 +1165,15 @@ public abstract class ValleyBikeController {
      * @return true if username is valid and false otherwise
      */
     public static boolean isValidUsername(String username){
-        if(username != null) return username.length() >= 6 && username.length() <= 14;
-        return false;
+        if((username==null)||(username.length()<6)||(username.length()>14)){
+            System.out.println("Username is not the correct string. Please try again.");
+            return false;
+        }
+        else if(ValleyBikeSim.customerMapContains(username)){
+            System.out.println("Username is already in use. Please try again.");
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -1188,42 +1184,40 @@ public abstract class ValleyBikeController {
      * @return true if password is valid and false otherwise
      */
     public static boolean isValidPassword(String password){
-        if(password != null) return password.length() >= 6 && password.length() <= 14;
-        return false;
+        if ((password != null)||(password.length()<6)||(password.length()>14)) {
+            System.out.println("Password is not the correct length. Please try again.");
+            return false;
+        }
+        return true;
     }
 
     /**
      * Validates credit card number input by user
-     * @return true if credit card is valid and false otherwise
      *
-     * Citation for following code:
-     * https://github.com/eix128/gnuc-credit-card-checker/blob/master/CCCheckerPro/src/com/gnuc/java/ccc/Luhn.java
+     * @param ccNumber is the credit card input by the user
+     *
+     * @return true if credit card is valid and false otherwise
      */
     static boolean isValidCreditCard(String ccNumber){
-        if (ccNumber == null) {
-            System.out.println("null");
+        // checks that input is 16 chars/digits long
+        if ((ccNumber == null)||(ccNumber.length() != 16)) {
+            System.out.println("This is not the correct number of digits." +
+                    " Please make sure you are entering 16 digits exactly.");
             return false;
         }
 
-        try {
-            Double num = Double.parseDouble(ccNumber);
-        } catch (NumberFormatException nfe) {
-            System.out.println("not a number");
+        try { // checks that input is only ints
+            Double num = Double.parseDouble(ccNumber); // attempt to convert to a double
+        } catch (NumberFormatException nfe) { // this exception is thrown if there are non-int chars
+            System.out.println("This is not a valid credit card number. " +
+                    "Please make sure you are entering 16 digits without spaces, dashes, or characters. ");
             return false;
         }
-        int ccLength = ccNumber.length();
-        if(ccLength == 16){
-            //90% of the time the method accepts the credit card
-            //10% of the time the method rejects the credit card
-            //This method makes a random decision and is not a real credit card validator
-            return Math.random() <= 0.95;
-        }
-        else{
-            System.out.println("not length 16");
-        }
 
-        System.out.println("all else");
-        return false;
+        //90% of the time the method accepts the credit card
+        //10% of the time the method rejects the credit card
+        //This method makes a random decision and is not a real credit card validator
+        return Math.random() <= 0.95;
     }
 
     /**
@@ -1233,7 +1227,7 @@ public abstract class ValleyBikeController {
      *
      * @return true if email address is valid and false otherwise
      *
-     * //note made this public for the sake of testing
+     * Note: made this public for the sake of testing
      */
     public static boolean isValidEmail(String emailAddress) {
         //regular expression to check format of the email address string input by user
@@ -1243,12 +1237,24 @@ public abstract class ValleyBikeController {
                 "A-Z]{2,7}$";
         Pattern pat = Pattern.compile(emailRegex);
 
-        //if the string is null return false
-        if (emailAddress == null) return false;
+        //if the string is null or too long, return false
+        if ((emailAddress == null)||(emailAddress.length()>50)){
+            System.out.println("This email address is not the correct length. " +
+                    "Make sure you are entering an email address that is between 5 and 50 characters long. " +
+                    "Please try again.");
+            return false;
+        }
 
-        //if the email address entered by user matches the pattern from the regex
-        //then return true, else return false
-        return pat.matcher(emailAddress).matches();
+        //if the string does not match the pattern from the regex, return false
+        else if (! pat.matcher(emailAddress).matches()){
+            System.out.println("This is not a valid email address. " +
+                    "Make sure you are entering an email that follows " +
+                    "the pattern ssss@ssss.ssss (where ssss is a string of characters). " +
+                    "Please try again.");
+            return false;
+        }
+        //if string passes all these tests, return true
+        return true;
     }
 
     //TODO should we make an isValidStation and isValidBike too?
