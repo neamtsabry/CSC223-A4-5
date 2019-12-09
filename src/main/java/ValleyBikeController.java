@@ -1041,13 +1041,15 @@ public abstract class ValleyBikeController {
         while (!isValidUsername(username)){
 
             //recursively calls itself until valid username input by user
-            System.out.println("Username is not valid.");
+            System.out.println("Username is not the correct length. Please try again.");
 
             //prompts user to input username
             System.out.println("Enter username (must be between 6-14 characters):");
             username = input.nextLine();
 
         }
+
+
 
         //return valid username input by user
         return username;
