@@ -992,6 +992,8 @@ public class ValleyBikeSim {
 				// if rental exceeds 24 hours, charge account 150 and notify user
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
+				//TODO wht do we do with rented bike? delete from system? Keep in system at station 0?
+				// do we reset customer's account so they can make more rentals now that they've paid the fine?
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
@@ -1010,14 +1012,13 @@ public class ValleyBikeSim {
 		for (String username : customerAccountMap.keySet()) {
 			// initiate key for iterator
 			CustomerAccount user = customerAccountMap.get(username);
-			//TODO check all memberships to see whether their payment is due (AM)
 			if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(user.getCreditCard())) {
 					if (user.getMembership().getMembershipInt() == 2) {
-						//monthly things
+						//TODO monthly things
 						user.getMembership().setTotalRidesLeft(20);
 					} else if (user.getMembership().getMembershipInt() == 3) {
-						//yearly things
+						//TODO yearly things
 						user.getMembership().setTotalRidesLeft(260);
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
