@@ -1314,11 +1314,12 @@ public class ValleyBikeSim {
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
 			//TODO is this the message you want to say? Do you want to return to initial menu? NS
-		} else {
+		} else { //id ride id valid, add to system
 			String sql = "INSERT INTO Ride(ride_id, bike_id, username, is_returned, " +
 					"ride_length, start_time_stamp, end_time_stamp, payment) " +
 					"VALUES(?,?,?,?,?, ?, ?, ?)";
 
+			//add ride to database
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 				String ride_id = ride.getRideId().toString();
@@ -1342,7 +1343,9 @@ public class ValleyBikeSim {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
 
+			//add ride to ride map
 			rideMap.put(ride.getRideId(), ride);
+			//TODO has this ride been added to customer list already? NS
 		}
 	}
 
