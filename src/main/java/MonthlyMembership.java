@@ -25,6 +25,10 @@ public class MonthlyMembership extends Membership{
         return (diff >= 30);
     }
 
+    MonthlyMembership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+        super(totalRidesLeft, lastPayment, memberSince);
+    }
+
     //checks whether there are 0 free rides left
     public boolean checkMaxRidesExceeded(){
         return super.getTotalRidesLeft() >= maxRides;

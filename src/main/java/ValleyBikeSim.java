@@ -38,6 +38,8 @@ public class ValleyBikeSim {
 
 	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
+	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+
 	/**
 	 * Reads in the stations csv file data and parses it into station objects
 	 * mapped by id for easy access and manipulation throughout program
@@ -104,11 +106,19 @@ public class ValleyBikeSim {
 			//create customer account from info
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
 
-			//TODO Here's where are null pointer is coming from!
-			System.out.println(customerAccount.getMembership().getLastPayment());
-
 			// add to the customer account map
 			customerAccountMap.put(username,customerAccount);
+		}
+	}
+
+	private static void readMembershipData(Statement stmt) throws SQLException{
+		ResultSet rs = stmt.executeQuery("SELECT * FROM Membership");
+		//get each value from each line in database
+		while ( rs.next() ) {
+			String username = rs.getString("username");
+			int totalRidesLeft = rs.getInt("total_rides_left");
+			LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
+			LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
 		}
 	}
 
@@ -1078,10 +1088,6 @@ public class ValleyBikeSim {
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
     	Membership membershipType = checkMembershipType(membership);
 
-    	//set date they joined this membership
-		membershipType.setMemberSince(LocalDate.now());
-		// Below is just a "band-aid" until we set the initial payment; it just assumes the first month/year were paid
-    	membershipType.setLastPayment(LocalDate.now());
     	//TODO: Pay for monthly and yearly membership
 
     	CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
@@ -1101,6 +1107,19 @@ public class ValleyBikeSim {
     		return new YearlyMembership();
 		}
     	return null;
+	}
+
+	static Membership checkMembershipType(int membership, int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+		if (membership == 1){
+			return new PayAsYouGoMembership(totalRidesLeft, lastPayment, memberSince);
+		}
+		if (membership == 2){
+			return new MonthlyMembership(totalRidesLeft, lastPayment, memberSince);
+		}
+		if (membership == 3){
+			return new YearlyMembership(totalRidesLeft, lastPayment, memberSince);
+		}
+		return null;
 	}
 
 	/**

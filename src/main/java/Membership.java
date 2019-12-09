@@ -9,6 +9,14 @@ public abstract class Membership {
 
     Membership() {
         this.totalRidesLeft = 0;
+        this.lastPayment = LocalDate.now();
+        this.memberSince = LocalDate.now();
+    }
+
+    Membership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+        this.totalRidesLeft = totalRidesLeft;
+        this.lastPayment = lastPayment;
+        this.memberSince = memberSince;
     }
 
     int getTotalRidesLeft() {

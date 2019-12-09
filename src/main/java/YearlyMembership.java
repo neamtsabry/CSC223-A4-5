@@ -10,6 +10,10 @@ public class YearlyMembership extends Membership{
         super();
     }
 
+    YearlyMembership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+        super(totalRidesLeft, lastPayment, memberSince);
+    }
+
     /**
      * checks whether it is time to renew the monthly membership
      * @return true if it has been 365+ days since last payment, false if less
