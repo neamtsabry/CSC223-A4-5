@@ -9,6 +9,9 @@ public class MonthlyMembership extends Membership{
     //rides that come included in membership each month
     private final int maxRides = 20;
 
+    /**
+     * constructor uses abstract class constructor
+     */
     MonthlyMembership() {
         super();
     }
@@ -23,6 +26,10 @@ public class MonthlyMembership extends Membership{
         Period period = Period.between(now, super.getLastPayment());
         int diff = period.getDays();
         return (diff >= 30);
+    }
+
+    MonthlyMembership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+        super(totalRidesLeft, lastPayment, memberSince);
     }
 
     //checks whether there are 0 free rides left

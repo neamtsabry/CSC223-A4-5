@@ -1,5 +1,7 @@
 import java.util.Objects;
-
+/**
+ *  Bike class that represents a bike in the system
+ */
 public class Bike {
     // bike id
     private int id;
@@ -34,7 +36,6 @@ public class Bike {
         this.mnt = (maintenance.equals("y"));
         this.mntReport = maintenanceReport;
         this.station = stationId;
-//        this.moveStation(stationId);
     }
 
     /**

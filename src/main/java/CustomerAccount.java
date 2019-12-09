@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 import java.util.UUID;
 
+/**
+ * customer account extends abstract accound
+ * represents a customer account in the system
+ */
 public class CustomerAccount extends Account{
 
     /** This field is the credit card number of the customer */

@@ -1,13 +1,24 @@
 import java.time.LocalDate;
 import java.time.Period;
 
+/**
+ * yearly membership extends abstract membership
+ * represents a user's yearly membership subscription
+ */
 public class YearlyMembership extends Membership{
 
     //rides that come included in membership each year
     private final int maxRides = 260;
 
+    /**
+     * constructor uses abstract membership's constructor
+     */
     public YearlyMembership() {
         super();
+    }
+
+    YearlyMembership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+        super(totalRidesLeft, lastPayment, memberSince);
     }
 
     /**
