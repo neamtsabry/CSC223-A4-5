@@ -9,6 +9,9 @@ public class MonthlyMembership extends Membership{
     //rides that come included in membership each month
     private final int maxRides = 20;
 
+    /**
+     * constructor uses abstract class constructor
+     */
     MonthlyMembership() {
         super();
     }

@@ -1,3 +1,7 @@
+/**
+ * internal account extends abstract account
+ * represents an internal account in the system
+ */
 class InternalAccount extends Account {
 
     /**

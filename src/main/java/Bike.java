@@ -1,5 +1,7 @@
 import java.util.Objects;
-
+/**
+ *  Bike class that represents a bike in the system
+ */
 public class Bike {
     // bike id
     private int id;
