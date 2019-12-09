@@ -104,7 +104,7 @@ public class ValleyBikeSim {
 			String password = rs.getString("password");
 			String emailAddress = rs.getString("email_address");
 			String creditCard = rs.getString("credit_card");
-			Membership membership = checkMembershipType(rs.getInt("membership"));
+			Membership membership = readMembershipData(stmt, username);
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
 			int balance = Integer.parseInt(rs.getString("balance"));
@@ -126,15 +126,16 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static void readMembershipData(Statement stmt) throws SQLException{
-		ResultSet rs = stmt.executeQuery("SELECT * FROM Membership");
-		//get each value from each line in database
-		while ( rs.next() ) {
-			String username = rs.getString("username");
-			int totalRidesLeft = rs.getInt("total_rides_left");
-			LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
-			LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
-		}
+	private static Membership readMembershipData(Statement stmt, String username) throws SQLException{
+		String query = "SELECT * FROM Membership WHERE username = " + username;
+		ResultSet rs = stmt.executeQuery(query);
+
+		int totalRidesLeft = rs.getInt("total_rides_left");
+		int type = rs.getInt("type");
+		LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
+		LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
+
+		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
 	}
 
 	/**
