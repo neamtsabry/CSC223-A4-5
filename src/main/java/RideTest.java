@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.Assert.assertEquals;
 import org.junit.Assert;
 
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -52,4 +54,5 @@ class RideTest {
         Assert.assertEquals(ValleyBikeSim.bikesMapContains(123456789), false);
         Assert.assertEquals(ValleyBikeSim.stationsMapContains(123456789), false);
     }
+
 }

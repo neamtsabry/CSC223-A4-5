@@ -33,32 +33,8 @@ public class Bike {
         this.location = bikeLocation;
         this.mnt = (maintenance.equals("y"));
         this.mntReport = maintenanceReport;
-        this.moveStation(stationId);
-    }
-
-    /**
-     * Move a bike to a different (or no) station
-     * Also sets station data to match this move
-     *
-     * @param newStationValue - station ID of the station the bike is moving to
-     */
-    void moveStation(int newStationValue) throws ClassNotFoundException {
-        if (! Objects.equals(this.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
-            Station oldStation = ValleyBikeSim.getStationObj(this.station); // get old station object
-            oldStation.removeFromBikeList(this); // remove bike from station's bike list
-        }
-
-        ValleyBikeSim.updateBikeStationId(this.id, newStationValue);
-
-        if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
-            Station newStation = ValleyBikeSim.getStationObj(this.station); // get new station object
-            ValleyBikeSim.updateStationBikeList(this.station, this.id);
-            ValleyBikeSim.updateBikeLocation(this.id, 0);
-        }
-
-        else {
-            ValleyBikeSim.updateBikeLocation(this.id, 2);
-        }
+        this.station = stationId;
+//        this.moveStation(stationId);
     }
 
     /**
