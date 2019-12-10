@@ -324,7 +324,7 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not update bike's station id in database at this time.");
+			System.out.println("Sorry, could not update station maintenance requests in the database at this time.");
 		}
 		//update station data in map
 		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
@@ -353,9 +353,8 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not add ride id to list in database at this time.");
+			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
 		}
-		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
@@ -379,7 +378,6 @@ public class ValleyBikeSim {
 	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
-		stationsMap.get(stationId).addToBikeList(bikeId);
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
 		try (Connection conn = connectToDatabase();
@@ -391,10 +389,9 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not add ride id to list in database at this time.");
+			System.out.println("Sorry, could not update station's bike list in database");
 		}
-
-		System.out.println("Your ride has been successfully added to your history.");
+		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
 
@@ -420,6 +417,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update bike's station id in database at this time.");
 		}
+
 		bikesMap.get(bikeId).setStation(newStationId);
 	}
 
@@ -452,14 +450,16 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * Update whether a bike has a maintenance request
+	 * Update whether a bike has a maintenance request along with its
+	 * maintenance report if it does
 	 *
 	 * @param bikeId  bike id to  update
 	 * @param req_mnt boolean whether bike has a maintenance request
+	 * @param new_mnt_report the maintenance report if bike requires maintenance
 	 * @throws ClassNotFoundException
 	 */
-	static void updateBikeRqMnt(int bikeId, boolean req_mnt) throws ClassNotFoundException {
-		String sql = "UPDATE Bike SET req_mnt = ? "
+	static void updateBikeRqMnt(int bikeId, boolean req_mnt, String new_mnt_report) throws ClassNotFoundException {
+		String sql = "UPDATE Bike SET req_mnt = ?, mnt_report = ?"
 				+ "WHERE id = ?";
 
 		//update maintenance request in database
@@ -472,7 +472,8 @@ public class ValleyBikeSim {
 
 			// set the corresponding param
 			pstmt.setInt(1, req_mnt_int);
-			pstmt.setInt(2, bikeId);
+			pstmt.setString(2, new_mnt_report);
+			pstmt.setInt(3, bikeId);
 
 			// update
 			pstmt.executeUpdate();
@@ -481,37 +482,13 @@ public class ValleyBikeSim {
 		}
 		//update maintenance request in bike map
 		bikesMap.get(bikeId).setMnt(req_mnt);
-		//TODO do we ever delete/add to maintenance requests map? NS
-	}
+		bikesMap.get(bikeId).setMntReport(new_mnt_report);
 
-	/**
-	 * Update the string description of a bike's maintenance report
-	 *
-	 * @param bikeId     the bike that has the maintenance request
-	 * @param mnt_report the new report string
-	 * @throws ClassNotFoundException
-	 */
-	static void updateBikeMntReport(int bikeId, String mnt_report) throws ClassNotFoundException {
-		String sql = "UPDATE Bike SET mnt_report = ? "
-				+ "WHERE id = ?";
-
-		//update maint req string in database
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-			// set the corresponding param
-			pstmt.setString(1, mnt_report);
-			pstmt.setInt(2, bikeId);
-
-			// update
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not update bike maintenance report in database at this time.");
+		// if bike requires maintenance
+		if(req_mnt){
+			// add bike id and report to map of maintenance requests
+			mntReqs.put(bikeId, new_mnt_report);
 		}
-
-		//update bike maint req in bike map
-		bikesMap.get(bikeId).setMntReport(mnt_report);
-		//TODO do we update string in maint reqs map? NS
 	}
 
 	/**
@@ -543,7 +520,6 @@ public class ValleyBikeSim {
 
 		//update ride in ride map
 		rideMap.get(rideId).setIsReturned(isReturned);
-		//TODO is the ride being updated in the customer's ride list? NS or AG
 	}
 
 	/**
@@ -574,7 +550,6 @@ public class ValleyBikeSim {
 
 		//update ride end timestamp in ride map
 		rideMap.get(rideId).setEndTimeStamp(end_time_stamp);
-		//TODO is ride end time stamp being update in customer ride list? NS or AG
 	}
 
 	/**
@@ -605,8 +580,33 @@ public class ValleyBikeSim {
 
 		//update payment for ride in ride map
 		rideMap.get(rideId).setPayment(payment);
+	}
 
-		//TODO what is ride payment if ride was included in membership, not payg? NS or AG
+	/**
+	 * Updates cost of ride
+	 *
+	 * @param rideId  ride being updated
+	 * @throws ClassNotFoundException
+	 */
+	static void updateRideStationTo(UUID rideId, int station_to) throws ClassNotFoundException {
+		String sql = "UPDATE Ride SET station_to = ? "
+				+ "WHERE ride_id = ?";
+
+		//update ride payment in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, station_to);
+			pstmt.setString(2, rideId.toString());
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		//update payment for ride in ride map
+		rideMap.get(rideId).setStationTo(station_to);
 	}
 
 
@@ -798,7 +798,6 @@ public class ValleyBikeSim {
 
 		//add new ride to customer's ride list
 		customerAccountMap.get(username).addNewRide(rideId);
-		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	/**
@@ -808,16 +807,13 @@ public class ValleyBikeSim {
 	 * @param lastRideisReturned boolean representing whether last bike was returned
 	 * @throws ClassNotFoundException
 	 */
-	static void updateLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
-		//TODO neamat implement in correct place, this method also updates the customer map obj
+	static void updateCustomerLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET last_ride_is_returned = ? "
 				+ "WHERE username = ?";
 
-		int lastRideReturnedInt;
+		int lastRideReturnedInt = 0;
 		if (lastRideisReturned) {
 			lastRideReturnedInt = 1;
-		} else {
-			lastRideReturnedInt = 0;
 		}
 
 		//update field in database
@@ -834,7 +830,6 @@ public class ValleyBikeSim {
 		}
 		//update field in customer account map
 		customerAccountMap.get(username).setLastRideIsReturned(lastRideisReturned);
-		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	/**
@@ -1078,12 +1073,13 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static void checkBikeRented(String username) throws ParseException, InterruptedException {
+	static void checkBikeRented(String username) throws ParseException, InterruptedException, ClassNotFoundException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+
 		// true if last ride was returned
-		//TODO Neamat when I was running the code I got a null pointer error from here from account home
 		Boolean isReturned = customer.getIsReturned();
+
 		if (!isReturned) {
 			UUID ride = customer.getLastRideId();
 			if (rideMap.get(ride).isRented24Hours()) {
@@ -1091,16 +1087,21 @@ public class ValleyBikeSim {
 				//credit card was pre-validated when bike was rented to ensure charge would be valid
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
+
+				//TODO where are we adding that balance to the credit card?
+
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 				//and tell them to contact customer service
+
 				//TODO end station is 0
+
 				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
 				//this allows users to continue to rent bikes, since they have paid the charge
-				Ride rideObj = getRideObj(ride);
-				rideObj.setIsReturned(true);
-				rideObj.setEndTimeStamp(Instant.now());
-				customerAccountMap.get(username).setLastRideIsReturned(true);
 
+				updateRideIsReturned(ride, true);
+				updateRideEndTimeStamp(ride, Instant.now());
+				updateRideStationTo(ride, 0);
+				updateCustomerLastRideisReturned(username, true);
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -1406,8 +1407,8 @@ public class ValleyBikeSim {
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
-			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 			ValleyBikeController.initialMenu();
+			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 		} else { //if bike valid, add to system
 			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
 					"VALUES(?,?,?,?,?)";
@@ -1478,7 +1479,6 @@ public class ValleyBikeSim {
 
 			//add ride to ride map
 			rideMap.put(ride.getRideId(), ride);
-			//TODO has this ride been added to customer list already? NS
 		}
 	}
 
@@ -1657,8 +1657,7 @@ public class ValleyBikeSim {
 				Bike bike = bikesMap.get(bikeId);
 
 				// set bike maintenance values to none
-				updateBikeRqMnt(bikeId, false);
-				updateBikeMntReport(bikeId, "n");
+				updateBikeRqMnt(bikeId, false, "n");
 
 				// bike now available for customers
 				bike.setBikeLocation(0);
@@ -1728,9 +1727,8 @@ public class ValleyBikeSim {
 	 * @param username username of account whose rides will be viewed
 	 * @return return the size of a customer's ride list
 	 */
-	static int viewTotalRides(String username) {
+	static int viewRideListLength(String username) {
 		return customerAccountMap.get(username).getRideIdList().size();
-		//TODO rename to get rideListLength ? NS
 	}
 
 	/**

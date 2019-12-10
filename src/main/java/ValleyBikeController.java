@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -39,7 +38,6 @@ public abstract class ValleyBikeController {
             case 1:
                 //create a new customer account
                 createCustomerAccount();
-//                rentBike("cptnemo");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -278,7 +276,7 @@ public abstract class ValleyBikeController {
                 reportProblem(username);
                 break;
             case 6:
-                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
+                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewRideListLength(username));
                 break;
             case 7:
                 int rideTime = ValleyBikeSim.viewAverageRideTime(username);
@@ -496,7 +494,7 @@ public abstract class ValleyBikeController {
                 "1: Edit username\t" +
                 "2: Edit password\t" +
                 "3: Edit email address\t" +
-                "0: Return to account home\n");
+                "0: Return to account home");
 
         int edit = getResponseBetween(0, 3, "Please enter your selection (0-5):");
 
@@ -654,15 +652,17 @@ public abstract class ValleyBikeController {
 
         UUID rideId = UUID.randomUUID();
 
+        Instant timeStamp = Instant.now();
+
         // create new ride object
         Ride ride = new Ride(rideId,
                 bikeID,
                 username,
                 false,
-                Instant.now(),
-                null,
+                timeStamp,
+                timeStamp,
                 statId,
-                null);
+                0);
 
         // add ride to map as well as database
         ValleyBikeSim.addRide(ride);
@@ -872,8 +872,7 @@ public abstract class ValleyBikeController {
         Bike bike = ValleyBikeSim.getBikeObj(bikeId);
 
         // set bike's maintenance report and maintenance to true
-        ValleyBikeSim.updateBikeRqMnt(bikeId, true);
-        ValleyBikeSim.updateBikeMntReport(bikeId, mntReport);
+        ValleyBikeSim.updateBikeRqMnt(bikeId, true, mntReport);
 
         // bike is now out of commission until fixed
         ValleyBikeSim.updateBikeLocation(bikeId, 1);
@@ -1083,7 +1082,11 @@ public abstract class ValleyBikeController {
         viewCustomerActivity(customer);
     }
 
-    //TODO Add comments to viewCustomerActivity method!!
+
+    /**
+     * view rides specified customer has taken
+     * @param customer customer whose rides will be displayed
+     */
     private static void viewCustomerActivity(CustomerAccount customer){
         ArrayList<UUID> rideList = customer.getRideIdList();
 
@@ -1092,6 +1095,7 @@ public abstract class ValleyBikeController {
             System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n", "Bike ID", "Is returned",
                     "Start Timestamp", "End Timestamp", "RideLength", "Station from", "Station to");
 
+            //format out printing of whole ride list
             for(UUID rideId : rideList){
                 Ride rideObj = ValleyBikeSim.getRideObj(rideId);
 
@@ -1104,7 +1108,7 @@ public abstract class ValleyBikeController {
                         rideObj.getStationFrom(),
                         rideObj.getStationTo());
             }
-        } else{
+        } else{ //if customer has no rides, inform user
             System.out.println("This customer has not started any rides yet.");
         }
     }
@@ -1184,14 +1188,13 @@ public abstract class ValleyBikeController {
         // get new bike's id
         int id = getResponseBetween(10, 1000, "Please enter the bike's ID ('111')");
 
-
         // if the bike already exists
         while(ValleyBikeSim.getBikeObj(id) != null){
             // ask if user wants to overwrite bike
             System.out.println("Bike with this ID already exists.");
 
             // prompt user to re-enter bike id
-            id = getResponse("Please re-enter the bike's ID");
+            id = getResponse("Please enter a new bike ID");
         }
 
         // View stations
@@ -1227,7 +1230,6 @@ public abstract class ValleyBikeController {
                 mnt,
                 mntReport
         );
-
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 
