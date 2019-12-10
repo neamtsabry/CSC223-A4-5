@@ -921,7 +921,7 @@ public class ValleyBikeSim {
 		//update membership type associated with user and date representing start of membership
 		customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
 		customerAccountMap.get(username).getMembership().setMemberSince(LocalDate.now());
-		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
+		System.out.println("Your membership has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
 	}
 
 
@@ -1304,36 +1304,6 @@ public class ValleyBikeSim {
 		return null;
 	}
 
-	/**
-	 * Verify username and password when a customer logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-	 */
-	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		//if the username entered by the user does not exist in the customer account map
-		/*
-		if (!customerAccountMap.containsKey(username)) {
-			//print that the account does not exist
-			System.out.println("This account does not exist.");
-			//prompt the user to input new account information again or log in
-			ValleyBikeController.initialMenu();
-		}
-		 */
-
-		//if the username exists but the password entered by the user does not match the password associated with that username
-		if (!password.equals(customerAccountMap.get(username).getPassword())) {
-			//print incorrect password
-			System.out.println("Incorrect password. Please try again.");
-			//prompt the user to input new account information again or log in
-			return;
-		}
-		//if the username and password both match with associated customer account object, lead the user to user account home
-		ValleyBikeController.customerAccountHome(username);
-	}
-
 	static Ride viewLongestRide(String username){
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
 		long longestRideLength = 0;
@@ -1345,37 +1315,6 @@ public class ValleyBikeSim {
 			}
 		}
 		return longestRide;
-	}
-
-
-	/**
-	 * Verify username and password when an internal staff logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-	 */
-	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		//if the username entered by the user does not exist in the internal account map
-		/*
-		if (!internalAccountMap.containsKey(username)) {
-			//print that the account does not exist
-			System.out.println("This account does not exist.");
-			//take the user back to the initial menu
-			return;
-		}
-		 */
-
-		//if the username exists but the password entered by the user does not match the password associated with that username
-		if (!password.equals(internalAccountMap.get(username).getPassword())) {
-			//print incorrect password
-			System.out.println("Incorrect password. Please try again.");
-			//take the user back to the initial menu
-			return;
-		}
-		//if the username and password both match with associated customer account object, lead the user to internal account home
-		ValleyBikeController.internalAccountHome(username);
 	}
 
 	/**
@@ -1937,4 +1876,48 @@ public class ValleyBikeSim {
 		}
 		return bikesAtStation;
 	}
+
+	/**
+	 * Verify username and password when an internal staff logs in to their account
+	 *
+	 * @param username is the username input by the user to log in
+	 * @param password is the password input by the user to log in
+	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
+	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
+
+	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+
+	//if the username exists but the password entered by the user does not match the password associated with that username
+	if (!password.equals(internalAccountMap.get(username).getPassword())) {
+	//print incorrect password
+	System.out.println("Incorrect password. Please try again.");
+	//take the user back to the initial menu
+	return;
+	}
+	//if the username and password both match with associated customer account object, lead the user to internal account home
+	ValleyBikeController.internalAccountHome(username);
+	}
+	 */
+
+	/**
+	 * Verify username and password when a customer logs in to their account
+	 *
+	 * @param username is the username input by the user to log in
+	 * @param password is the password input by the user to log in
+	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
+	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
+	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+
+	//if the username exists but the password entered by the user does not match the password associated with that username
+	if (!password.equals(customerAccountMap.get(username).getPassword())) {
+	//print incorrect password
+	System.out.println("Incorrect password. Please try again.");
+	//prompt the user to input new account information again or log in
+	return;
+	}
+	//if the username and password both match with associated customer account object, lead the user to user account home
+	ValleyBikeController.customerAccountHome(username);
+	}
+
+	 */
 }
