@@ -55,7 +55,8 @@ public abstract class ValleyBikeController {
             case 1:
                 initialMenu();
             case 11:
-                createCustomerAccount();
+//                createCustomerAccount();
+                rentBike();
             case 12:
                 logIn();
             case 2:
@@ -155,7 +156,7 @@ public abstract class ValleyBikeController {
      */
     private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt the user to choose which kind of account they want to log into
-//TODO GB - make menu lines shorter vertically
+        //TODO GB - make menu lines shorter vertically
         System.out.println("\nPlease choose from one of the following menu options:");
         int logIn = getResponse("1. Log in to customer account.\n" +
                 "2. Log in to internal account.\n" +
@@ -180,7 +181,7 @@ public abstract class ValleyBikeController {
         // push log in menu to our stack in case we want to return
         menuPath.push(0);
 
-//TODO validate that username exists in the system right away!
+        //TODO validate that username exists in the system right away!
         //prompt the user to input their username and password
         String username = enterUsername(null);
         String password = enterPassword(null);
