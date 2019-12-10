@@ -1293,6 +1293,18 @@ public class ValleyBikeSim {
 		ValleyBikeController.customerAccountHome(username);
 	}
 
+	static void viewLongestRide(String username){
+		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
+		long longestRide = 0;
+		UUID longestRideId;
+		for (UUID ride: rideIdList){
+			if (rideMap.get(ride).getRideLength() > longestRide){
+				longestRide = rideMap.get(ride).getRideLength();
+			}
+		}
+	}
+
+
 	/**
 	 * Verify username and password when an internal staff logs in to their account
 	 *

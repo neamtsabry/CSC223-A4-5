@@ -222,7 +222,7 @@ public abstract class ValleyBikeController {
         //menu option for customer account home
         System.out.println("\nPlease choose from one of the following menu options:\n"
                 + "1. View and edit account info\n"
-                + "2. View account activity"
+                + "2. View account activity\n"
                 + "3. View account balance\n"
                 + "4. View station list");
 
@@ -230,10 +230,10 @@ public abstract class ValleyBikeController {
         else { System.out.println("5. Return bike"); }
 
         System.out.println("6. Report a problem\n"
-                + "7. View total number of rides\n"
-                + "8. View average ride time\n"
-                + "9. View your most popular ride time.\n"
-                + "99. Delete account.\n"
+                + "7. View your total number of rides\n"
+                + "8. View your average ride time\n"
+                + "9. View your longest ride\n"
+                + "10. Delete account\n"
                 + "0. Log out\n" +
                 "Please enter your selection (0-5):");
 
@@ -253,14 +253,17 @@ public abstract class ValleyBikeController {
                 editCustomerAccount(username);
                 break;
             case 2:
+               //TODO view account activity
+                break;
+            case 3:
                 //view account balance
                 System.out.println("Your account balance is "+ ValleyBikeSim.viewAccountBalance(username));
                 break;
-            case 3:
+            case 4:
                 //view station list
                 ValleyBikeSim.viewStationList();
                 break;
-            case 4:
+            case 5:
                 // if customer has no ongoing rentals, help user rent a bike
                 if (customer.getIsReturned()) { rentBike(username); }
                 else { //else, user can return a bike
@@ -268,18 +271,18 @@ public abstract class ValleyBikeController {
                     returnBike(username, lastRideId);
                 } // if customer has ongoing rental, help user return bike
                 break;
-            case 5:
+            case 6:
                 reportProblem(username);
                 break;
-            case 6:
+            case 7:
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
                 break;
-            case 7:
+            case 8:
                 System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
                 break;
-            case 8:
-                break;
             case 9:
+                break;
+            case 10:
                 ValleyBikeSim.disableCustomerAccount(username);
                 break;
             case 0:
