@@ -155,7 +155,7 @@ public abstract class ValleyBikeController {
         //if user wants to log out take them back to initial menu
         if (password.contentEquals("0")){ return; }
 
-        while (!password.equals(ValleyBikeSim.getCustomerObj(username).getPassword())){
+        while (password != ValleyBikeSim.getInternalObj(username).getPassword()){
             System.out.println("Invalid password. Please try again.");
             System.out.println("Please enter your password or '0' to cancel:");
             password = input.nextLine();
@@ -1217,9 +1217,9 @@ public abstract class ValleyBikeController {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
-            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel: \n");
+            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel: ");
             username = input.nextLine();
-
+            //System.out.println("hihi"+username+"hihi");
             // check for '0' input and return to previous menu
             if (username.contentEquals("0")) { returnToLastMenu(creator); }
 

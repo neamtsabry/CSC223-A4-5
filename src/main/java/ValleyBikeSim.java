@@ -1769,6 +1769,18 @@ public class ValleyBikeSim {
 	}
 
 	/**
+	 * Helper method for controller class to get internal object by
+	 * finding it in internal account map and returning it
+	 *
+	 * @param key username of desired account
+	 * @return internal account matching inputted username
+	 */
+	static InternalAccount getInternalObj(String key) {
+		return internalAccountMap.get(key);
+	}
+
+
+	/**
 	 * Helper method for controller class to get bike object by
 	 * finding it in the bikes tree data structure and using station ID
 	 *
