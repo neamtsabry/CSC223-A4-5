@@ -50,7 +50,7 @@ public class ValleyBikeSim {
 
 	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
-	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	/**
 	 * Reads in the stations csv file data and parses it into station objects
@@ -150,7 +150,7 @@ public class ValleyBikeSim {
 				totalRidesLeft = rows.getInt("total_rides_left");
 				type = rows.getInt("type");
 				lastPayment = LocalDate.parse(rows.getString("last_payment"), formatter);
-				memberSince = LocalDate.parse(rows.getString("member_since"), formatter);
+				memberSince = LocalDate.parse(rows.getString("membership_since"), formatter);
 			}
 		}
 		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
@@ -1304,8 +1304,26 @@ public class ValleyBikeSim {
 		CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
 		addCustomerAccount(customerAccount);
+		addMembership(membershipType, username);
 	}
 
+	static void addMembership(Membership membership, String username){
+		String sql = "INSERT INTO Membership(username, total_rides_left, last_payment, membership_since, type) " +
+				"VALUES(?,?,?,?,?)";
+
+		//add customer account to database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, username);
+			pstmt.setInt(2, membership.getTotalRidesLeft());
+			pstmt.setString(3, membership.getLastPayment().toString());
+			pstmt.setString(4, membership.getMemberSince().toString());
+			pstmt.setDouble(5, membership.getMembershipInt());
+			pstmt.executeUpdate();
+		} catch (SQLException | ClassNotFoundException e) {
+			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+		}
+	}
 
 	static Membership checkMembershipType(int membership,  int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
 		if (membership == 1){
