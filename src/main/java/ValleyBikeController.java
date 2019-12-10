@@ -280,6 +280,9 @@ public abstract class ValleyBikeController {
                 System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
                 break;
             case 9:
+                Ride ride = ValleyBikeSim.viewLongestRide(username);
+                System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
+                System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 break;
             case 10:
                 ValleyBikeSim.disableCustomerAccount(username);

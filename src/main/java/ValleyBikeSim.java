@@ -1,4 +1,5 @@
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -96,7 +97,7 @@ public class ValleyBikeSim {
 	 * @param stmt //TODO
 	 * @throws SQLException
 	 */
-	private static void readCustomerAccountData(Statement stmt) throws SQLException {
+	private static void readCustomerAccountData(Statement stmt) throws SQLException, ClassNotFoundException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Customer_Account");
 		//get each value from each line in database
 		while (rs.next()) {
@@ -104,15 +105,19 @@ public class ValleyBikeSim {
 			String password = rs.getString("password");
 			String emailAddress = rs.getString("email_address");
 			String creditCard = rs.getString("credit_card");
-			Membership membership = readMembershipData(stmt, username);
+			Membership membership = readMembershipData(username);
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
 			int balance = Integer.parseInt(rs.getString("balance"));
 			String rideIdString = rs.getString("ride_id_string");
 			ArrayList<UUID> rideIdList = new ArrayList<>();
-			if (rideIdString != null) {
+			if (rideIdString != null && rideIdString.length() > 0){
 				for (String ride : rideIdString.split(",")) {
-					rideIdList.add(UUID.fromString(ride));
+					String s2 = ride.replace("-", "");
+					UUID uuid = new UUID(
+							new BigInteger(s2.substring(0, 16), 16).longValue(),
+							new BigInteger(s2.substring(16), 16).longValue());
+					rideIdList.add(uuid);
 				}
 			}
 			//create customer account from info
@@ -126,19 +131,30 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static Membership readMembershipData(Statement stmt, String username) throws SQLException{
-		String query = "SELECT * FROM Membership WHERE username = " + username;
-		ResultSet rs = stmt.executeQuery(query);
+	private static Membership readMembershipData(String username) throws ClassNotFoundException, SQLException{
+		String sql = "SELECT * FROM Membership WHERE username = ?";
 
-		int totalRidesLeft = rs.getInt("total_rides_left");
-		int type = rs.getInt("type");
-		LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
-		LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
-
+		int totalRidesLeft = 0;
+		int type = 0;
+		LocalDate lastPayment = null;
+		LocalDate memberSince = null;
+		//update sql database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)){
+			// set the corresponding param
+			pstmt.setString(1, username);
+			ResultSet rows = pstmt.executeQuery();
+			while(rows.next())
+			{
+				totalRidesLeft = rows.getInt("total_rides_left");
+				type = rows.getInt("type");
+				lastPayment = LocalDate.parse(rows.getString("last_payment"), formatter);
+				memberSince = LocalDate.parse(rows.getString("member_since"), formatter);
+			}
+		}
 		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
 	}
-
-	/**
+		/**
 	 * Reads in info from database and converts to internal account objects that get stored in data structure
 	 *
 	 * @param stmt //TODO
@@ -1293,15 +1309,17 @@ public class ValleyBikeSim {
 		ValleyBikeController.customerAccountHome(username);
 	}
 
-	static void viewLongestRide(String username){
+	static Ride viewLongestRide(String username){
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
-		long longestRide = 0;
-		UUID longestRideId;
+		long longestRideLength = 0;
+		Ride longestRide = null;
 		for (UUID ride: rideIdList){
-			if (rideMap.get(ride).getRideLength() > longestRide){
-				longestRide = rideMap.get(ride).getRideLength();
+			if (rideMap.get(ride).getRideLength() > longestRideLength){
+				longestRideLength = rideMap.get(ride).getRideLength();
+				longestRide = rideMap.get(ride);
 			}
 		}
+		return longestRide;
 	}
 
 
