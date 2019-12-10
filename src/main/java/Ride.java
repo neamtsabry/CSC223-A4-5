@@ -35,6 +35,10 @@ public class Ride {
     //payment made for ride
     private double payment;
 
+    private int stationTo;
+
+    private int stationFrom;
+
     /**
      * constructor initializes ride object
      * @param rideIdVal sets ride id
@@ -47,13 +51,16 @@ public class Ride {
      */
     public Ride(UUID rideIdVal, int bikeIdVal, String usernameVal,
                 Boolean isReturnedVal, Instant startTimeStampVal,
-                Instant endTimeStampVal) throws ParseException {
+                Instant endTimeStampVal, Integer stationFromVal, Integer stationToVal) throws ParseException {
         this.rideId = rideIdVal;
         this.bikeId = bikeIdVal;
         this.username = usernameVal;
         this.isReturned = isReturnedVal;
         this.startTimeStamp = startTimeStampVal;
         this.endTimeStamp = endTimeStampVal;
+
+        this.stationFrom = stationFromVal;
+        this.stationTo = stationToVal;
 
         if(endTimeStamp != null){
             this.getRideLength(); //if ride has ended calculate ride length
@@ -131,9 +138,16 @@ public class Ride {
      * @return ride length
      */
     public long getRideLength() {
+        // if ride still wasn't returned
+        if(this.endTimeStamp == null){
+            // return duration of ride so far
+            this.rideLength = Duration.between(getStartTimeStamp(), Instant.now()).toHours();
+        }
+
         if(this.isReturned){
             this.rideLength = Duration.between(getStartTimeStamp(), getEndTimeStamp()).toHours();
         }
+
         return this.rideLength;
     }
 
@@ -170,6 +184,22 @@ public class Ride {
      */
     public Boolean getIsReturned(){
         return this.isReturned;
+    }
+
+    public int getStationTo(){
+        return this.stationTo;
+    }
+
+    public void setStationTo(int newStationTo){
+        this.stationTo = newStationTo;
+    }
+
+    public int getStationFrom() {
+        return stationFrom;
+    }
+
+    public void setStationFrom(int newStationFrom) {
+        this.stationFrom = newStationFrom;
     }
 
     /**

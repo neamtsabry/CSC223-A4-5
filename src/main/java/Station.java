@@ -40,7 +40,7 @@ public class Station {
                    Integer capacityValue,
                    Integer kiosk, String address1) {
         this.name = nameValue;
-        // this.bikes = bikesValue;
+//        this.bikes = bikesValue;
         // this.availableDocks = availableDocksValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;

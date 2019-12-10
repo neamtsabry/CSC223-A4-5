@@ -48,6 +48,8 @@ public class ValleyBikeSim {
 
 	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
+	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+
 	/**
 	 * Reads in the stations csv file data and parses it into station objects
 	 * mapped by id for easy access and manipulation throughout program
@@ -102,7 +104,7 @@ public class ValleyBikeSim {
 			String password = rs.getString("password");
 			String emailAddress = rs.getString("email_address");
 			String creditCard = rs.getString("credit_card");
-			Membership membership = checkMembershipType(rs.getInt("membership"));
+			Membership membership = readMembershipData(stmt, username);
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
 			int balance = Integer.parseInt(rs.getString("balance"));
@@ -115,13 +117,25 @@ public class ValleyBikeSim {
 			}
 			//create customer account from info
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
+
 			//TODO AG - Here's where our null pointer is coming from! getLastPayment field is not being updated when we read in account data, so it stays null...
 			//TODO AG - We also have to read in max rides for memberships
-			System.out.println(customerAccount.getMembership().getLastPayment());
 
 			// add to the customer account map
 			customerAccountMap.put(username, customerAccount);
 		}
+	}
+
+	private static Membership readMembershipData(Statement stmt, String username) throws SQLException{
+		String query = "SELECT * FROM Membership WHERE username = " + username;
+		ResultSet rs = stmt.executeQuery(query);
+
+		int totalRidesLeft = rs.getInt("total_rides_left");
+		int type = rs.getInt("type");
+		LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
+		LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
+
+		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
 	}
 
 	/**
@@ -166,11 +180,15 @@ public class ValleyBikeSim {
 
 			if (bikeString != null) {
 				for (String bikeId : bikeString.split(",")) {
-					bikeList.add(Integer.parseInt(bikeId));
+					try{
+                        bikeList.add(Integer.parseInt(bikeId));
+                    } catch(NumberFormatException e){}
 				}
 			}
+
 			//create new station instance
 			Station station = new Station(name, reqMnt, capacity, kiosk, address, bikeList);
+
 			// add to the station tree
 			stationsMap.put(id, station);
 		}
@@ -191,6 +209,7 @@ public class ValleyBikeSim {
 			int location = rs.getInt("location");
 			int stationId = rs.getInt("station_id");
 			int reqMnt = rs.getInt("req_mnt");
+
 			String maintenance = "n";
 
 			if (reqMnt == 1) {
@@ -227,6 +246,8 @@ public class ValleyBikeSim {
 			String start_time_stamp = rs.getString("start_time_stamp");
 			String end_time_stamp = rs.getString("end_time_stamp");
 			double payment = rs.getDouble("payment");
+			int station_from = rs.getInt("station_from");
+			int station_to = rs.getInt("station_ti");
 
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
@@ -256,7 +277,7 @@ public class ValleyBikeSim {
 			// create new ride object with fields
 			Ride ride = new Ride(uuid_id, bike_id, username,
 					is_returned_bool, start_time_stamp_instant,
-					end_time_stamp_instant);
+					end_time_stamp_instant, station_from, station_to);
 
 			ride.setRideLength(rideLength);
 			updateRidePayment(uuid_id, payment);
@@ -266,7 +287,7 @@ public class ValleyBikeSim {
 		}
 	}
 
-	/**
+	/*
 	 * Updates the number of maintenance requests at a station
 	 *
 	 * @param stationId the station id that will get updated
@@ -275,7 +296,7 @@ public class ValleyBikeSim {
 	 */
 	static void updateStationMntRqsts(int stationId, int mntRqsts) throws ClassNotFoundException {
 		String sql = "UPDATE Station SET trq_mnt = ? "
-				+ "WHERE id = ?";
+		+ "WHERE id = ?";
 
 		//update sql database
 		try (Connection conn = connectToDatabase();
@@ -319,6 +340,46 @@ public class ValleyBikeSim {
 		}
 		System.out.println("Your ride has been successfully added to your history.");
 	}
+
+	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
+		String sql = "UPDATE Station SET bikes = ? "
+				+ "WHERE id = ?";
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setInt(1, bikes);
+			pstmt.setInt(2, stationId);
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update station's bikes nums in database at this time.");
+		}
+	}
+
+	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
+		String sql = "UPDATE Station SET bike_string = ? "
+				+ "WHERE id = ?";
+		stationsMap.get(stationId).addToBikeList(bikeId);
+		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, bikeIdsString);
+			pstmt.setInt(2, bikeId);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not add ride id to list in database at this time.");
+		}
+
+		System.out.println("Your ride has been successfully added to your history.");
+	}
+
 
 	/**
 	 * Update the station id that the bike is registered at
@@ -1048,7 +1109,7 @@ public class ValleyBikeSim {
 	 */
 	static void viewBikeList() {
 		// format table view
-		System.out.format("%-15s%-15s%-15s%-15s%-15s\n", "ID", "Location", "Station ID",
+		System.out.format("%-10s%-10s%-10s%-10s%-10s\n", "ID", "Location", "Stat. ID",
 				"Main. Req", "Main. Report");
 
 		// while the iterator has a next value
@@ -1058,7 +1119,7 @@ public class ValleyBikeSim {
 			Bike bike = bikesMap.get(key);
 
 			// format the view of the bike object values
-			System.out.format("%-15d%-15d%-15d%-15s%-15s\n",
+			System.out.format("%-10d%-10d%-10d%-10s%-10s\n",
 					key,
 					bike.getBikeLocation(),
 					bike.getStation(),
@@ -1111,8 +1172,8 @@ public class ValleyBikeSim {
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, membership, balance) " +
-					"VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, balance, last_ride_is_returned, enabled, ride_id_string) " +
+					"VALUES(?,?,?,?,?,?,?,?)";
 
 			//add customer account to database
 			try (Connection conn = connectToDatabase();
@@ -1121,8 +1182,10 @@ public class ValleyBikeSim {
 				pstmt.setString(2, customerAccount.getPassword());
 				pstmt.setString(3, customerAccount.getEmailAddress());
 				pstmt.setString(4, customerAccount.getCreditCard());
-				pstmt.setInt(5, customerAccount.getMembership().getMembershipInt());
-				pstmt.setInt(6, customerAccount.getBalance());
+				pstmt.setInt(5, customerAccount.getBalance());
+				pstmt.setInt(6, booleanToInt(customerAccount.getIsReturned()));
+				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
+				pstmt.setString(8, customerAccount.getRideIdListToString());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
@@ -1132,6 +1195,10 @@ public class ValleyBikeSim {
 			//add the new customer account object to customer account map
 			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
+	}
+
+	private static int booleanToInt(boolean myBoolean) {
+		return myBoolean ? 1 : 0;
 	}
 
 	/**
@@ -1183,13 +1250,9 @@ public class ValleyBikeSim {
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		Membership membershipType = checkMembershipType(membership);
-		// CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
-		//set date they joined this membership
-		membershipType.setMemberSince(LocalDate.now());
-		// set their last account payment date to today
-		membershipType.setLastPayment(LocalDate.now());
-		//TODO: fake paying for monthly and yearly membership
+    	Membership membershipType = checkMembershipType(membership);
+
+    	//TODO: Pay for monthly and yearly membership
 
 		//create instance of customer object
 		CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
@@ -1197,6 +1260,19 @@ public class ValleyBikeSim {
 		addCustomerAccount(customerAccount);
 	}
 
+
+	static Membership checkMembershipType(int membership, int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+		if (membership == 1){
+			return new PayAsYouGoMembership(totalRidesLeft, lastPayment, memberSince);
+		}
+		if (membership == 2){
+			return new MonthlyMembership(totalRidesLeft, lastPayment, memberSince);
+		}
+		if (membership == 3){
+			return new YearlyMembership(totalRidesLeft, lastPayment, memberSince);
+		}
+		return null;
+	}
 
 	/**
 	 * Verify username and password when a customer logs in to their account
@@ -1224,6 +1300,18 @@ public class ValleyBikeSim {
 		//if the username and password both match with associated customer account object, lead the user to user account home
 		ValleyBikeController.customerAccountHome(username);
 	}
+
+	static void viewLongestRide(String username){
+		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
+		long longestRide = 0;
+		UUID longestRideId;
+		for (UUID ride: rideIdList){
+			if (rideMap.get(ride).getRideLength() > longestRide){
+				longestRide = rideMap.get(ride).getRideLength();
+			}
+		}
+	}
+
 
 	/**
 	 * Verify username and password when an internal staff logs in to their account
@@ -1269,8 +1357,8 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kiosk, address) " +
-					"VALUES(?,?,?,?,?,?,?,?)";
+					"capacity, kiosk, address, bike_string) " +
+					"VALUES(?,?,?,?,?,?,?,?,?)";
 
 			//add station to database
 			try (Connection conn = connectToDatabase();
@@ -1283,7 +1371,8 @@ public class ValleyBikeSim {
 				pstmt.setInt(6, station.getCapacity());
 				pstmt.setInt(7, station.getKioskNum());
 				pstmt.setString(8, station.getAddress());
-				pstmt.executeUpdate();
+                pstmt.setString(9, "");
+                pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
@@ -1303,7 +1392,7 @@ public class ValleyBikeSim {
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		if (stationsMap.get(bike.getId()) != null) { //if bike id already in system, inform user
+		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
 			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 			ValleyBikeController.initialMenu();
@@ -1346,8 +1435,8 @@ public class ValleyBikeSim {
 			//TODO is this the message you want to say? Do you want to return to initial menu? NS
 		} else { //id ride id valid, add to system
 			String sql = "INSERT INTO Ride(ride_id, bike_id, username, is_returned, " +
-					"ride_length, start_time_stamp, end_time_stamp, payment) " +
-					"VALUES(?,?,?,?,?, ?, ?, ?)";
+					"ride_length, start_time_stamp, end_time_stamp, payment, station_to, station_from) " +
+					"VALUES(?,?,?,?,?,?,?, ?,?, ?)";
 
 			//add ride to database
 			try (Connection conn = connectToDatabase();
@@ -1367,6 +1456,8 @@ public class ValleyBikeSim {
 				pstmt.setLong(6, ride.getRideLength());
 				pstmt.setString(7, ride.getStartTimeStamp().toString());
 				pstmt.setString(8, ride.getEndTimeStamp().toString());
+				pstmt.setInt(9, ride.getStationFrom());
+				pstmt.setInt(10, ride.getStationTo());
 
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
@@ -1379,6 +1470,31 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * Move a bike to a different (or no) station
+	 * Also sets station data to match this move
+	 *
+	 * @param newStationValue - station ID of the station the bike is moving to
+	 */
+	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
+		//TODO ME why check if bike's station is 0 then get the station?
+	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
+	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
+			oldStation.removeFromBikeList(bike); // remove bike from station's bike list
+		}
+
+        updateBikeStationId(bike.getId(), newStationValue);
+
+		if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
+			Station newStation = stationsMap.get(bike.getStation()); // get new station object
+			updateStationBikeList(bike.getStation(), bike.getId());
+			updateBikeLocation(bike.getId(), 0);
+		}
+
+		else {
+			updateBikeLocation(bike.getId(), 2);
+		}
+	}
 
 	/**
 	 * Iterates through stations to determine ideal percentage of vehicles to capacity
@@ -1461,7 +1577,8 @@ public class ValleyBikeSim {
 						int bikeID = bikesAtStation.pop();
 						Bike bike = getBikeObj(bikeID);
 						extraBikes.push(bike);
-						bike.moveStation(0); // set bike's station to 0, or no station
+						moveStation(bike,0); // set bike's station to 0, or no station
+
 						//new capacity percentage after reassigning
 						newPercentage = (int) (((float) (station.getBikes()) / station.getCapacity()) * 100);
 					}
@@ -1483,7 +1600,6 @@ public class ValleyBikeSim {
 	 * @param extraBikes       - stack of extra bikes to put in stations
 	 */
 	private static void reassignLowPercentage(Map<Integer, Integer> stationsCapacity, int idealPercentage, Deque<Bike> extraBikes) throws ClassNotFoundException {
-
 		//loop through stations and add bikes until matches ideal capacity
 		for (Integer stationKey : stationsCapacity.keySet()) {
 			Station station = stationsMap.get(stationKey);
@@ -1499,7 +1615,7 @@ public class ValleyBikeSim {
 
 				if (!extraBikes.isEmpty()) { // while stack isn't empty
 					Bike bike = extraBikes.pop(); // get a bike from our stack
-					bike.moveStation(stationKey); // move this bike to the current station
+					moveStation(bike, stationKey); // move this bike to the current station
 				} else {
 					return;
 				} // return when stack is empty
