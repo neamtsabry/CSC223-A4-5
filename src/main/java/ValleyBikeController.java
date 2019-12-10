@@ -155,7 +155,7 @@ public abstract class ValleyBikeController {
         //if user wants to log out take them back to initial menu
         if (password.contentEquals("0")){ return; }
 
-        while (password != ValleyBikeSim.getInternalObj(username).getPassword()){
+        while (!password.equals(ValleyBikeSim.getInternalObj(username).getPassword())){
             System.out.println("Invalid password. Please try again.");
             System.out.println("Please enter your password or '0' to cancel:");
             password = input.nextLine();
