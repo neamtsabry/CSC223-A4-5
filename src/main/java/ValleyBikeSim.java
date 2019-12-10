@@ -1054,7 +1054,7 @@ public class ValleyBikeSim {
 
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
-	 * gone on for too long (in which caase they are charged)
+	 * gone on for too long (in which case they are charged)
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
@@ -1067,11 +1067,19 @@ public class ValleyBikeSim {
 			UUID ride = customer.getLastRideId();
 			if (rideMap.get(ride).isRented24Hours()) {
 				// if rental exceeds 24 hours, charge account 150 and notify user
+				//credit card was pre-validated when bike was rented to ensure charge would be valid
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO wht do we do with rented bike? delete from system? Keep in system at station 0?
-				// do we reset customer's account so they can make more rentals now that they've paid the fine?
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
+				//and tell them to contact customer service
+				//TODO end station is 0
+				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
+				//this allows users to continue to rent bikes, since they have paid the charge
+				Ride rideObj = getRideObj(ride);
+				rideObj.setIsReturned(true);
+				rideObj.setEndTimeStamp(Instant.now());
+				customerAccountMap.get(username).setLastRideIsReturned(true);
+
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +

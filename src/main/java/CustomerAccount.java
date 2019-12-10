@@ -13,8 +13,8 @@ public class CustomerAccount extends Account{
     /** This field is the membership type that the customer is paying for */
     private Membership membership;
 
-    /** This field is the balance of the customer in their account */
-    private int balance;
+    /** This field is the running total of money customer has spent paying for rides */
+    private double balance;
 
     // stack of ride ids user has
     private ArrayList<UUID> rideIdList;
@@ -82,7 +82,7 @@ public class CustomerAccount extends Account{
      * This is the setter method to update balance
      * @param balance is the new balance of the user
      */
-    void setBalance(int balance) {
+    void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -98,7 +98,7 @@ public class CustomerAccount extends Account{
      * This is the getter method to access the balance associated with the customer account
      * @return the balance associated with the customer account
      */
-    int getBalance() {
+    double getBalance() {
         return balance;
     }
 
@@ -116,10 +116,6 @@ public class CustomerAccount extends Account{
 
     Boolean getIsReturned(){
         return this.lastRideIsReturned;
-    }
-
-    void setIsReturned(Boolean isReturnedValue){
-        this.lastRideIsReturned = isReturnedValue;
     }
 
     ArrayList<UUID> getRideIdList() {
@@ -144,9 +140,5 @@ public class CustomerAccount extends Account{
 
     public void setLastRideIsReturned(boolean lastRideIsReturned) {
         this.lastRideIsReturned = lastRideIsReturned;
-    }
-
-    public boolean isLastRideIsReturned() {
-        return lastRideIsReturned;
     }
 }
