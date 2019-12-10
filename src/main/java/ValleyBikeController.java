@@ -79,7 +79,7 @@ public abstract class ValleyBikeController {
      */
     static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //check whether it's time to renew customer's memberships
-        //ValleyBikeSim.checkMembershipRenewalTime();
+        ValleyBikeSim.checkMembershipRenewalTime();
 
         System.out.print("\nPlease choose from one of the following menu options: \n"
                 + "1: Create Customer Account "
@@ -142,13 +142,13 @@ public abstract class ValleyBikeController {
         System.out.println("Customer account successfully created!");
 
         if (membership == 2) {
-            System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew" +
-                    "each month, and you will get an email notification when your card is charged." +
-                    "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+            System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew each month, \n" +
+                    " and you will get an email notification when your card is charged. \n" +
+                    " If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
         } else if (membership == 3) {
-            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew" +
-                    "each month, and you will get an email notification when your card is charged." +
+            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
+                    " and you will get an email notification when your card is charged. \n" +
                     "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
         }
@@ -252,24 +252,23 @@ public abstract class ValleyBikeController {
 
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         //menu option for customer account home
-        System.out.println("\nPlease choose from one of the following menu options:\n"
-                + "1: View and edit account info "
-                + "2: View account balance "
-                + "3: View station list "
-                + "4: View station list. ");
+        System.out.print("\nPlease choose from one of the following menu options:\n"
+                + "1: View and edit account info. "
+                + "2: View account balance. "
+                + "3: View station list. ");
 
         //if customer does not have a bike rented, allow option to rent
         //otherwise, give option to return
-        if (customer.getIsReturned()) { System.out.print("5: Rent a bike"); }
-        else { System.out.print("5: Return bike"); }
+        if (customer.getIsReturned()) { System.out.print("4: Rent a bike. "); }
+        else { System.out.print("4: Return bike. "); }
 
-        System.out.print("6: Report a problem "
-                + "7: View total number of rides "
-                + "8: View average ride time "
-                + "9: View your most popular ride time. "
-                + "10: Delete account. "
-                + "0: Log out \n" +
-                "Please enter your selection (0-5):");
+        System.out.print("6: Report a problem. "
+                + "5: View total number of rides. "
+                + "6: View average ride time. "
+                + "7: View your most popular ride time. "
+                + "8: Delete account. "
+                + "9: Log out. \n" +
+                "Please enter your selection (0-5): \n");
 
         // if input is not a integer
         if (!input.hasNextInt()){
@@ -287,17 +286,14 @@ public abstract class ValleyBikeController {
                 editCustomerAccount(username);
                 break;
             case 2:
-               //TODO view account activity
-                break;
-            case 3:
                 //view account balance
                 System.out.println("Your account balance is "+ ValleyBikeSim.viewAccountBalance(username));
                 break;
-            case 4:
+            case 3:
                 //view station list
                 ValleyBikeSim.viewStationList();
                 break;
-            case 5:
+            case 4:
                 // if customer has no ongoing rentals, help user rent a bike
                 if (customer.getIsReturned()) { rentBike(username); }
                 else { //else, user can return a bike
@@ -305,21 +301,21 @@ public abstract class ValleyBikeController {
                     returnBike(username, lastRideId);
                 } // if customer has ongoing rental, help user return bike
                 break;
-            case 6:
+            case 5:
                 reportProblem(username);
                 break;
-            case 7:
+            case 6:
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
                 break;
-            case 8:
+            case 7:
                 System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
                 break;
-            case 9:
+            case 8:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
                 System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
                 System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 break;
-            case 10:
+            case 9:
                 ValleyBikeSim.disableCustomerAccount(username);
                 break;
             case 0:
@@ -383,7 +379,8 @@ public abstract class ValleyBikeController {
         }
         System.out.println("\nEmail Address: " + customer.getEmailAddress());
         System.out.println("Credit Card: " + customer.getCreditCard().substring(11));
-        System.out.println("Membership: " + customer.getMembership().getMembershipString());
+        //TODO returns a null pointer exception AG
+        //System.out.println("Membership: " + customer.getMembership().getMembershipString());
     }
 
 
@@ -445,10 +442,20 @@ public abstract class ValleyBikeController {
             case 5:
                 //remember this menu so we can return later
                 menuPath.push(21);
-
                 //edit membership type
                 int newMembership = enterMembership();
-                ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                //validate credit card if customer wants to switch to paid membership
+                if (newMembership == 2 || newMembership == 3) {
+                    String creditcard = ValleyBikeSim.getCustomerObj(username).getCreditCard();
+                    if (!isValidCreditCard(creditcard)) {
+                        //if cc is not valid, do not allow them to switch memberships.
+                        System.out.println("Sorry, your credit card is not valid. You cannot switch to a paying membership at this time. \n" +
+                                "Please ensure your credit card information is updated and try again. ");
+                    } else {
+                        //if credit card is valid, switch memberships
+                        ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                    }
+                }
                 break;
             case 0:
                 return;
@@ -1223,7 +1230,7 @@ public abstract class ValleyBikeController {
         do {//loops until user inputs 0 or valid password
             //prompts user to input credit card
             System.out.println("Enter credit card number" +
-                    " (must be a 14 digit number with no spaces or dashes)" +
+                    " (must be a 16 digit number with no spaces or dashes)" +
                     " or '0' to cancel:");
             creditCard = input.nextLine();
 
