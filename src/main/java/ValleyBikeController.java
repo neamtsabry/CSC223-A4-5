@@ -228,10 +228,10 @@ public abstract class ValleyBikeController {
 
         //if customer does not have a bike rented, allow option to rent
         //otherwise, give option to return
-        if (customer.getIsReturned()) { System.out.println("5: Rent a bike"); }
-        else { System.out.println("5: Return bike"); }
+        if (customer.getIsReturned()) { System.out.print("5: Rent a bike"); }
+        else { System.out.print("5: Return bike"); }
 
-        System.out.println("6: Report a problem "
+        System.out.print("6: Report a problem "
                 + "7: View total number of rides "
                 + "8: View average ride time "
                 + "9: View your most popular ride time. "
@@ -784,7 +784,7 @@ public abstract class ValleyBikeController {
                 + "10: Equalize stations. "
                 + "11: View total number of users. "
                 + "12: View total number of maintenance requests. "
-                + "13: View most popular ride time of the day. "
+                + "13: View most popular station. "
                 + "0: Log out. \n");
         System.out.println("Please enter your selection (1-9): ");
 
