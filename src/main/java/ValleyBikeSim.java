@@ -1090,8 +1090,9 @@ public class ValleyBikeSim {
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 				//and tell them to contact customer service
 				//TODO end station is 0
-				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
-				//this allows users to continue to rent bikes, since they have paid the charge
+				//ASSUMPTION: if bike has been rented over 24 hours, it is probably lost or stolen forever
+				//so proceed like ride has been returned, to "station 0" (the checked-out station)
+				//this allows user to rent bikes again, and prevents them from being fined again for same bike
 				Ride rideObj = getRideObj(ride);
 				rideObj.setIsReturned(true);
 				rideObj.setEndTimeStamp(Instant.now());
