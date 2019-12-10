@@ -460,7 +460,6 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.updateInternalEmailAddress(username, newEmail);
                 break;
             case 0:
-                //TODO this returns us to initial menu we want internal account home GRACE
                 menuPath.pop();// we no longer have to keep track of this menu
                 return;
             default:
@@ -852,7 +851,6 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //edit this internal account
-                //TODO push menu so can return
                 editInternalAccount(username);
                 break;
             case 3:
