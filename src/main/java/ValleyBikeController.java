@@ -894,20 +894,20 @@ public abstract class ValleyBikeController {
     static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt user to pick option from main internal menu
         System.out.print("\n Choose from the following:\n"
-                + "1: Create new internal account\t"
-                + "2: Edit account information\t"
-                + "3: View and edit customer account information\t"
+                + "1: Create new internal account \t"
+                + "2: Edit account information \t"
+                + "3: View and edit customer data \t"
                 // + "4: View customer balances\t"
                 // + "5: View customer activity\t"
-                + "4: Add new station\t"
+                + "4: Add new station \t"
                 + "5: Add new bike\n"
-                + "6: View station list\t"
-                + "7: View bike list\t"
-                + "8: Edit/Resolve maintenance requests\t"
-                + "9: Equalize stations\t"
+                + "6: View station list \t"
+                + "7: View bike list \t"
+                + "8: Edit/Resolve maintenance requests \t"
+                + "9: Equalize stations \t"
                 + "10: View total number of users\n"
-                + "11: View total number of maintenance requests\t"
-                + "12: View most popular station\t"
+                + "11: View total number of maintenance requests \t"
+                + "12: View most popular station \t"
                 + "0: Log out\n");
 
         //get and validate user response
@@ -1067,7 +1067,7 @@ public abstract class ValleyBikeController {
 
         // check for '0' input and return to previous menu
         //TODO Grace - check on this return call
-        if (username.contentEquals("0")) { returnToLastMenu(null); }
+        if (Objects.equals(username, "0")) { returnToLastMenu(null); }
 
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 
@@ -1121,7 +1121,12 @@ public abstract class ValleyBikeController {
      */
     private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // use helper function to check input is valid and save it
-        int id = getResponseBetween(10, 1000, "Please enter the ID for this station ('111') or '0' to cancel:");
+        int id = getResponseBetween(0, 1000, "Please enter the ID for this station ('111') or '0' to cancel:");
+
+        //check for 0 input and return
+        if (id==0){
+            System.out.println("Station creation canceled.");
+            return; }
 
         // handle if the station already exists
         while(ValleyBikeSim.stationsMapContains(id)){
@@ -1129,17 +1134,33 @@ public abstract class ValleyBikeController {
             System.out.println("Station with this ID already exists.");
 
             // re-prompt user for station id
-            id = getResponse("Please re-enter the ID for this station:");
+            id = getResponseBetween(0, 1000,"Please re-enter the ID for this station:");
+            // assumption: since station id cannot be greater than 1000,
+            // we are assuming the system will never contain more than 10^3 stations
+            // therefore, each station can have a unique id
+
+            //check for 0 input and return
+            if (id==0){
+                System.out.println("Station creation canceled.");
+                return; }
         }
 
         // prompt user for station name
-        System.out.println("Please enter station name: ");
+        System.out.println("Please enter station name or '0' to cancel: ");
         input.nextLine();
         String name = input.nextLine();
+
+        //check for 0 input and return
+        if (Objects.equals(name, "0")){
+            System.out.println("Station creation canceled.");
+            return;
+        }
+        //TODO GRACE check string length
 
         // assume new station starts off with no maintenance requests
         Integer maintenanceRequest = 0;
 
+        //TODO GRACE! CHECK FOR CANCEL KEY!!!
         // prompt capacity for station
         Integer capacity = getResponseBetween(5, 37, "What is the station's capacity (5-37)?");
 
@@ -1186,7 +1207,10 @@ public abstract class ValleyBikeController {
      */
     static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // get new bike's id
-        int id = getResponseBetween(10, 1000, "Please enter the bike's ID ('111')");
+        int id = getResponseBetween(0, 1000, "Please enter the bike's ID ('111')");
+        // assumption: since bike id cannot be greater than 1000,
+        // we are assuming the system will never contain more than 10^3 bikes
+        // therefore, each bike can have a unique id
 
         // if the bike already exists
         while(ValleyBikeSim.getBikeObj(id) != null){
