@@ -1055,6 +1055,7 @@ public class ValleyBikeSim {
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
 	 * gone on for too long (in which case they are charged)
+	 * Credit card was validated when bike was rented so does not need to be validated again to charge them
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */

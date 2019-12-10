@@ -141,6 +141,18 @@ public abstract class ValleyBikeController {
         //Let the user know the account has been successfully created
         System.out.println("Customer account successfully created!");
 
+        if (membership == 2) {
+            System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew" +
+                    "each month, and you will get an email notification when your card is charged." +
+                    "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+                    "and notified via email. ");
+        } else if (membership == 3) {
+            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew" +
+                    "each month, and you will get an email notification when your card is charged." +
+                    "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+                    "and notified via email. ");
+        }
+
         menuPath.pop();// we no longer need to remember this menu
 
         //instead of returning to previous menu,
@@ -484,17 +496,14 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-        //check membership, and if pay-as-you-go make sure credit card is still valid before continuing
-        int membership = ValleyBikeSim.viewMembershipType(username).getMembershipInt();
-        if (membership == 1) {
-            String creditCard = ValleyBikeSim.viewCreditCard(username);
-            //check validity of credit card, send them back to home menu if not valid
-            if (!isValidCreditCard(creditCard)) {
-                System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
+        //validate credit card before allowing rental- to make sure they can pay
+        String creditCard = ValleyBikeSim.viewCreditCard(username);
+        //check validity of credit card, send them back to home menu if not valid
+        if (!isValidCreditCard(creditCard)) {
+            System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
                         " in your account is correct, then try again.");
-                return; // return to customerAccountHome
-            }
-        } //if there is no problem, continue with rental
+            return; // return to customerAccountHome
+        }
 
         // View stations
         System.out.println("STATION LIST:");
@@ -676,29 +685,57 @@ public abstract class ValleyBikeController {
             System.out.println();
         }
 
-        //check how many free rides remain in account to determine how to charge for rental
+        calculateRentalCharge(username, rideObj, lastRideId);
+
+        System.out.println("You're all done! Thank you for returning this bike.");
+        // take user back to their account home
+        customerAccountHome(username);
+    }
+
+    /**
+     * helper method for bike return that calculates cost of rental and charges customer
+     * The credit card was validated when rental was made, so it does not need to be validated again
+     * @param username username of account that made the rental
+     * @param rideObj ride object that represents the ride information
+     * @param lastRideId id of the ride object
+     * @throws ClassNotFoundException
+     */
+    private static void calculateRentalCharge(String username, Ride rideObj, UUID lastRideId) throws ClassNotFoundException {
+        //check how many included rides remain in account to determine how to charge for rental
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
+        long rideLength = rideObj.getRideLength();
+        long paymentDue;
         //if pay-as-you-go or no free rides remaining on membership, charge by time
         if (ridesLeft == 0) {
-            long rideLength = rideObj.getRideLength();
             //card was already validated before bike rented to ensure they can pay for the rental
             //ride cost is 15c per minute
-            long paymentDue = rideLength * (long) .15;
+            paymentDue = rideLength * (long) .15;
             //update balance to add new ride payment
             double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
-
             //update ride payment in ride object
             ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
 
         } else {
-            //otherwise merely decrement rides remaining in membership, payment is 0
+            //otherwise decrement rides remaining in membership
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
-            ValleyBikeSim.updateRidePayment(lastRideId, 0.00);
+            //calculate whether there is an overtime charge (for a ride longer than 1hr)
+
+            if (rideLength > 60L) {
+                long paymentLength = rideLength - 60L;
+                //ride cost is 15c per minute after 1st hour
+                paymentDue = paymentLength * (long) .15;
+                //update balance to add new ride payment
+                double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+                ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
+            } else {
+                //ride is free if under 1hr
+                paymentDue = 0L;
+                ValleyBikeSim.updateRidePayment(lastRideId, 0.00);
+            }
         }
-        System.out.println("You're all done! Thank you for returning this bike.");
-        // take user back to their account home
-        customerAccountHome(username);
+        //inform customer of the charge
+        System.out.println("You have been charged " + paymentDue + "for your ride." );
     }
 
 
