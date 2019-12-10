@@ -671,7 +671,7 @@ public abstract class ValleyBikeController {
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
         ValleyBikeSim.updateRideIdList(username, rideId);
-        ValleyBikeSim.updateLastRideisReturned(username, false);
+        ValleyBikeSim.updateCustomerLastRideisReturned(username, false);
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
@@ -745,7 +745,7 @@ public abstract class ValleyBikeController {
 
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
-        ValleyBikeSim.updateLastRideisReturned(username, true);
+        ValleyBikeSim.updateCustomerLastRideisReturned(username, true);
 
         System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
         System.out.println();
@@ -997,7 +997,7 @@ public abstract class ValleyBikeController {
         String customerUsername = input.nextLine();
 
         // check for '0' input and return to previous menu
-        //if (customerUsername.contentEquals("0")) { returnToLastMenu(username); }
+        if (Objects.equals(customerUsername, "0")) { returnToLastMenu(username); }
 
         // keep asking for input if it isn't a valid customer username
         while (! ValleyBikeSim.accountMapsContain(customerUsername, 1)){
@@ -1034,7 +1034,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view customer balance
-                //TODO view customer balance
+                System.out.println("Account balance for" + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
                 break;
             case 3:
                 // view customer ride data
