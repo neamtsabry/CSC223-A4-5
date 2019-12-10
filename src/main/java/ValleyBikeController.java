@@ -189,16 +189,36 @@ public abstract class ValleyBikeController {
             System.out.println("That is not a valid input. Please try again.");
             logIn();
         }
+//TODO COME BACK TO HERE!!!
+        //prompt the user to input their username
+        System.out.println("Please enter your username or '0' to cancel:");
+        String username = input.nextLine();
 
-        // push log in menu to our stack in case we want to return
-        menuPath.push(0);
+        //if user wants to log out take them back to initial menu
+        if (username.contentEquals("0")){
+            return;
+        }
 
-        //TODO validate that username exists in the system right away!
-        //prompt the user to input their username and password
-        String username = enterUsername(null);
-        String password = enterPassword(null);
+        while ((logIn == 1) && (!ValleyBikeSim.accountMapsContain(username, 1)) ||
+                (logIn == 2) && (!ValleyBikeSim.accountMapsContain(username, 2))){
+            System.out.println("Username does not exist. Please try again.");
+            System.out.println("Please enter your username or '0' to cancel:");
+            username = input.nextLine();
 
-        menuPath.pop();// we no longer need to remember this menu
+            //if user wants to log out take them back to initial menu
+            if (username.contentEquals("0")){
+                return;
+            }
+        }
+
+        //prompt the user to input their password
+        System.out.println("Please enter your password or '0' to cancel:");
+        String password = input.nextLine();
+
+        //if user wants to log out take them back to initial menu
+        if (password.contentEquals("0")){
+            return;
+        }
 
         switch (logIn){
             case 1:
@@ -240,10 +260,10 @@ public abstract class ValleyBikeController {
 
         //if customer does not have a bike rented, allow option to rent
         //otherwise, give option to return
-        if (customer.getIsReturned()) { System.out.println("5: Rent a bike"); }
-        else { System.out.println("5: Return bike"); }
+        if (customer.getIsReturned()) { System.out.print("5: Rent a bike"); }
+        else { System.out.print("5: Return bike"); }
 
-        System.out.println("6: Report a problem "
+        System.out.print("6: Report a problem "
                 + "7: View total number of rides "
                 + "8: View average ride time "
                 + "9: View your most popular ride time. "
@@ -821,7 +841,7 @@ public abstract class ValleyBikeController {
                 + "10: Equalize stations. "
                 + "11: View total number of users. "
                 + "12: View total number of maintenance requests. "
-                + "13: View most popular ride time of the day. "
+                + "13: View most popular station. "
                 + "0: Log out. \n");
         System.out.println("Please enter your selection (1-9): ");
 
@@ -1023,6 +1043,7 @@ public abstract class ValleyBikeController {
         // get new bike's id
         //TODO GRACE validate length of bike id
         int id = getResponse("Please enter the bike's ID");
+
 
         // if the bike already exists
         while(ValleyBikeSim.getBikeObj(id) != null){
@@ -1241,6 +1262,8 @@ public abstract class ValleyBikeController {
      * @return true if username is valid and false otherwise
      */
     public static boolean isValidUsername(String username){
+
+
         if((username==null)||(username.length()<6)||(username.length()>14)){
             System.out.println("Username is not the correct length. " +
                     "Make sure you are entering a username between 6 and 14 characters long. " +
@@ -1262,7 +1285,7 @@ public abstract class ValleyBikeController {
      * @return true if password is valid and false otherwise
      */
     public static boolean isValidPassword(String password){
-        if ((password != null)&&(password.length()<6)||(password.length()>14)) {
+        if ((password == null)||(password.length()<6)||(password.length()>14)) {
             System.out.println("Password is not the correct length. Please try again.");
             return false;
         }
