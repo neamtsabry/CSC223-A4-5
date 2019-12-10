@@ -155,7 +155,7 @@ public abstract class ValleyBikeController {
         //if user wants to log out take them back to initial menu
         if (password.contentEquals("0")){ return; }
 
-        while (!password.equals(ValleyBikeSim.getCustomerObj(username).getPassword())){
+        while (!password.equals(ValleyBikeSim.getInternalObj(username).getPassword())){
             System.out.println("Invalid password. Please try again.");
             System.out.println("Please enter your password or '0' to cancel:");
             password = input.nextLine();
@@ -307,7 +307,6 @@ public abstract class ValleyBikeController {
         System.out.println("Internal account successfully created!");
 
         menuPath.pop();// we no longer need to remember this menu
-        return;
     }
 
     /**
@@ -330,9 +329,9 @@ public abstract class ValleyBikeController {
                 "\nUsername: " + customer.getUsername() +
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
+                "\nCredit Card: ************" + customer.getCreditCard().substring(12));
                 //TODO returns a null pointer exception AG
-                //"\nCredit Card: ************" + customer.getCreditCard().substring(12) +
-                "\nMembership: " + customer.getMembership().getMembershipString());
+                //"\nMembership: " + customer.getMembership().getMembershipString());
     }
 
 
@@ -408,7 +407,7 @@ public abstract class ValleyBikeController {
                 }
                 break;
             case 0:
-                //TODO GRACE check on this
+                //TODO GRACE check on this-- it returns to initial menu not customer home
                 returnToLastMenu(username);
             default:
                 //if none of the other options, must not be valid
@@ -1043,7 +1042,7 @@ public abstract class ValleyBikeController {
      */
     private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // use helper function to check input is valid and save it
-        int id = getResponse("Please enter the ID for this station or '0' to cancel:");
+        int id = getResponseBetween(10, 1000, "Please enter the ID for this station ('111') or '0' to cancel:");
 
         // handle if the station already exists
         while(ValleyBikeSim.stationsMapContains(id)){
@@ -1108,8 +1107,7 @@ public abstract class ValleyBikeController {
      */
     static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // get new bike's id
-        //TODO GRACE validate length of bike id
-        int id = getResponse("Please enter the bike's ID");
+        int id = getResponseBetween(10, 1000, "Please enter the bike's ID ('111')");
 
 
         // if the bike already exists
@@ -1218,9 +1216,9 @@ public abstract class ValleyBikeController {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
-            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel:");
+            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel: ");
             username = input.nextLine();
-
+            //System.out.println("hihi"+username+"hihi");
             // check for '0' input and return to previous menu
             if (username.contentEquals("0")) { returnToLastMenu(creator); }
 
