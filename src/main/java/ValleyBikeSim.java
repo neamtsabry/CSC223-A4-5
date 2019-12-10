@@ -792,15 +792,12 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 */
 	static void updateLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
-		//TODO neamat implement in correct place, this method also updates the customer map obj
 		String sql = "UPDATE Customer_Account SET last_ride_is_returned = ? "
 				+ "WHERE username = ?";
 
-		int lastRideReturnedInt;
+		int lastRideReturnedInt = 0;
 		if (lastRideisReturned) {
 			lastRideReturnedInt = 1;
-		} else {
-			lastRideReturnedInt = 0;
 		}
 
 		//update field in database
