@@ -1,4 +1,5 @@
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -96,7 +97,7 @@ public class ValleyBikeSim {
 	 * @param stmt //TODO
 	 * @throws SQLException
 	 */
-	private static void readCustomerAccountData(Statement stmt) throws SQLException {
+	private static void readCustomerAccountData(Statement stmt) throws SQLException, ClassNotFoundException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Customer_Account");
 		//get each value from each line in database
 		while (rs.next()) {
@@ -104,15 +105,19 @@ public class ValleyBikeSim {
 			String password = rs.getString("password");
 			String emailAddress = rs.getString("email_address");
 			String creditCard = rs.getString("credit_card");
-			Membership membership = readMembershipData(stmt, username);
+			Membership membership = readMembershipData(username);
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
-			int balance = Integer.parseInt(rs.getString("balance"));
+			double balance = rs.getDouble("balance");
 			String rideIdString = rs.getString("ride_id_string");
 			ArrayList<UUID> rideIdList = new ArrayList<>();
-			if (rideIdString != null) {
+			if (rideIdString != null && rideIdString.length() > 0){
 				for (String ride : rideIdString.split(",")) {
-					rideIdList.add(UUID.fromString(ride));
+					String s2 = ride.replace("-", "");
+					UUID uuid = new UUID(
+							new BigInteger(s2.substring(0, 16), 16).longValue(),
+							new BigInteger(s2.substring(16), 16).longValue());
+					rideIdList.add(uuid);
 				}
 			}
 			//create customer account from info
@@ -126,19 +131,30 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static Membership readMembershipData(Statement stmt, String username) throws SQLException{
-		String query = "SELECT * FROM Membership WHERE username = " + username;
-		ResultSet rs = stmt.executeQuery(query);
+	private static Membership readMembershipData(String username) throws ClassNotFoundException, SQLException{
+		String sql = "SELECT * FROM Membership WHERE username = ?";
 
-		int totalRidesLeft = rs.getInt("total_rides_left");
-		int type = rs.getInt("type");
-		LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
-		LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
-
+		int totalRidesLeft = 0;
+		int type = 0;
+		LocalDate lastPayment = null;
+		LocalDate memberSince = null;
+		//update sql database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)){
+			// set the corresponding param
+			pstmt.setString(1, username);
+			ResultSet rows = pstmt.executeQuery();
+			while(rows.next())
+			{
+				totalRidesLeft = rows.getInt("total_rides_left");
+				type = rows.getInt("type");
+				lastPayment = LocalDate.parse(rows.getString("last_payment"), formatter);
+				memberSince = LocalDate.parse(rows.getString("member_since"), formatter);
+			}
+		}
 		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
 	}
-
-	/**
+		/**
 	 * Reads in info from database and converts to internal account objects that get stored in data structure
 	 *
 	 * @param stmt //TODO
@@ -1035,7 +1051,8 @@ public class ValleyBikeSim {
 
 	/**
 	 * Method to check whether customer already has a bike rented and whether the rental has
-	 * gone on for too long (in which caase they are charged)
+	 * gone on for too long (in which case they are charged)
+	 * Credit card was validated when bike was rented so does not need to be validated again to charge them
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
@@ -1043,16 +1060,25 @@ public class ValleyBikeSim {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 		// true if last ride was returned
+		//TODO Neamat when I was running the code I got a null pointer error from here from account home
 		Boolean isReturned = customer.getIsReturned();
 		if (!isReturned) {
 			UUID ride = customer.getLastRideId();
 			if (rideMap.get(ride).isRented24Hours()) {
 				// if rental exceeds 24 hours, charge account 150 and notify user
+				//credit card was pre-validated when bike was rented to ensure charge would be valid
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
-				//TODO wht do we do with rented bike? delete from system? Keep in system at station 0?
-				// do we reset customer's account so they can make more rentals now that they've paid the fine?
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
+				//and tell them to contact customer service
+				//TODO end station is 0
+				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
+				//this allows users to continue to rent bikes, since they have paid the charge
+				Ride rideObj = getRideObj(ride);
+				rideObj.setIsReturned(true);
+				rideObj.setEndTimeStamp(Instant.now());
+				customerAccountMap.get(username).setLastRideIsReturned(true);
+
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -1090,6 +1116,18 @@ public class ValleyBikeSim {
 				}
 			}
 		}
+	}
+
+	static void viewTotalUsers(){
+		//TODO Asmita
+	}
+
+	static void viewTotalMaintenanceRequests(){
+		//TODO Asmita
+	}
+
+	static void viewMostPopularStation(){
+		//TODO Asmita
 	}
 
 	/**
@@ -1171,7 +1209,7 @@ public class ValleyBikeSim {
 				pstmt.setString(2, customerAccount.getPassword());
 				pstmt.setString(3, customerAccount.getEmailAddress());
 				pstmt.setString(4, customerAccount.getCreditCard());
-				pstmt.setInt(5, customerAccount.getBalance());
+				pstmt.setDouble(5, customerAccount.getBalance());
 				pstmt.setInt(6, booleanToInt(customerAccount.getIsReturned()));
 				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
 				pstmt.setString(8, customerAccount.getRideIdListToString());
@@ -1273,32 +1311,37 @@ public class ValleyBikeSim {
 	 */
 	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		//if the username entered by the user does not exist in the customer account map
+		/*
 		if (!customerAccountMap.containsKey(username)) {
 			//print that the account does not exist
 			System.out.println("This account does not exist.");
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		}
+		 */
+
 		//if the username exists but the password entered by the user does not match the password associated with that username
 		if (!password.equals(customerAccountMap.get(username).getPassword())) {
 			//print incorrect password
-			System.out.println("Incorrect password.");
+			System.out.println("Incorrect password. Please try again.");
 			//prompt the user to input new account information again or log in
-			ValleyBikeController.initialMenu();
+			return;
 		}
 		//if the username and password both match with associated customer account object, lead the user to user account home
 		ValleyBikeController.customerAccountHome(username);
 	}
 
-	static void viewLongestRide(String username){
+	static Ride viewLongestRide(String username){
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
-		long longestRide = 0;
-		UUID longestRideId;
+		long longestRideLength = 0;
+		Ride longestRide = null;
 		for (UUID ride: rideIdList){
-			if (rideMap.get(ride).getRideLength() > longestRide){
-				longestRide = rideMap.get(ride).getRideLength();
+			if (rideMap.get(ride).getRideLength() > longestRideLength){
+				longestRideLength = rideMap.get(ride).getRideLength();
+				longestRide = rideMap.get(ride);
 			}
 		}
+		return longestRide;
 	}
 
 
@@ -1312,16 +1355,19 @@ public class ValleyBikeSim {
 	 */
 	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		//if the username entered by the user does not exist in the internal account map
+		/*
 		if (!internalAccountMap.containsKey(username)) {
 			//print that the account does not exist
 			System.out.println("This account does not exist.");
 			//take the user back to the initial menu
 			return;
 		}
+		 */
+
 		//if the username exists but the password entered by the user does not match the password associated with that username
 		if (!password.equals(internalAccountMap.get(username).getPassword())) {
 			//print incorrect password
-			System.out.println("Incorrect password.");
+			System.out.println("Incorrect password. Please try again.");
 			//take the user back to the initial menu
 			return;
 		}

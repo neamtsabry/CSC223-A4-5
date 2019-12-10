@@ -40,8 +40,6 @@ public class Station {
                    Integer capacityValue,
                    Integer kiosk, String address1) {
         this.name = nameValue;
-//        this.bikes = bikesValue;
-        // this.availableDocks = availableDocksValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
         this.kioskNumber = kiosk;
@@ -60,14 +58,10 @@ public class Station {
      * @param bikeList list of bikes at station
      */
     Station(String nameValue,
-            // Integer bikesValue,
-            // Integer availableDocksValue,
             Integer maintenanceRequestValue,
             Integer capacityValue,
             Integer kiosk, String address1, LinkedList<Integer> bikeList) {
         this.name = nameValue;
-        // this.bikes = bikesValue;
-        // this.availableDocks = availableDocksValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
         this.kioskNumber = kiosk;
@@ -101,7 +95,6 @@ public class Station {
      * calculates number of available docks
      */
     int getAvailableDocks() {
-        // return this.availableDocks;
         return (this.capacity - bikeList.size());
     }
 

@@ -141,11 +141,11 @@ public class Ride {
         // if ride still wasn't returned
         if(this.endTimeStamp == null){
             // return duration of ride so far
-            this.rideLength = Duration.between(getStartTimeStamp(), Instant.now()).toHours();
+            this.rideLength = Duration.between(getStartTimeStamp(), Instant.now()).toMinutes();
         }
 
         if(this.isReturned){
-            this.rideLength = Duration.between(getStartTimeStamp(), getEndTimeStamp()).toHours();
+            this.rideLength = Duration.between(getStartTimeStamp(), getEndTimeStamp()).toMinutes();
         }
 
         return this.rideLength;
