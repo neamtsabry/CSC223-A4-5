@@ -79,7 +79,7 @@ public abstract class ValleyBikeController {
      */
     static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //check whether it's time to renew customer's memberships
-        ValleyBikeSim.checkMembershipRenewalTime();
+        //ValleyBikeSim.checkMembershipRenewalTime();
 
         System.out.print("\nPlease choose from one of the following menu options: \n"
                 + "1: Create Customer Account "
@@ -527,23 +527,44 @@ public abstract class ValleyBikeController {
         String creditCard = ValleyBikeSim.viewCreditCard(username);
         //check validity of credit card, send them back to home menu if not valid
         if (!isValidCreditCard(creditCard)) {
-            System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
-                        " in your account is correct, then try again.");
+            System.out.println("Sorry, your credit card is not valid. You cannot rent a bike without a valid credit card. \n" +
+                    "Please make sure the credit card saved in your account is correct, then try again.");
             return; // return to customerAccountHome
         }
 
         // View stations
         System.out.println("STATION LIST:");
         ValleyBikeSim.viewStationList(); // view station list
+        //get input
+        //while input not valid station or 0
+            //
+
 
         // choose station to rent from or go back
         int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
                 "Enter the station ID ('11') or '0' to return to menu: ");
+        Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
+
+        while ((stationFrom == null || Objects.equals(stationFrom.getBikes(), 0)) && statId != 0) {
+            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
+
+            //if station doesn't have bikes, equalize stations and have user re-select station
+            else if (Objects.equals(stationFrom.getBikes(), 0)) {
+                System.out.println("The station entered does not have any bikes.\n" +
+                        "We are notifying maintenance worker to resolve this, but in the meantime please " +
+                        "choose another station");
+                //mocking notification to maintenance worker who immediately goes and equalizes stations
+                ValleyBikeSim.equalizeStations();
+            }
+            statId = getResponse("Please pick a station to rent a bike from.\n" +
+                    "Enter the station ID ('11') or '0' to return to menu: ");
+            stationFrom = ValleyBikeSim.getStationObj(statId);
+        }
 
         // if user entered 0, return to menu
         if (Objects.equals(statId, 0)){ return; }
 
-        // Validate user input for station ID
+        /*// Validate user input for station ID
         // keep prompting user until input matches the ID of an available station
         Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
 
@@ -564,7 +585,10 @@ public abstract class ValleyBikeController {
             statId = getResponse("Please pick a station to rent a bike from.\n" +
                     "Enter the station ID ('11') or '0' to return to menu: ");
             stationFrom = ValleyBikeSim.getStationObj(statId);
-        }
+
+            // if user entered 0, return to menu
+            if (Objects.equals(stationFrom, 0)){ return; }
+        }*/
 
         // View available bike ids at station
         System.out.println("Here's a list of bike IDs at Station #" + statId);
@@ -705,7 +729,7 @@ public abstract class ValleyBikeController {
             // if there's 1 available docks or less at station after bike is returned
             // notify maintenance worker to redistribute bikes
             // right now this work is automated by the equalizeStations() function
-            System.out.println("Station is almost full!");
+            System.out.println("We see that the station is now almost full!");
             System.out.println("We are notifying maintenance worker to resolve this.");
             //mock call to maintenance worker who immediately equalizes stations
             ValleyBikeSim.equalizeStations();
