@@ -998,7 +998,7 @@ public abstract class ValleyBikeController {
         String customerUsername = input.nextLine();
 
         // check for '0' input and return to previous menu
-        //if (customerUsername.contentEquals("0")) { returnToLastMenu(username); }
+        if (Objects.equals(customerUsername, "0")) { returnToLastMenu(username); }
 
         // keep asking for input if it isn't a valid customer username
         while (! ValleyBikeSim.accountMapsContain(customerUsername, 1)){
@@ -1035,7 +1035,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view customer balance
-                //TODO view customer balance
+                System.out.println("Account balance for" + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
                 break;
             case 3:
                 // view customer ride data
