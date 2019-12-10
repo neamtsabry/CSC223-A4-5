@@ -88,13 +88,13 @@ public abstract class ValleyBikeController {
         System.out.println("Customer account successfully created!");
 
         if (membership == 2) {
-            System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew" +
-                    "each month, and you will get an email notification when your card is charged." +
-                    "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+            System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew each month, \n" +
+                    " and you will get an email notification when your card is charged. \n" +
+                    " If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
         } else if (membership == 3) {
-            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew" +
-                    "each month, and you will get an email notification when your card is charged." +
+            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
+                    " and you will get an email notification when your card is charged. \n" +
                     "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
         }
@@ -234,17 +234,14 @@ public abstract class ValleyBikeController {
                 editCustomerAccount(username);
                 break;
             case 2:
-               //TODO view account activity
-                break;
-            case 3:
                 //view account balance
                 System.out.println("Your account balance is "+ ValleyBikeSim.viewAccountBalance(username));
                 break;
-            case 4:
+            case 3:
                 //view station list
                 ValleyBikeSim.viewStationList();
                 break;
-            case 5:
+            case 4:
                 // if customer has no ongoing rentals, help user rent a bike
                 if (customer.getIsReturned()) { rentBike(username); }
                 else { //else, user can return a bike
@@ -252,21 +249,21 @@ public abstract class ValleyBikeController {
                     returnBike(username, customer.getLastRideId());
                 } // if customer has ongoing rental, help user return bike
                 break;
-            case 6:
+            case 5:
                 reportProblem(username);
                 break;
-            case 7:
+            case 6:
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
                 break;
-            case 8:
+            case 7:
                 System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
                 break;
-            case 9:
+            case 8:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
                 System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
                 System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 break;
-            case 10:
+            case 9:
                 ValleyBikeSim.disableCustomerAccount(username);
                 break;
             case 0:
@@ -333,7 +330,8 @@ public abstract class ValleyBikeController {
                 "\nUsername: " + customer.getUsername() +
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
-                "\nCredit Card: ************" + customer.getCreditCard().substring(12) +
+                //TODO returns a null pointer exception AG
+                //"\nCredit Card: ************" + customer.getCreditCard().substring(12) +
                 "\nMembership: " + customer.getMembership().getMembershipString());
     }
 
@@ -394,10 +392,20 @@ public abstract class ValleyBikeController {
             case 5:
                 //remember this menu so we can return later
                 menuPath.push(21);
-
                 //edit membership type
                 int newMembership = enterMembership();
-                ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                //validate credit card if customer wants to switch to paid membership
+                if (newMembership == 2 || newMembership == 3) {
+                    String creditcard = ValleyBikeSim.getCustomerObj(username).getCreditCard();
+                    if (!isValidCreditCard(creditcard)) {
+                        //if cc is not valid, do not allow them to switch memberships.
+                        System.out.println("Sorry, your credit card is not valid. You cannot switch to a paying membership at this time. \n" +
+                                "Please ensure your credit card information is updated and try again. ");
+                    } else {
+                        //if credit card is valid, switch memberships
+                        ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                    }
+                }
                 break;
             case 0:
                 //TODO GRACE check on this
@@ -468,7 +476,7 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * Allows a customer to rent a bike by asking for necessary input
+     * Allows a customer to rent a bike by asking for necessary inputs
      *
      * @throws IOException
      * @throws ParseException
@@ -478,8 +486,8 @@ public abstract class ValleyBikeController {
         String creditCard = ValleyBikeSim.viewCreditCard(username);
         //check validity of credit card, send them back to home menu if not valid
         if (!isValidCreditCard(creditCard)) {
-            System.out.println("Sorry, your credit card is not valid. Please make sure the credit card saved" +
-                        " in your account is correct, then try again.");
+            System.out.println("Sorry, your credit card is not valid. You cannot rent a bike without a valid credit card. \n" +
+                    "Please make sure the credit card saved in your account is correct, then try again.");
             return; // return to customerAccountHome
         }
 
@@ -490,11 +498,31 @@ public abstract class ValleyBikeController {
         // choose station to rent from or go back
         int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
                 "Enter the station ID ('11') or '0' to return to menu: ");
+        Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
+
+        //keep running while loop until input valid station with available bikes
+        while ((stationFrom == null || Objects.equals(stationFrom.getBikes(), 0)) && statId != 0) {
+            //if station doesnt exist, inform user
+            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
+
+            //if station doesn't have bikes, equalize stations and have user re-select station
+            else if (Objects.equals(stationFrom.getBikes(), 0)) {
+                System.out.println("The station entered does not have any bikes.\n" +
+                        "We are notifying maintenance worker to resolve this, but in the meantime please " +
+                        "choose another station");
+                //mock notification to maintenance worker who immediately goes and equalizes stations
+                ValleyBikeSim.equalizeStations();
+            }
+            //because station not valid, have user re-input and then validate
+            statId = getResponse("Please pick a station to rent a bike from.\n" +
+                    "Enter the station ID ('11') or '0' to return to menu: ");
+            stationFrom = ValleyBikeSim.getStationObj(statId);
+        }
 
         // if user entered 0, return to menu
         if (Objects.equals(statId, 0)){ return; }
 
-        // Validate user input for station ID
+        /*// Validate user input for station ID
         // keep prompting user until input matches the ID of an available station
         Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
 
@@ -515,7 +543,10 @@ public abstract class ValleyBikeController {
             statId = getResponse("Please pick a station to rent a bike from.\n" +
                     "Enter the station ID ('11') or '0' to return to menu: ");
             stationFrom = ValleyBikeSim.getStationObj(statId);
-        }
+
+            // if user entered 0, return to menu
+            if (Objects.equals(stationFrom, 0)){ return; }
+        }*/
 
         // View available bike ids at station
         System.out.println("Here's a list of bike IDs at Station #" + statId);
@@ -656,7 +687,7 @@ public abstract class ValleyBikeController {
             // if there's 1 available docks or less at station after bike is returned
             // notify maintenance worker to redistribute bikes
             // right now this work is automated by the equalizeStations() function
-            System.out.println("Station is almost full!");
+            System.out.println("We see that the station is now almost full!");
             System.out.println("We are notifying maintenance worker to resolve this.");
             //mock call to maintenance worker who immediately equalizes stations
             ValleyBikeSim.equalizeStations();
