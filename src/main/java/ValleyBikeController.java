@@ -1046,23 +1046,8 @@ public abstract class ValleyBikeController {
         return num;
     }
 
-    //TODO do we really need both ^ getResponseBetween and isIntBetween??
 
-    /**
-     * Helper method to check if input is between two values
-     *
-     * @param num - the number to be validated
-     * @param a - the smallest value accepted for num
-     * @param b - the largest value accepted for num
-     * @return return true if a <= num <= b
-     */
-    static boolean isIntBetween(int num, int a, int b){
-        while(num < a || num > b){
-            System.out.println("That is not a valid response. Please try again.");
-            return false;
-        }
-        return true;
-    }
+
 
 
 
@@ -1168,20 +1153,16 @@ public abstract class ValleyBikeController {
      * @return membership string input by user
      */
     private static int enterMembership() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        int num;
-        do {//loops until user inputs int 0-3
-            System.out.println("Choose membership type: \n" +
-                    "1: Pay-as-you-go Membership. " +
-                    "2: Monthly Membership. " +
-                    "3: Yearly Membership ");
-            //prompt the user to pick an int option
-            num = getResponse("Please enter your selection (1-3) or '0' to cancel:");
-            input.nextLine();
+        System.out.println("Choose membership type: \n" +
+                "1: Pay-as-you-go Membership. " +
+                "2: Monthly Membership. " +
+                "3: Yearly Membership ");
 
-            // check for '0' input and return to previous menu
-            if (Objects.equals(num, 0)) { returnToLastMenu(null); }
+        //prompt the user to pick an int option
+        int num = getResponseBetween(0,3,"Please enter your selection (1-3) or '0' to cancel:");
 
-        } while (!isIntBetween(num, 1, 3)); //validates input between 1 and 3 (0 is accounted for previously)
+        // check for '0' input and return to previous menu
+        if (Objects.equals(num, 0)) { returnToLastMenu(null); }
 
         //return membership input by user
         return num;
@@ -1284,6 +1265,22 @@ public abstract class ValleyBikeController {
     }
 
     //TODO should we make an isValidStation and isValidBike too?
+
+    /**
+     * Helper method to check if input is between two values
+     *
+     * @param num - the number to be validated
+     * @param a - the smallest value accepted for num
+     * @param b - the largest value accepted for num
+     * @return return true if a <= num <= b
+     */
+    static boolean isIntBetween(int num, int a, int b){
+        while(num < a || num > b){
+            System.out.println("That is not a valid response. Please try again.");
+            return false;
+        }
+        return true;
+    }
 
     /**
      * We are not currently using this method.
