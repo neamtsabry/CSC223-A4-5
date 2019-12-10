@@ -675,14 +675,15 @@ public abstract class ValleyBikeController {
 
         //check how many free rides remain in account to determine how to charge for rental
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
-        //if pay-as-you-go or no rides remaining on membership, charge by time
+        //if pay-as-you-go or no free rides remaining on membership, charge by time
         if (ridesLeft == 0) {
             long rideLength = rideObj.getRideLength();
             //card was already validated before bike rented to ensure they can pay for the rental
-            long paymentDue = rideLength * (long) .30;
-            //TODO balance needs to be a double (let payment be long in cast
-            int balance = ValleyBikeSim.getCustomerObj(username).getBalance();
-            ValleyBikeSim.getCustomerObj(username).setBalance(balance + (int) paymentDue);
+            //ride cost is 15c per minute
+            long paymentDue = rideLength * (long) .15;
+            //update balance to add new ride payment
+            double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+            ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
 
             //update ride payment in ride object
             ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
