@@ -124,9 +124,6 @@ public class ValleyBikeSim {
 			//create customer account from info
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
 
-			//TODO AG - Here's where our null pointer is coming from! getLastPayment field is not being updated when we read in account data, so it stays null...
-			//TODO AG - We also have to read in max rides for memberships
-
 			// add to the customer account map
 			customerAccountMap.put(username, customerAccount);
 		}
@@ -648,8 +645,6 @@ public class ValleyBikeSim {
 	 */
 	static void disableCustomerAccount(String username) throws NoSuchAlgorithmException, ClassNotFoundException {
 		CustomerAccount customerAccount = customerAccountMap.get(username);
-		//remove customer from map of customers
-		customerAccountMap.remove(username);
 		MessageDigest md = MessageDigest.getInstance("MD5");
 		//update password to random hashcode
 		StringBuilder sb = new StringBuilder();
@@ -664,8 +659,7 @@ public class ValleyBikeSim {
 		for (byte b : hashInBytesEmailAddress) {
 			sb.append(String.format("%02x", b));
 		}
-		//TODO internal email address? why?? AG
-		updateInternalEmailAddress(username, sb.toString());
+		updateCustomerEmailAddress(username, sb.toString());
 		//update username to random hashcode
 		sb.setLength(0);
 		byte[] hashInBytesUsername = md.digest(customerAccount.getUsername().getBytes(StandardCharsets.UTF_8));
@@ -701,8 +695,6 @@ public class ValleyBikeSim {
 		}
 
 		//update account in customer map
-		//TODO the username was removed from the map in disableCustomerAccount- should that be changed?
-		// the username passed in to this account has already been changed to hash as well- AG
 		customerAccountMap.get(username).setEnabled(false);
 		System.out.println("Your account has been successfully deleted.");
 	}
@@ -1141,12 +1133,34 @@ public class ValleyBikeSim {
 		}
 	}
 
-	static void viewTotalUsers(){
-		//TODO Asmita
+	static int viewTotalUsers() throws SQLException, ClassNotFoundException {
+		Connection conn = connectToDatabase();
+		int count = 0;
+		//read in data from database to data structures
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Customer_Account");
+			while (rs.next()) {
+				count = rs.getInt("COUNT(*)");
+			}
+			conn.close();
+		}
+		return count;
 	}
 
-	static void viewTotalMaintenanceRequests(){
-		//TODO Asmita
+	static int viewTotalMaintenanceRequests() throws SQLException, ClassNotFoundException {
+		Connection conn = connectToDatabase();
+		int total = 0;
+		//read in data from database to data structures
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT SUM(req_mnt) FROM Station");
+			while (rs.next()) {
+				total = rs.getInt("SUM(req_mnt)");
+			}
+			conn.close();
+		}
+		return total;
 	}
 
 	static void viewMostPopularStation(){
@@ -1214,7 +1228,7 @@ public class ValleyBikeSim {
 	 * @throws IOException    the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-	public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
 		if (customerAccountMap.get(customerAccount.getUsername()) != null) {
 			//print that the username already exists
@@ -1257,7 +1271,7 @@ public class ValleyBikeSim {
 	 * @throws IOException    the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
 		if (customerAccountMap.get(internalAccount.getUsername()) != null) {
 			//print that the username already exists
@@ -1299,7 +1313,7 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
     	//create new membership instance
 		Membership membershipType = checkMembershipType(membership);
 		//create instance of customer object
@@ -1364,7 +1378,7 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (stationsMap.get(id) != null) { //if station id already exists, inform user
 			System.out.println("Station with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
@@ -1404,7 +1418,7 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
@@ -1441,7 +1455,7 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (rideMap.get(ride.getRideId()) != null) {
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
