@@ -26,7 +26,7 @@ public abstract class ValleyBikeController {
         //check whether it's time to renew customer's memberships
         //ValleyBikeSim.checkMembershipRenewalTime();
 
-        System.out.print("\nPlease choose from one of the following menu options:\n"
+        System.out.print("Please choose from one of the following menu options:\n"
                 + "1: Create Customer Account\t"
                 + "2: Log In\t"
                 + "0: Exit program\n");
@@ -70,15 +70,36 @@ public abstract class ValleyBikeController {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
-        //remember this menu in case we need to return
-        menuPath.push(1);
-
         //each field has its own method which calls itself until a valid input is entered
-        String username = enterUsername(null);
-        String password = enterPassword(null);
-        String emailAddress = enterEmail(null);
+        String username = enterUsername();
+        if (Objects.equals(username, "0")){
+            System.out.println("Account creation canceled.");
+            initialMenu();
+        }
+
+        String password = enterPassword();
+        if (Objects.equals(password, "0")){
+            System.out.println("Account creation canceled.");
+            initialMenu();
+        }
+
+        String emailAddress = enterEmail();
+        if (Objects.equals(emailAddress, "0")){
+            System.out.println("Account creation canceled.");
+            initialMenu();
+        }
+
         String creditCard = enterCreditCard();
+        if (Objects.equals(creditCard, "0")){
+            System.out.println("Account creation canceled.");
+            initialMenu();
+        }
+
         int membership = enterMembership();
+        if (membership==0){
+            System.out.println("Account creation canceled.");
+            initialMenu();
+        }
 
         //once all the required fields have been input by the user, create new customer account
         //Assumption: initially the balance in customer account is always 0
@@ -99,8 +120,6 @@ public abstract class ValleyBikeController {
                     "and notified via email. ");
         }
 
-        menuPath.pop();// we no longer need to remember this menu
-
         //instead of returning to previous menu,
         // we move these new customers to their home menu
         customerAccountHome(username);
@@ -114,7 +133,7 @@ public abstract class ValleyBikeController {
      */
     private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt the user to choose which kind of account they want to log into
-        System.out.println("\nPlease choose from one of the following menu options:\n" +
+        System.out.println("Please choose from one of the following menu options:\n" +
                 "1: Log in to customer account\t" +
                 "2: Log in to internal account\t" +
                 "0: Return to menu");
@@ -131,7 +150,9 @@ public abstract class ValleyBikeController {
         String username = input.nextLine();
 
         //if user wants to log out take them back to initial menu
-        if (username.contentEquals("0")) { return; }
+        if (username.contentEquals("0")) {
+            System.out.println("Login canceled.");
+            return; }
 
         // if logging into a customer account (logIn == 1), check that the customer account map contains the username
         // if logging into an internal account (logIn == 2), check that the internal account map contains the username
@@ -142,26 +163,32 @@ public abstract class ValleyBikeController {
             username = input.nextLine();
 
             //if user wants to log out take them back to initial menu
-            if (username.contentEquals("0")){ return; }
+            if (username.contentEquals("0")){
+                System.out.println("Login canceled.");
+                return; }
         }
-
-        //Account user = ValleyBikeSim.getCustomerObj(username);
-
 
         //prompt the user to input their password
         System.out.println("Please enter your password or '0' to cancel:");
         String password = input.nextLine();
 
         //if user wants to log out take them back to initial menu
-        if (password.contentEquals("0")){ return; }
+        if (password.contentEquals("0")){
+            System.out.println("Login canceled.");
+            return; }
 
-        while (!password.equals(ValleyBikeSim.getInternalObj(username).getPassword())){
+        // if logging into a customer account (logIn == 1), check that password matches customer account
+        // if logging into an internal account (logIn == 2), check that password matches internal account
+        while(((logIn == 1) && (!password.equals(ValleyBikeSim.getCustomerObj(username).getPassword()))) ||
+                ((logIn == 2) && (!password.equals(ValleyBikeSim.getInternalObj(username).getPassword()))) ) {
             System.out.println("Invalid password. Please try again.");
             System.out.println("Please enter your password or '0' to cancel:");
             password = input.nextLine();
 
             //if user wants to log out take them back to initial menu
-            if (password.contentEquals("0")){ return; }
+            if (password.contentEquals("0")){
+                System.out.println("Login canceled.");
+                return; }
         }
 
         // once valid username and password are obtained, print greeting and bring them to home menu
@@ -170,14 +197,10 @@ public abstract class ValleyBikeController {
         switch (logIn){
             case 1:
                 //if they want to log in to customer account
-                //validate their username and password in the customer account map
-                // ValleyBikeSim.customerLogIn(username, password);
                 customerAccountHome(username);
                 break;
             case 2:
                 //if they want to log in to internal account
-                //validate their username and password in the internal account map
-                // ValleyBikeSim.internalLogIn(username, password);
                 internalAccountHome(username);
                 break;
         }
@@ -227,10 +250,13 @@ public abstract class ValleyBikeController {
         // int num = input.nextInt();
         switch(num) {
             case 1:
+                //TODO GRACE
+                // save customer home menu index in case we need to return
+                menuPath.push(2);
                 //print current account info
                 viewCustomerAccount(username);
                 //edit account info
-                editCustomerAccount(username);
+                editCustomerAccount(username, null);
                 break;
             case 2:
                 //view account balance
@@ -295,9 +321,22 @@ public abstract class ValleyBikeController {
         menuPath.push(2);
 
         //each field has its own method which calls itself until a valid input is entered
-        String newUsername = enterUsername(username);
-        String password = enterPassword(username);
-        String emailAddress = enterEmail(username);
+        String newUsername = enterUsername();
+        if (Objects.equals(newUsername, "0")){
+            System.out.println("Account creation canceled.");
+            returnToLastMenu(username);
+        }
+
+        String password = enterPassword();
+        if (Objects.equals(password, "0")){
+            System.out.println("Account creation canceled.");
+            returnToLastMenu(username);
+        }
+        String emailAddress = enterEmail();
+        if (Objects.equals(emailAddress, "0")){
+            System.out.println("Account creation canceled.");
+            returnToLastMenu(username);
+        }
 
         //create new internal account object from inputs
         InternalAccount internalAccount = new InternalAccount(newUsername, password, emailAddress);
@@ -329,9 +368,9 @@ public abstract class ValleyBikeController {
                 "\nUsername: " + customer.getUsername() +
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
-                "\nCredit Card: ************" + customer.getCreditCard().substring(12));
+                "\nCredit Card: ************" + customer.getCreditCard().substring(12) +
                 //TODO returns a null pointer exception AG
-                //"\nMembership: " + customer.getMembership().getMembershipString());
+                "\nMembership: " + customer.getMembership().getMembershipString());
     }
 
 
@@ -339,8 +378,11 @@ public abstract class ValleyBikeController {
      * Menu page for editing customer account information
      *
      * @param username is the unique username associated with the customer account
+     * @param master if an internal account is editing a user account, this string
+     *               is the internal account username; if customer is accessing
+     *               their own account, this string is null
      */
-    private static void editCustomerAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void editCustomerAccount(String username, String master) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         //TODO save edited fields
 
         //prompt user to choose which field they want to edit
@@ -357,48 +399,64 @@ public abstract class ValleyBikeController {
 
         switch (edit){
             case 1:
-                //remember this menu so we can return later
-                menuPath.push(21);
-
                 //edit username
-                String newUsername = enterUsername(null);
-                ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                String newUsername = enterUsername();
+
+                if (! Objects.equals(username, "0")) {
+                    ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 2:
-                //remember this menu so we can return later
-                menuPath.push(21);
-
                 //edit password
-                String newPassword = enterPassword(null);
-                ValleyBikeSim.updateCustomerPassword(username, newPassword);
+                String newPassword = enterPassword();
+                if (! Objects.equals(newPassword, "0")){
+                    ValleyBikeSim.updateCustomerPassword(username, newPassword);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 3:
-                //remember this menu so we can return later
-                menuPath.push(21);
-
                 //edit email address
-                String newEmail = enterEmail(null);
-                ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
+                String newEmail = enterEmail();
+                if (! Objects.equals(newEmail, "0")){
+                    ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 4:
-                //remember this menu so we can return later
-                menuPath.push(21);
-
                 //edit credit card number
                 String newCreditCard = enterCreditCard();
-                ValleyBikeSim.updateCustomerCreditCard(username, newCreditCard);
+                if (! Objects.equals(newCreditCard, "0")){
+                    ValleyBikeSim.updateCustomerCreditCard(username, newCreditCard);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 5:
                 //remember this menu so we can return later
-                menuPath.push(21);
+                // menuPath.push(21);
                 //edit membership type
                 int newMembership = enterMembership();
+
+
+                if (newMembership==0){
+                    System.out.println("Account revision canceled.");
+                    break;
+                }
+
                 //validate credit card if customer wants to switch to paid membership
                 if (newMembership == 2 || newMembership == 3) {
                     String creditcard = ValleyBikeSim.getCustomerObj(username).getCreditCard();
                     if (!isValidCreditCard(creditcard)) {
                         //if cc is not valid, do not allow them to switch memberships.
-                        System.out.println("Sorry, your credit card is not valid. You cannot switch to a paying membership at this time. \n" +
+                        System.out.println("You cannot switch to a paying membership at this time. \n" +
                                 "Please ensure your credit card information is updated and try again. ");
                     } else {
                         //if credit card is valid, switch memberships
@@ -408,13 +466,16 @@ public abstract class ValleyBikeController {
                 break;
             case 0:
                 //TODO GRACE check on this-- it returns to initial menu not customer home
-                returnToLastMenu(username);
+                // if there is a master string, return to an internal account; else, return to a customer account
+                if (master == null){
+                returnToLastMenu(username);}
+                else returnToLastMenu(master);
             default:
                 //if none of the other options, must not be valid
                 System.out.println("That is not a valid input. Please try again.");
         }
         //if function call finished and returned to this page, keep calling edit account again until 'return to menu' is chosen
-        editCustomerAccount(username);
+        editCustomerAccount(username, master);
     }
 
     /**
@@ -439,36 +500,43 @@ public abstract class ValleyBikeController {
 
         int edit = getResponseBetween(0, 3, "Please enter your selection (0-5):");
 
-        // keep track of menu we're on in case we want to return
-        // 21 stands for editInternalAccount() in returnToLastMenu()
-        menuPath.push(21);
-
         switch (edit){
             case 1:
                 //edit username
-                String newUsername = enterUsername(null);
-                ValleyBikeSim.updateInternalUsername(username, newUsername);
+                String newUsername = enterUsername();
+                if (! Objects.equals(newUsername, "0")) {
+                    ValleyBikeSim.updateInternalUsername(username, newUsername);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 2:
                 //edit password
-                String newPassword = enterPassword(null);
-                ValleyBikeSim.updateInternalPassword(username, newPassword);
+                String newPassword = enterPassword();
+                if (! Objects.equals(newPassword, "0")) {
+                    ValleyBikeSim.updateInternalPassword(username, newPassword);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 3:
                 //edit email address
-                String newEmail = enterEmail(null);
-                ValleyBikeSim.updateInternalEmailAddress(username, newEmail);
+                String newEmail = enterEmail();
+                if (! Objects.equals(newEmail, "0")) {
+                    ValleyBikeSim.updateInternalEmailAddress(username, newEmail);
+                }
+                else {
+                    System.out.println("Account revision canceled.");
+                }
                 break;
             case 0:
-                menuPath.pop();// we no longer have to keep track of this menu
                 return;
             default:
                 //if none of of other options, must not be valid
                 System.out.println("That is not a valid input. Please try again.");
         }
-
-        // we no longer have to keep track of this menu
-        menuPath.pop();
 
         //if function call finished and returned to this page, keep calling home again until 'return to menu' is chosen
         editInternalAccount(username);
@@ -765,7 +833,9 @@ public abstract class ValleyBikeController {
         while (!ValleyBikeSim.bikesMapContains(bikeId)){
             System.out.println("The bike ID entered does not exist in our system. Please try again.");
             bikeId = getResponse("Please enter bike ID ('11') or '0' to cancel:");
-            if (Objects.equals(bikeId, 0)){ return; } // if user entered 0, return to menu
+            if (Objects.equals(bikeId, 0)){
+                System.out.println("Report problem has been canceled.");
+                return; } // if user entered 0, return to menu
         }
 
         // prompt user for report detailing what's wrong
@@ -830,19 +900,19 @@ public abstract class ValleyBikeController {
                 + "3: View and edit customer account information\t"
                 // + "4: View customer balances\t"
                 // + "5: View customer activity\t"
-                + "6: Add new station\t"
-                + "7: Add new bike\t"
-                + "8: View station list\t"
-                + "9: View bike list\t"
-                + "10: Edit/Resolve maintenance requests\t"
-                + "11: Equalize stations\t"
-                + "12: View total number of users\t"
-                + "13: View total number of maintenance requests\t"
-                + "14: View most popular station\t"
+                + "4: Add new station\t"
+                + "5: Add new bike\n"
+                + "6: View station list\t"
+                + "7: View bike list\t"
+                + "8: Edit/Resolve maintenance requests\t"
+                + "9: Equalize stations\t"
+                + "10: View total number of users\n"
+                + "11: View total number of maintenance requests\t"
+                + "12: View most popular station\t"
                 + "0: Log out\n");
 
         //get and validate user response
-        int num = getResponseBetween(0,14, "Please enter your selection (0-14):");
+        int num = getResponseBetween(0,12, "Please enter your selection (0-12):");
 
         switch(num) {
             case 1:
@@ -854,11 +924,13 @@ public abstract class ValleyBikeController {
                 editInternalAccount(username);
                 break;
             case 3:
-                menuPath.push(2); // add this menu to stack in case we want to return
+                menuPath.push(3); // add this menu to stack in case we want to return
                 findCustomer(username);
                 menuPath.pop();
                 //TODO view and edit customer account
                 break;
+
+                /*
             case 4:
                 //TODO view customer balances
                 break;
@@ -866,37 +938,39 @@ public abstract class ValleyBikeController {
                 //view customer activity
                 viewCustomerActivity();
                 break;
-            case 6:
+                 */
+
+            case 4:
                 //add station to station list
                 addStation();
                 break;
-            case 7:
+            case 5:
                 //add bike to bike list
                 addBike();
                 break;
-            case 8:
+            case 6:
                 //view station list
                 ValleyBikeSim.viewStationList();
                 break;
-            case 9:
+            case 7:
                 //view bike list
                 ValleyBikeSim.viewBikeList();
                 break;
-            case 10:
+            case 8:
                 // resolve maintenance requests
                 ValleyBikeSim.resolveMntReqs();
                 break;
-            case 11:
+            case 9:
                 //equalize stations
                 ValleyBikeSim.equalizeStations();
                 break;
-            case 12:
+            case 10:
                 //TODO view total number of users
                 break;
-            case 13:
+            case 11:
                 //TODO View total number of maintenance requests
                 break;
-            case 14:
+            case 12:
                 //TODO View most popular station
                 break;
             case 0:
@@ -924,7 +998,7 @@ public abstract class ValleyBikeController {
         String customerUsername = input.nextLine();
 
         // check for '0' input and return to previous menu
-        if (customerUsername.contentEquals("0")) { returnToLastMenu(username); }
+        //if (customerUsername.contentEquals("0")) { returnToLastMenu(username); }
 
         // keep asking for input if it isn't a valid customer username
         while (! ValleyBikeSim.accountMapsContain(customerUsername, 1)){
@@ -947,7 +1021,7 @@ public abstract class ValleyBikeController {
                 + "1: Edit customer account\t"
                 + "2: View customer balances\t"
                 + "3: View customer activity\t"
-                + "0: Return to menu");
+                + "0: Return to menu\n");
 
         //get and validate user response
         int num = getResponseBetween(0,3, "Please enter your selection (0-3):");
@@ -957,7 +1031,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //edit customer account
-                editCustomerAccount(username);
+                editCustomerAccount(customerUsername, username);
                 break;
             case 2:
                 //view customer balance
@@ -971,7 +1045,8 @@ public abstract class ValleyBikeController {
                 returnToLastMenu(username);
         }
 
-
+        //if we get through the switch, revisit the beginning of menu
+        findCustomer(username);
     }
 
 
@@ -1208,11 +1283,9 @@ public abstract class ValleyBikeController {
      * Prompts user to input username
      * Validates if username is between 6-14 characters
      * Loops until valid username input by user
-     * @param creator - internal username for person creating the internal account
-     *               this string is null for customer account creation
      * @return valid username input by user
      */
-    private static String enterUsername(String creator) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterUsername() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
@@ -1220,8 +1293,12 @@ public abstract class ValleyBikeController {
             username = input.nextLine();
             //System.out.println("hihi"+username+"hihi");
             // check for '0' input and return to previous menu
-            if (username.contentEquals("0")) { returnToLastMenu(creator); }
-
+            if (Objects.equals(username, "0")) {
+                // if (creator==null){
+                //     returnToLastMenu(null);
+                // } else returnToLastMenu(creator);
+                return username;
+            }
         } while (!isValidUsername(username)); //validates that username is between 6-14 characters and unique in our system
 
         //return valid username input by user
@@ -1232,11 +1309,10 @@ public abstract class ValleyBikeController {
      * Prompts user to input password
      * Validates if password is between 6-14 characters
      * Recursively calls itself until valid password input by user
-     * @param creator - internal username for person creating the internal account
-     *                this string is null for customer account creation
+     *
      * @return valid password input by user
      */
-    private static String enterPassword(String creator) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String password;
         do {//loops until user inputs 0 or valid password
             //prompts user to input password
@@ -1245,7 +1321,10 @@ public abstract class ValleyBikeController {
 
             // check for '0' input and return to previous menu
             // creator string is null for customer account creation
-            if (password.contentEquals("0")) { returnToLastMenu(creator); }
+            if (Objects.equals(password, "0")) {
+                //returnToLastMenu(creator);
+                return password;
+            }
 
         } while (!isValidPassword(password)); //validates that password is between 6-14 characters
 
@@ -1257,11 +1336,10 @@ public abstract class ValleyBikeController {
      * Prompts user to input email address
      * Validates if email address is in correct format
      * Recursively calls itself until valid email address input by user
-     * @param creator - internal username for person creating the internal account
-     *                this string is null for customer account creation
+     *
      * @return valid email address input by user
      */
-    private static String enterEmail(String creator) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String emailAddress;
         do {//loops until user inputs 0 or valid password
             //prompts user to input email address
@@ -1269,7 +1347,10 @@ public abstract class ValleyBikeController {
             emailAddress = input.nextLine();
 
             // check for '0' input and return to previous menu
-            if (emailAddress.contentEquals("0")) { returnToLastMenu(creator); }
+            if (Objects.equals(emailAddress, "0")) {
+                //returnToLastMenu(creator);
+                return emailAddress;
+            }
 
         } while (!isValidEmail(emailAddress)); //validates that email address is in correct format
 
@@ -1293,7 +1374,10 @@ public abstract class ValleyBikeController {
             creditCard = input.nextLine();
 
             // check for '0' input and return to previous menu
-            if (creditCard.contentEquals("0")) { returnToLastMenu(null); }
+            if (Objects.equals(creditCard, "0")) {
+                //returnToLastMenu(null);
+                return creditCard;
+            }
 
         } while (!isValidCreditCard(creditCard)); //validates the credit card is correct
 
@@ -1315,7 +1399,9 @@ public abstract class ValleyBikeController {
         int num = getResponseBetween(0,3,"Please enter your selection (1-3) or '0' to cancel:");
 
         // check for '0' input and return to previous menu
-        if (Objects.equals(num, 0)) { returnToLastMenu(null); }
+        if (Objects.equals(num, 0)) {
+            return 0;
+        }
 
         //return membership input by user
         return num;
@@ -1376,10 +1462,17 @@ public abstract class ValleyBikeController {
                     "Please make sure you are entering 16 digits without spaces, dashes, or characters. ");
             return false;
         }
+
         //90% of the time the method accepts the credit card
         //10% of the time the method rejects the credit card
         //This method makes a random decision and is not a real credit card validator
-        return Math.random() <= 0.95;
+        if (Math.random() <= 0.95) {
+            return true; // accept card
+        }
+
+        // else "decline" card
+        System.out.println("This credit card has been declined. Please try again. ");
+        return false;
     }
 
     /**
@@ -1455,7 +1548,7 @@ public abstract class ValleyBikeController {
             case 2:
                 customerAccountHome(username);
             case 21:
-                editCustomerAccount(username);
+                editCustomerAccount(username, null);
             case 3:
                 internalAccountHome(username);
             case 31:
@@ -1464,8 +1557,6 @@ public abstract class ValleyBikeController {
                 initialMenu();
         }
     }
-
-    //TODO should we make an isValidStation and isValidBike too?
 
     /**
      * Helper method to check if input is between two values
