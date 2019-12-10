@@ -1042,7 +1042,7 @@ public abstract class ValleyBikeController {
      */
     private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // use helper function to check input is valid and save it
-        int id = getResponse("Please enter the ID for this station or '0' to cancel:");
+        int id = getResponseBetween(10, 1000, "Please enter the ID for this station ('111') or '0' to cancel:");
 
         // handle if the station already exists
         while(ValleyBikeSim.stationsMapContains(id)){
@@ -1107,8 +1107,7 @@ public abstract class ValleyBikeController {
      */
     static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
         // get new bike's id
-        //TODO GRACE validate length of bike id
-        int id = getResponse("Please enter the bike's ID");
+        int id = getResponseBetween(10, 1000, "Please enter the bike's ID ('111')");
 
 
         // if the bike already exists
