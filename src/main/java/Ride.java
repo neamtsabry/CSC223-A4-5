@@ -47,7 +47,7 @@ public class Ride {
      */
     public Ride(UUID rideIdVal, int bikeIdVal, String usernameVal,
                 Boolean isReturnedVal, Instant startTimeStampVal,
-                Instant endTimeStampVal) throws ParseException {
+                Instant endTimeStampVal){
         this.rideId = rideIdVal;
         this.bikeId = bikeIdVal;
         this.username = usernameVal;

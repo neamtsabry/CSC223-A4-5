@@ -1222,18 +1222,21 @@ public class ValleyBikeSim {
 	 */
 	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		//if the username entered by the user does not exist in the customer account map
+		/*
 		if (!customerAccountMap.containsKey(username)) {
 			//print that the account does not exist
 			System.out.println("This account does not exist.");
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		}
+		 */
+
 		//if the username exists but the password entered by the user does not match the password associated with that username
 		if (!password.equals(customerAccountMap.get(username).getPassword())) {
 			//print incorrect password
-			System.out.println("Incorrect password.");
+			System.out.println("Incorrect password. Please try again.");
 			//prompt the user to input new account information again or log in
-			ValleyBikeController.initialMenu();
+			return;
 		}
 		//if the username and password both match with associated customer account object, lead the user to user account home
 		ValleyBikeController.customerAccountHome(username);
@@ -1249,16 +1252,19 @@ public class ValleyBikeSim {
 	 */
 	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		//if the username entered by the user does not exist in the internal account map
+		/*
 		if (!internalAccountMap.containsKey(username)) {
 			//print that the account does not exist
 			System.out.println("This account does not exist.");
 			//take the user back to the initial menu
 			return;
 		}
+		 */
+
 		//if the username exists but the password entered by the user does not match the password associated with that username
 		if (!password.equals(internalAccountMap.get(username).getPassword())) {
 			//print incorrect password
-			System.out.println("Incorrect password.");
+			System.out.println("Incorrect password. Please try again.");
 			//take the user back to the initial menu
 			return;
 		}
