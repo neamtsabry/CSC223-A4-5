@@ -971,7 +971,7 @@ public abstract class ValleyBikeController {
                 System.out.println("The total number of maintenance requests currently from all stations is " + ValleyBikeSim.viewTotalMaintenanceRequests());
                 break;
             case 12:
-                //TODO View most popular station
+                System.out.println("The most popular station is " + ValleyBikeSim.viewMostPopularStation());
                 break;
             case 0:
                 //go to initial menu to log out

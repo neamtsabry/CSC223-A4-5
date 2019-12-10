@@ -1163,8 +1163,38 @@ public class ValleyBikeSim {
 		return total;
 	}
 
-	static void viewMostPopularStation(){
-		//TODO Asmita
+	static int viewMostPopularStation() throws SQLException, ClassNotFoundException {
+		HashMap<Integer, Integer> stationCountMap = new HashMap<>();
+		Connection conn = connectToDatabase();
+		//read in data from database to data structures
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT station_to, station_from FROM Ride");
+			while (rs.next()) {
+				int stationTo = rs.getInt("station_to");
+				int stationFrom = rs.getInt("station_from");
+				if (!stationCountMap.containsKey(stationTo)){
+					stationCountMap.put(stationTo, 1);
+				} else {
+					stationCountMap.put(stationTo, stationCountMap.get(stationTo)+1);
+				}
+				if (!stationCountMap.containsKey(stationFrom)){
+					stationCountMap.put(stationFrom, 1);
+				} else {
+					stationCountMap.put(stationFrom, stationCountMap.get(stationFrom)+1);
+				}
+			}
+			conn.close();
+		}
+		Map.Entry<Integer, Integer> maxEntry = null;
+		for (Map.Entry<Integer, Integer> entry : stationCountMap.entrySet())
+		{
+			if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+			{
+				maxEntry = entry;
+			}
+		}
+		return maxEntry.getKey();
 	}
 
 	/**
