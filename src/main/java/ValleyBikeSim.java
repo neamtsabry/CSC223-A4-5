@@ -1063,6 +1063,7 @@ public class ValleyBikeSim {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 		// true if last ride was returned
+		//TODO Neamat when I was running the code I got a null pointer error from here from account home
 		Boolean isReturned = customer.getIsReturned();
 		if (!isReturned) {
 			UUID ride = customer.getLastRideId();
@@ -1118,6 +1119,18 @@ public class ValleyBikeSim {
 				}
 			}
 		}
+	}
+
+	static void viewTotalUsers(){
+		//TODO Asmita
+	}
+
+	static void viewTotalMaintenanceRequests(){
+		//TODO Asmita
+	}
+
+	static void viewMostPopularStation(){
+		//TODO Asmita
 	}
 
 	/**
