@@ -108,7 +108,7 @@ public class ValleyBikeSim {
 			Membership membership = readMembershipData(username);
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
-			int balance = Integer.parseInt(rs.getString("balance"));
+			double balance = rs.getDouble("balance");
 			String rideIdString = rs.getString("ride_id_string");
 			ArrayList<UUID> rideIdList = new ArrayList<>();
 			if (rideIdString != null && rideIdString.length() > 0){
@@ -1198,7 +1198,7 @@ public class ValleyBikeSim {
 				pstmt.setString(2, customerAccount.getPassword());
 				pstmt.setString(3, customerAccount.getEmailAddress());
 				pstmt.setString(4, customerAccount.getCreditCard());
-				pstmt.setInt(5, customerAccount.getBalance());
+				pstmt.setDouble(5, customerAccount.getBalance());
 				pstmt.setInt(6, booleanToInt(customerAccount.getIsReturned()));
 				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
 				pstmt.setString(8, customerAccount.getRideIdListToString());

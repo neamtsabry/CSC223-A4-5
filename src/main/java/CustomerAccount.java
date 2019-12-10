@@ -51,7 +51,7 @@ public class CustomerAccount extends Account{
      * @param membership is the membership type that the customer is paying for
      * @param balance is the money that the customer has available in their account
      */
-    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, int balance, boolean lastRideIsReturned, boolean enabled, ArrayList<UUID> rideIdList) {
+    public CustomerAccount(String username, String password, String emailAddress, String creditCard, Membership membership, double balance, boolean lastRideIsReturned, boolean enabled, ArrayList<UUID> rideIdList) {
         //username, password and email address same as super class
         super(username, password, emailAddress);
         this.creditCard = creditCard;
