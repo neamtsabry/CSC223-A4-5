@@ -81,9 +81,9 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.checkMembershipRenewalTime();
 
         System.out.print("\nPlease choose from one of the following menu options: \n"
-                + "1. Create Customer Account\n"
-                + "2. Log In\n"
-                + "0. Exit program\n");
+                + "1: Create Customer Account "
+                + "2: Log In "
+                + "0: Exit program \n");
         //prompt the user to pick an int option
         int num = getResponse("Please enter your selection (0-2):");
         input.nextLine();
@@ -156,9 +156,9 @@ public abstract class ValleyBikeController {
         //prompt the user to choose which kind of account they want to log into
 //TODO GB - make menu lines shorter vertically
         System.out.println("\nPlease choose from one of the following menu options:");
-        int logIn = getResponse("1. Log in to customer account.\n" +
-                "2. Log in to internal account.\n" +
-                "0. Return to menu.\n" +
+        int logIn = getResponse("1: Log in to customer account. " +
+                "2: Log in to internal account. " +
+                "0: Return to menu.  \n" +
                 "Please enter your selection (0-2):");
         input.nextLine();
 
@@ -219,21 +219,21 @@ public abstract class ValleyBikeController {
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         //menu option for customer account home
         System.out.println("\nPlease choose from one of the following menu options:\n"
-                + "1. View and edit account info\n"
-                + "2. View account balance\n"
-                + "3. View station list");
+                + "1: View and edit account info "
+                + "2: View account balance "
+                + "3: View station list ");
 
         //if customer does not have a bike rented, allow option to rent
         //otherwise, give option to return
         if (customer.getIsReturned()) { System.out.println("4. Rent a bike"); }
         else { System.out.println("4. Return bike"); }
 
-        System.out.println("5. Report a problem\n"
-                + "6. View total number of rides\n"
-                + "7. View average ride time\n"
-                + "8. View your most popular ride time.\n"
-                + "9. Delete account.\n"
-                + "0. Log out\n" +
+        System.out.println("5: Report a problem "
+                + "6: View total number of rides "
+                + "7: View average ride time "
+                + "8: View your most popular ride time. "
+                + "9: Delete account. "
+                + "0: Log out \n" +
                 "Please enter your selection (0-5):");
 
         // if input is not a integer
@@ -360,12 +360,12 @@ public abstract class ValleyBikeController {
 
         //prompt user to choose which field they want to edit
         System.out.println("\nPlease choose from one of the following menu options:\n" +
-                "1. Edit username.\n" +
-                "2. Edit password.\n" +
-                "3. Edit email address.\n" +
-                "4. Edit credit card number.\n" +
-                "5. Edit membership.\n" +
-                "0. Return to account home." +
+                "1: Edit username. " +
+                "2: Edit password. " +
+                "3: Edit email address. " +
+                "4: Edit credit card number. " +
+                "5: Edit membership. " +
+                "0: Return to account home. \n" +
                 "Please enter your selection (0-5):");
         int edit = input.nextInt();
         input.nextLine();
@@ -436,10 +436,10 @@ public abstract class ValleyBikeController {
 
         //prompt user to choose which field they want to edit
         System.out.println("\nPlease choose from one of the following menu options:\n" +
-                "1. Edit username.\n" +
-                "2. Edit password.\n" +
-                "3. Edit email address.\n" +
-                "0. Return to account home." +
+                "1: Edit username. " +
+                "2: Edit password. " +
+                "3: Edit email address. " +
+                "0: Return to account home.\n" +
                 "Please enter your selection (0-5):");
         int edit = input.nextInt();
         input.nextLine();
@@ -670,16 +670,17 @@ public abstract class ValleyBikeController {
             long rideLength = rideObj.getRideLength();
             //card was already validated before bike rented to ensure they can pay for the rental
             long paymentDue = rideLength * (long) .30;
-            //TODO what are we even using balance for
-            double balance = ValleyBikeSim.viewAccountBalance(username) + paymentDue;
+            //TODO balance needs to be a double (let payment be long in cast
+            int balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+            ValleyBikeSim.getCustomerObj(username).setBalance(balance + (int) paymentDue);
+
             //update ride payment in ride object
             ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
 
         } else {
-            //otherwise merely decrement rides remaining in membership
+            //otherwise merely decrement rides remaining in membership, payment is 0
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
-
-            //TODO what should ride payment look like if ride is not charged?
+            ValleyBikeSim.updateRidePayment(lastRideId, 0.00);
         }
         System.out.println("You're all done! Thank you for returning this bike.");
         // take user back to their account home
@@ -759,21 +760,21 @@ public abstract class ValleyBikeController {
     static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
         //prompt user to pick option from main internal menu
         System.out.print("\n Choose from the following: \n"
-                + "1. Create new internal account \n"
-                + "2. Edit account information \n"
-                + "3. View customer balances \n"
-                + "4. View customer activity \n"
-                + "5. Add new station \n"
-                + "6. Add new bike \n"
-                + "7. View station list \n"
-                + "8. View bike list \n"
-                + "9. Edit/Resolve maintenance requests \n"
-                + "10. Equalize stations\n"
-                + "11. View total number of users\n"
-                + "12. View total number of maintenance requests\n"
-                + "13. View most popular ride time of the day\n"
-                + "0. Log out \n");
-        System.out.println("Please enter your selection (1-9):");
+                + "1: Create new internal account. "
+                + "2: Edit account information. "
+                + "3: View customer balances. "
+                + "4: View customer activity. "
+                + "5: Add new station. "
+                + "6: Add new bike. "
+                + "7: View station list. "
+                + "8: View bike list. "
+                + "9: Edit/Resolve maintenance requests. "
+                + "10: Equalize stations. "
+                + "11: View total number of users. "
+                + "12: View total number of maintenance requests. "
+                + "13: View most popular ride time of the day. "
+                + "0: Log out. \n");
+        System.out.println("Please enter your selection (1-9): ");
 
         if (!input.hasNextInt()){
             //keep asking for input until valid

@@ -14,6 +14,7 @@ public class CustomerAccount extends Account{
     private Membership membership;
 
     /** This field is the balance of the customer in their account */
+    //TODO make balance double
     private int balance;
 
     // stack of ride ids user has
@@ -140,9 +141,5 @@ public class CustomerAccount extends Account{
 
     public void setLastRideIsReturned(boolean lastRideIsReturned) {
         this.lastRideIsReturned = lastRideIsReturned;
-    }
-
-    public boolean isLastRideIsReturned() {
-        return lastRideIsReturned;
     }
 }
