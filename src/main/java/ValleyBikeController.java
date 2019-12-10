@@ -657,7 +657,7 @@ public abstract class ValleyBikeController {
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
         ValleyBikeSim.updateRideIdList(username, rideId);
-        ValleyBikeSim.updateLastRideisReturned(username, false);
+        ValleyBikeSim.updateCustomerLastRideisReturned(username, false);
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
@@ -731,7 +731,7 @@ public abstract class ValleyBikeController {
 
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
-        ValleyBikeSim.updateLastRideisReturned(username, true);
+        ValleyBikeSim.updateCustomerLastRideisReturned(username, true);
 
         System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
         System.out.println();

@@ -1093,8 +1093,6 @@ public class ValleyBikeSim {
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 				//and tell them to contact customer service
 
-				//TODO end station is 0
-
 				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
 				//this allows users to continue to rent bikes, since they have paid the charge
 
@@ -1102,6 +1100,7 @@ public class ValleyBikeSim {
 				updateRideEndTimeStamp(ride, Instant.now());
 				updateRideStationTo(ride, 0);
 				updateCustomerLastRideisReturned(username, true);
+
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -1365,33 +1364,29 @@ public class ValleyBikeSim {
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		if (stationsMap.get(id) != null) { //if station id already exists, inform user
-			System.out.println("Station with this id already exists.\nPlease try again with another username or log in.");
-			ValleyBikeController.initialMenu();
-		} else { //if station is valid, add to system
-			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kiosk, address, bike_string) " +
-					"VALUES(?,?,?,?,?,?,?,?,?)";
+		String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
+				"capacity, kiosk, address, bike_string) " +
+				"VALUES(?,?,?,?,?,?,?,?,?)";
 
-			//add station to database
-			try (Connection conn = connectToDatabase();
-				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-				pstmt.setInt(1, id);
-				pstmt.setString(2, station.getStationName());
-				pstmt.setInt(3, station.getBikes());
-				pstmt.setInt(4, station.getAvailableDocks());
-				pstmt.setInt(5, station.getMaintenanceRequest());
-				pstmt.setInt(6, station.getCapacity());
-				pstmt.setInt(7, station.getKioskNum());
-				pstmt.setString(8, station.getAddress());
-                pstmt.setString(9, "");
-                pstmt.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
-			}
-			//add station to station map
-			stationsMap.put(id, station);
+		//add station to database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, id);
+			pstmt.setString(2, station.getStationName());
+			pstmt.setInt(3, station.getBikes());
+			pstmt.setInt(4, station.getAvailableDocks());
+			pstmt.setInt(5, station.getMaintenanceRequest());
+			pstmt.setInt(6, station.getCapacity());
+			pstmt.setInt(7, station.getKioskNum());
+			pstmt.setString(8, station.getAddress());
+			pstmt.setString(9, "");
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, something went wrong with adding new customer account to database.");
 		}
+
+		//add station to station map
+		stationsMap.put(id, station);
 	}
 
 	/**
@@ -1405,30 +1400,25 @@ public class ValleyBikeSim {
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
-			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
-			ValleyBikeController.initialMenu();
-			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
-		} else { //if bike valid, add to system
-			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
+		String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
 					"VALUES(?,?,?,?,?)";
 
-			//add bike to database
-			try (Connection conn = connectToDatabase();
-				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-				pstmt.setInt(1, bike.getId());
-				pstmt.setInt(2, bike.getBikeLocation());
-				pstmt.setInt(3, bike.getStation());
-				pstmt.setBoolean(4, bike.getMnt());
-				pstmt.setString(5, bike.getMntReport());
-				pstmt.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
-			}
-
-			//add bike to bike map
-			bikesMap.put(bike.getId(), bike);
+		//add bike to database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, bike.getId());
+			pstmt.setInt(2, bike.getBikeLocation());
+			pstmt.setInt(3, bike.getStation());
+			pstmt.setBoolean(4, bike.getMnt());
+			pstmt.setString(5, bike.getMntReport());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, something went wrong with adding new customer account to database.");
 		}
+
+		//add bike to bike map
+		bikesMap.put(bike.getId(), bike);
+
 	}
 
 	/**
