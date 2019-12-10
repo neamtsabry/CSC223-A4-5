@@ -56,7 +56,6 @@ public abstract class ValleyBikeController {
                 initialMenu();
             case 11:
                 createCustomerAccount();
-//                rentBike("asmitagautam");
             case 12:
                 logIn();
             case 2:
@@ -93,7 +92,6 @@ public abstract class ValleyBikeController {
             case 1:
                 //create a new customer account
                 createCustomerAccount();
-//                rentBike("cptnemo");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -598,15 +596,17 @@ public abstract class ValleyBikeController {
 
         UUID rideId = UUID.randomUUID();
 
+        Instant timeStamp = Instant.now();
+
         // create new ride object
         Ride ride = new Ride(rideId,
                 bikeID,
                 username,
                 false,
-                Instant.now(),
-                null,
+                timeStamp,
+                timeStamp,
                 statId,
-                null);
+                0);
 
         // add ride to map as well as database
         ValleyBikeSim.addRide(ride);
@@ -806,8 +806,7 @@ public abstract class ValleyBikeController {
         Bike bike = ValleyBikeSim.getBikeObj(bikeId);
 
         // set bike's maintenance report and maintenance to true
-        ValleyBikeSim.updateBikeRqMnt(bikeId, true);
-        ValleyBikeSim.updateBikeMntReport(bikeId, mntReport);
+        ValleyBikeSim.updateBikeRqMnt(bikeId, true, mntReport);
 
         // bike is now out of commission until fixed
         ValleyBikeSim.updateBikeLocation(bikeId, 1);
@@ -1043,7 +1042,6 @@ public abstract class ValleyBikeController {
         // get new bike's id
         //TODO GRACE validate length of bike id
         int id = getResponse("Please enter the bike's ID");
-
 
         // if the bike already exists
         while(ValleyBikeSim.getBikeObj(id) != null){

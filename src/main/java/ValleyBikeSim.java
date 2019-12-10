@@ -323,7 +323,7 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not update bike's station id in database at this time.");
+			System.out.println("Sorry, could not update station maintenance requests in the database at this time.");
 		}
 		//update station data in map
 		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
@@ -352,9 +352,8 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not add ride id to list in database at this time.");
+			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
 		}
-		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
@@ -378,7 +377,6 @@ public class ValleyBikeSim {
 	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
-		stationsMap.get(stationId).addToBikeList(bikeId);
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
 		try (Connection conn = connectToDatabase();
@@ -390,10 +388,10 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
-			System.out.println("Sorry, could not add ride id to list in database at this time.");
+			System.out.println("Sorry, could not update station's bike list in database");
 		}
 
-		System.out.println("Your ride has been successfully added to your history.");
+		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
 
@@ -419,6 +417,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update bike's station id in database at this time.");
 		}
+
 		bikesMap.get(bikeId).setStation(newStationId);
 	}
 
@@ -451,14 +450,16 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 * Update whether a bike has a maintenance request
+	 * Update whether a bike has a maintenance request along with its
+	 * maintenance report if it does
 	 *
 	 * @param bikeId  bike id to  update
 	 * @param req_mnt boolean whether bike has a maintenance request
+	 * @param new_mnt_report the maintenance report if bike requires maintenance
 	 * @throws ClassNotFoundException
 	 */
-	static void updateBikeRqMnt(int bikeId, boolean req_mnt) throws ClassNotFoundException {
-		String sql = "UPDATE Bike SET req_mnt = ? "
+	static void updateBikeRqMnt(int bikeId, boolean req_mnt, String new_mnt_report) throws ClassNotFoundException {
+		String sql = "UPDATE Bike SET req_mnt = ?, mnt_report = ?"
 				+ "WHERE id = ?";
 
 		//update maintenance request in database
@@ -471,7 +472,8 @@ public class ValleyBikeSim {
 
 			// set the corresponding param
 			pstmt.setInt(1, req_mnt_int);
-			pstmt.setInt(2, bikeId);
+			pstmt.setString(2, new_mnt_report);
+			pstmt.setInt(3, bikeId);
 
 			// update
 			pstmt.executeUpdate();
@@ -480,37 +482,13 @@ public class ValleyBikeSim {
 		}
 		//update maintenance request in bike map
 		bikesMap.get(bikeId).setMnt(req_mnt);
-		//TODO do we ever delete/add to maintenance requests map? NS
-	}
+		bikesMap.get(bikeId).setMntReport(new_mnt_report);
 
-	/**
-	 * Update the string description of a bike's maintenance report
-	 *
-	 * @param bikeId     the bike that has the maintenance request
-	 * @param mnt_report the new report string
-	 * @throws ClassNotFoundException
-	 */
-	static void updateBikeMntReport(int bikeId, String mnt_report) throws ClassNotFoundException {
-		String sql = "UPDATE Bike SET mnt_report = ? "
-				+ "WHERE id = ?";
-
-		//update maint req string in database
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-			// set the corresponding param
-			pstmt.setString(1, mnt_report);
-			pstmt.setInt(2, bikeId);
-
-			// update
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not update bike maintenance report in database at this time.");
+		// if bike requires maintenance
+		if(req_mnt){
+			// add bike id and report to map of maintenance requests
+			mntReqs.put(bikeId, new_mnt_report);
 		}
-
-		//update bike maint req in bike map
-		bikesMap.get(bikeId).setMntReport(mnt_report);
-		//TODO do we update string in maint reqs map? NS
 	}
 
 	/**
@@ -1680,8 +1658,7 @@ public class ValleyBikeSim {
 				Bike bike = bikesMap.get(bikeId);
 
 				// set bike maintenance values to none
-				updateBikeRqMnt(bikeId, false);
-				updateBikeMntReport(bikeId, "n");
+				updateBikeRqMnt(bikeId, false, "n");
 
 				// bike now available for customers
 				bike.setBikeLocation(0);
