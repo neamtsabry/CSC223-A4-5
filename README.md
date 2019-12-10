@@ -73,5 +73,6 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 https://stackoverflow.com/questions/27005861/calculate-days-between-two-dates-in-java-8
 https://stackoverflow.com/questions/50299639/converting-string-to-instant
 https://www.tutorialspoint.com/java/util/uuid_fromstring.htm
+https://www.w3schools.com/sql/sql_delete.asp
 
 ***

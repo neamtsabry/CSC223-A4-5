@@ -1015,7 +1015,11 @@ public class ValleyBikeSim {
 			totalRideTime += rideMap.get(ride).getRideLength();
 		}
 		//divide total ride time by number of rides to get average ride time
-		return totalRideTime / rideIdList.size();
+		if (rideIdList.size() == 0) {
+			return 0;
+		} else {
+			return totalRideTime / rideIdList.size();
+		}
 	}
 
 	/**
@@ -1763,6 +1767,18 @@ public class ValleyBikeSim {
 	static CustomerAccount getCustomerObj(String key) {
 		return customerAccountMap.get(key);
 	}
+
+	/**
+	 * Helper method for controller class to get internal object by
+	 * finding it in internal account map and returning it
+	 *
+	 * @param key username of desired account
+	 * @return internal account matching inputted username
+	 */
+	static InternalAccount getInternalObj(String key) {
+		return internalAccountMap.get(key);
+	}
+
 
 	/**
 	 * Helper method for controller class to get bike object by

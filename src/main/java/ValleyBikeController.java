@@ -93,7 +93,7 @@ public abstract class ValleyBikeController {
                     " If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
         } else if (membership == 3) {
-            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
+            System.out.println("You have been charged $90 for your yearly membership. Your membership will auto-renew each year,\n" +
                     " and you will get an email notification when your card is charged. \n" +
                     "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
@@ -155,7 +155,7 @@ public abstract class ValleyBikeController {
         //if user wants to log out take them back to initial menu
         if (password.contentEquals("0")){ return; }
 
-        while (!password.equals(ValleyBikeSim.getCustomerObj(username).getPassword())){
+        while (password != ValleyBikeSim.getInternalObj(username).getPassword()){
             System.out.println("Invalid password. Please try again.");
             System.out.println("Please enter your password or '0' to cancel:");
             password = input.nextLine();
@@ -213,13 +213,12 @@ public abstract class ValleyBikeController {
                 + "1: View and edit account info\t"
                 + "2: View account balance\t"
                 + "3: View station list\t"
-                + "4: View station list\t"
-                + "5: " + rentReturnString + "\t"
-                + "6: Report a problem\n"
-                + "7: View total number of rides\t"
-                + "8: View average ride time\t"
-                + "9: View your most popular ride time\t"
-                + "10: Delete account\t"
+                + "4: " + rentReturnString + "\t"
+                + "5: Report a problem\n"
+                + "6: View total number of rides\t"
+                + "7: View average ride time\t"
+                + "8: View your most popular ride time\t"
+                + "9: Delete account\t"
                 + "0: Log out");
 
         //get and validate user response
@@ -256,7 +255,8 @@ public abstract class ValleyBikeController {
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
                 break;
             case 7:
-                System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
+                int rideTime = ValleyBikeSim.viewAverageRideTime(username);
+                System.out.println("Your average ride time is " + rideTime + " minutes.");
                 break;
             case 8:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
@@ -307,7 +307,6 @@ public abstract class ValleyBikeController {
         System.out.println("Internal account successfully created!");
 
         menuPath.pop();// we no longer need to remember this menu
-        return;
     }
 
     /**
@@ -330,9 +329,9 @@ public abstract class ValleyBikeController {
                 "\nUsername: " + customer.getUsername() +
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
+                "\nCredit Card: ************" + customer.getCreditCard().substring(12));
                 //TODO returns a null pointer exception AG
-                //"\nCredit Card: ************" + customer.getCreditCard().substring(12) +
-                "\nMembership: " + customer.getMembership().getMembershipString());
+                //"\nMembership: " + customer.getMembership().getMembershipString());
     }
 
 
@@ -408,7 +407,7 @@ public abstract class ValleyBikeController {
                 }
                 break;
             case 0:
-                //TODO GRACE check on this
+                //TODO GRACE check on this-- it returns to initial menu not customer home
                 returnToLastMenu(username);
             default:
                 //if none of the other options, must not be valid
@@ -1217,9 +1216,9 @@ public abstract class ValleyBikeController {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
-            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel:");
+            System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel: ");
             username = input.nextLine();
-
+            //System.out.println("hihi"+username+"hihi");
             // check for '0' input and return to previous menu
             if (username.contentEquals("0")) { returnToLastMenu(creator); }
 
