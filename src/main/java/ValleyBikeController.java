@@ -435,7 +435,7 @@ public abstract class ValleyBikeController {
                 "1: Edit username\t" +
                 "2: Edit password\t" +
                 "3: Edit email address\t" +
-                "0: Return to account home\n");
+                "0: Return to account home");
 
         int edit = getResponseBetween(0, 3, "Please enter your selection (0-5):");
 
@@ -832,7 +832,7 @@ public abstract class ValleyBikeController {
                 // + "5: View customer activity\t"
                 + "6: Add new station\t"
                 + "7: Add new bike\t"
-                + "8: View station list\t"
+                + "8: View station list\n"
                 + "9: View bike list\t"
                 + "10: Edit/Resolve maintenance requests\t"
                 + "11: Equalize stations\t"
@@ -854,7 +854,7 @@ public abstract class ValleyBikeController {
                 editInternalAccount(username);
                 break;
             case 3:
-                menuPath.push(2); // add this menu to stack in case we want to return
+                menuPath.push(3); // add this menu to stack in case we want to return
                 findCustomer(username);
                 menuPath.pop();
                 //TODO view and edit customer account
@@ -1116,7 +1116,7 @@ public abstract class ValleyBikeController {
             System.out.println("Bike with this ID already exists.");
 
             // prompt user to re-enter bike id
-            id = getResponse("Please re-enter the bike's ID");
+            id = getResponse("Please enter a new bike ID");
         }
 
         // View stations

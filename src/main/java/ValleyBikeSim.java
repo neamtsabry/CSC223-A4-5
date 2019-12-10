@@ -355,7 +355,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
-		System.out.println("Your ride has been successfully added to your history.");
+		//System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
@@ -393,8 +393,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
-
-		System.out.println("Your ride has been successfully added to your history.");
+		//System.out.println("Your ride has been successfully added to your history.");
 	}
 
 
@@ -1388,8 +1387,8 @@ public class ValleyBikeSim {
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
-			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 			ValleyBikeController.initialMenu();
+			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 		} else { //if bike valid, add to system
 			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
 					"VALUES(?,?,?,?,?)";
