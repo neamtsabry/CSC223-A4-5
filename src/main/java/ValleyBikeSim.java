@@ -104,7 +104,7 @@ public class ValleyBikeSim {
 			String password = rs.getString("password");
 			String emailAddress = rs.getString("email_address");
 			String creditCard = rs.getString("credit_card");
-			Membership membership = checkMembershipType(rs.getInt("membership"));
+			Membership membership = readMembershipData(stmt, username);
 			int lastRideIsReturned = rs.getInt("last_ride_is_returned");
 			int enabled = rs.getInt("enabled");
 			int balance = Integer.parseInt(rs.getString("balance"));
@@ -126,15 +126,16 @@ public class ValleyBikeSim {
 		}
 	}
 
-	private static void readMembershipData(Statement stmt) throws SQLException{
-		ResultSet rs = stmt.executeQuery("SELECT * FROM Membership");
-		//get each value from each line in database
-		while ( rs.next() ) {
-			String username = rs.getString("username");
-			int totalRidesLeft = rs.getInt("total_rides_left");
-			LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
-			LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
-		}
+	private static Membership readMembershipData(Statement stmt, String username) throws SQLException{
+		String query = "SELECT * FROM Membership WHERE username = " + username;
+		ResultSet rs = stmt.executeQuery(query);
+
+		int totalRidesLeft = rs.getInt("total_rides_left");
+		int type = rs.getInt("type");
+		LocalDate lastPayment = LocalDate.parse(rs.getString("last_payment"), formatter);
+		LocalDate memberSince = LocalDate.parse(rs.getString("member_since"), formatter);
+
+		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
 	}
 
 	/**
@@ -1163,8 +1164,8 @@ public class ValleyBikeSim {
 			//prompt the user to input new account information again or log in
 			ValleyBikeController.initialMenu();
 		} else {
-			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, membership, balance) " +
-					"VALUES(?,?,?,?,?,?)";
+			String sql = "INSERT INTO Customer_Account(username, password, email_address, credit_card, balance, last_ride_is_returned, enabled, ride_id_string) " +
+					"VALUES(?,?,?,?,?,?,?,?)";
 
 			//add customer account to database
 			try (Connection conn = connectToDatabase();
@@ -1173,8 +1174,10 @@ public class ValleyBikeSim {
 				pstmt.setString(2, customerAccount.getPassword());
 				pstmt.setString(3, customerAccount.getEmailAddress());
 				pstmt.setString(4, customerAccount.getCreditCard());
-				pstmt.setInt(5, customerAccount.getMembership().getMembershipInt());
-				pstmt.setInt(6, customerAccount.getBalance());
+				pstmt.setInt(5, customerAccount.getBalance());
+				pstmt.setInt(6, booleanToInt(customerAccount.getIsReturned()));
+				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
+				pstmt.setString(8, customerAccount.getRideIdListToString());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
@@ -1184,6 +1187,10 @@ public class ValleyBikeSim {
 			//add the new customer account object to customer account map
 			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
+	}
+
+	private static int booleanToInt(boolean myBoolean) {
+		return myBoolean ? 1 : 0;
 	}
 
 	/**

@@ -1233,7 +1233,7 @@ public abstract class ValleyBikeController {
      * @return true if password is valid and false otherwise
      */
     public static boolean isValidPassword(String password){
-        if ((password != null)||(password.length()<6)||(password.length()>14)) {
+        if ((password != null)&&(password.length()<6)||(password.length()>14)) {
             System.out.println("Password is not the correct length. Please try again.");
             return false;
         }
