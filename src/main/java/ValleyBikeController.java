@@ -93,7 +93,7 @@ public abstract class ValleyBikeController {
                     " If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
         } else if (membership == 3) {
-            System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
+            System.out.println("You have been charged $90 for your yearly membership. Your membership will auto-renew each year,\n" +
                     " and you will get an email notification when your card is charged. \n" +
                     "If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
                     "and notified via email. ");
@@ -213,13 +213,12 @@ public abstract class ValleyBikeController {
                 + "1: View and edit account info\t"
                 + "2: View account balance\t"
                 + "3: View station list\t"
-                + "4: View station list\t"
-                + "5: " + rentReturnString + "\t"
-                + "6: Report a problem\n"
-                + "7: View total number of rides\t"
-                + "8: View average ride time\t"
-                + "9: View your most popular ride time\t"
-                + "10: Delete account\t"
+                + "4: " + rentReturnString + "\t"
+                + "5: Report a problem\n"
+                + "6: View total number of rides\t"
+                + "7: View average ride time\t"
+                + "8: View your most popular ride time\t"
+                + "9: Delete account\t"
                 + "0: Log out");
 
         //get and validate user response
@@ -256,7 +255,8 @@ public abstract class ValleyBikeController {
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
                 break;
             case 7:
-                System.out.println("Your average ride time is " + ValleyBikeSim.viewAverageRideTime(username));
+                int rideTime = ValleyBikeSim.viewAverageRideTime(username);
+                System.out.println("Your average ride time is " + rideTime + " minutes.");
                 break;
             case 8:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);

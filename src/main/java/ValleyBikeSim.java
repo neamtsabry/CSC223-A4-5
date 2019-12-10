@@ -1015,7 +1015,11 @@ public class ValleyBikeSim {
 			totalRideTime += rideMap.get(ride).getRideLength();
 		}
 		//divide total ride time by number of rides to get average ride time
-		return totalRideTime / rideIdList.size();
+		if (rideIdList.size() == 0) {
+			return 0;
+		} else {
+			return totalRideTime / rideIdList.size();
+		}
 	}
 
 	/**
