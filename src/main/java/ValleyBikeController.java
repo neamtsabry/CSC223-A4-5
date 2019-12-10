@@ -55,8 +55,8 @@ public abstract class ValleyBikeController {
             case 1:
                 initialMenu();
             case 11:
-//                createCustomerAccount();
-                rentBike();
+                createCustomerAccount();
+//                rentBike("asmitagautam");
             case 12:
                 logIn();
             case 2:
