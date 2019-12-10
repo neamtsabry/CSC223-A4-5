@@ -1171,9 +1171,9 @@ public abstract class ValleyBikeController {
         int num;
         do {//loops until user inputs int 0-3
             System.out.println("Choose membership type: \n" +
-                    "1. Pay-as-you-go Membership \n" +
-                    "2. Monthly Membership \n" +
-                    "3. Yearly Membership");
+                    "1: Pay-as-you-go Membership. " +
+                    "2: Monthly Membership. " +
+                    "3: Yearly Membership ");
             //prompt the user to pick an int option
             num = getResponse("Please enter your selection (1-3) or '0' to cancel:");
             input.nextLine();
