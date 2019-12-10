@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -252,7 +251,7 @@ public abstract class ValleyBikeController {
                 reportProblem(username);
                 break;
             case 6:
-                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewTotalRides(username));
+                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewRideListLength(username));
                 break;
             case 7:
                 int rideTime = ValleyBikeSim.viewAverageRideTime(username);
@@ -1008,7 +1007,11 @@ public abstract class ValleyBikeController {
         viewCustomerActivity(customer);
     }
 
-    //TODO Add comments to viewCustomerActivity method!!
+
+    /**
+     * view rides specified customer has taken
+     * @param customer customer whose rides will be displayed
+     */
     private static void viewCustomerActivity(CustomerAccount customer){
         ArrayList<UUID> rideList = customer.getRideIdList();
 
@@ -1017,6 +1020,7 @@ public abstract class ValleyBikeController {
             System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n", "Bike ID", "Is returned",
                     "Start Timestamp", "End Timestamp", "RideLength", "Station from", "Station to");
 
+            //format out printing of whole ride list
             for(UUID rideId : rideList){
                 Ride rideObj = ValleyBikeSim.getRideObj(rideId);
 
@@ -1029,7 +1033,7 @@ public abstract class ValleyBikeController {
                         rideObj.getStationFrom(),
                         rideObj.getStationTo());
             }
-        } else{
+        } else{ //if customer has no rides, inform user
             System.out.println("This customer has not started any rides yet.");
         }
     }
@@ -1152,7 +1156,6 @@ public abstract class ValleyBikeController {
                 mnt,
                 mntReport
         );
-
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 

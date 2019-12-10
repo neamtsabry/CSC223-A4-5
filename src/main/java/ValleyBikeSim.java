@@ -542,7 +542,6 @@ public class ValleyBikeSim {
 
 		//update ride in ride map
 		rideMap.get(rideId).setIsReturned(isReturned);
-		//TODO is the ride being updated in the customer's ride list? NS or AG
 	}
 
 	/**
@@ -604,8 +603,6 @@ public class ValleyBikeSim {
 
 		//update payment for ride in ride map
 		rideMap.get(rideId).setPayment(payment);
-
-		//TODO what is ride payment if ride was included in membership, not payg? NS or AG
 	}
 
 
@@ -1477,7 +1474,6 @@ public class ValleyBikeSim {
 
 			//add ride to ride map
 			rideMap.put(ride.getRideId(), ride);
-			//TODO has this ride been added to customer list already? NS
 		}
 	}
 
@@ -1727,9 +1723,8 @@ public class ValleyBikeSim {
 	 * @param username username of account whose rides will be viewed
 	 * @return return the size of a customer's ride list
 	 */
-	static int viewTotalRides(String username) {
+	static int viewRideListLength(String username) {
 		return customerAccountMap.get(username).getRideIdList().size();
-		//TODO rename to get rideListLength ? NS
 	}
 
 	/**
