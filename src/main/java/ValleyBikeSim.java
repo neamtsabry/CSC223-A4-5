@@ -1,3 +1,4 @@
+
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -49,7 +50,7 @@ public class ValleyBikeSim {
 
 	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
-	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	/**
 	 * Reads in the stations csv file data and parses it into station objects
@@ -149,7 +150,7 @@ public class ValleyBikeSim {
 				totalRidesLeft = rows.getInt("total_rides_left");
 				type = rows.getInt("type");
 				lastPayment = LocalDate.parse(rows.getString("last_payment"), formatter);
-				memberSince = LocalDate.parse(rows.getString("member_since"), formatter);
+				memberSince = LocalDate.parse(rows.getString("membership_since"), formatter);
 			}
 		}
 		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
@@ -390,7 +391,6 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update station's bike list in database");
 		}
-
 		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
@@ -520,7 +520,6 @@ public class ValleyBikeSim {
 
 		//update ride in ride map
 		rideMap.get(rideId).setIsReturned(isReturned);
-		//TODO is the ride being updated in the customer's ride list? NS or AG
 	}
 
 	/**
@@ -551,7 +550,6 @@ public class ValleyBikeSim {
 
 		//update ride end timestamp in ride map
 		rideMap.get(rideId).setEndTimeStamp(end_time_stamp);
-		//TODO is ride end time stamp being update in customer ride list? NS or AG
 	}
 
 	/**
@@ -582,8 +580,33 @@ public class ValleyBikeSim {
 
 		//update payment for ride in ride map
 		rideMap.get(rideId).setPayment(payment);
+	}
 
-		//TODO what is ride payment if ride was included in membership, not payg? NS or AG
+	/**
+	 * Updates cost of ride
+	 *
+	 * @param rideId  ride being updated
+	 * @throws ClassNotFoundException
+	 */
+	static void updateRideStationTo(UUID rideId, int station_to) throws ClassNotFoundException {
+		String sql = "UPDATE Ride SET station_to = ? "
+				+ "WHERE ride_id = ?";
+
+		//update ride payment in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			pstmt.setInt(1, station_to);
+			pstmt.setString(2, rideId.toString());
+
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+		}
+
+		//update payment for ride in ride map
+		rideMap.get(rideId).setStationTo(station_to);
 	}
 
 
@@ -775,7 +798,6 @@ public class ValleyBikeSim {
 
 		//add new ride to customer's ride list
 		customerAccountMap.get(username).addNewRide(rideId);
-		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	/**
@@ -785,7 +807,7 @@ public class ValleyBikeSim {
 	 * @param lastRideisReturned boolean representing whether last bike was returned
 	 * @throws ClassNotFoundException
 	 */
-	static void updateLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
+	static void updateCustomerLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET last_ride_is_returned = ? "
 				+ "WHERE username = ?";
 
@@ -808,7 +830,6 @@ public class ValleyBikeSim {
 		}
 		//update field in customer account map
 		customerAccountMap.get(username).setLastRideIsReturned(lastRideisReturned);
-		System.out.println("Your ride has been successfully added to your history.");
 	}
 
 	/**
@@ -880,6 +901,8 @@ public class ValleyBikeSim {
 		String sql = "UPDATE Customer_Account SET membership = ? "
 				+ "WHERE username = ?";
 
+		//TODO are you updating lastPaymentDate, number of rides remaining, etc?
+		// Everything would change when membership type changes
 		//update membership type in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -896,7 +919,19 @@ public class ValleyBikeSim {
 		//update membership type associated with user and date representing start of membership
 		customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
 		customerAccountMap.get(username).getMembership().setMemberSince(LocalDate.now());
-		System.out.println("Your credit card information has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
+		System.out.println("Your membership has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
+		//inform user of the charge for their new membership
+		if (newMembership == 2) {
+			System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew each month, \n" +
+					" and you will get an email notification when your card is charged. \n" +
+					" If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+					"and notified via email. ");
+		} else if (newMembership == 3) {
+			System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
+					" and you will get an email notification when your card is charged. \n" +
+					"If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+					"and notified via email. ");
+		}
 	}
 
 
@@ -975,7 +1010,11 @@ public class ValleyBikeSim {
 			totalRideTime += rideMap.get(ride).getRideLength();
 		}
 		//divide total ride time by number of rides to get average ride time
-		return totalRideTime / rideIdList.size();
+		if (rideIdList.size() == 0) {
+			return 0;
+		} else {
+			return totalRideTime / rideIdList.size();
+		}
 	}
 
 	/**
@@ -1034,12 +1073,13 @@ public class ValleyBikeSim {
 	 *
 	 * @param username is the unique username associated with the customer account
 	 */
-	static void checkBikeRented(String username) throws ParseException, InterruptedException {
+	static void checkBikeRented(String username) throws ParseException, InterruptedException, ClassNotFoundException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+
 		// true if last ride was returned
-		//TODO Neamat when I was running the code I got a null pointer error from here from account home
 		Boolean isReturned = customer.getIsReturned();
+
 		if (!isReturned) {
 			UUID ride = customer.getLastRideId();
 			if (rideMap.get(ride).isRented24Hours()) {
@@ -1047,16 +1087,21 @@ public class ValleyBikeSim {
 				//credit card was pre-validated when bike was rented to ensure charge would be valid
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
+
+				//TODO where are we adding that balance to the credit card?
+
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 				//and tell them to contact customer service
+
 				//TODO end station is 0
+
 				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
 				//this allows users to continue to rent bikes, since they have paid the charge
-				Ride rideObj = getRideObj(ride);
-				rideObj.setIsReturned(true);
-				rideObj.setEndTimeStamp(Instant.now());
-				customerAccountMap.get(username).setLastRideIsReturned(true);
 
+				updateRideIsReturned(ride, true);
+				updateRideEndTimeStamp(ride, Instant.now());
+				updateRideStationTo(ride, 0);
+				updateCustomerLastRideisReturned(username, true);
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -1255,18 +1300,34 @@ public class ValleyBikeSim {
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-    	Membership membershipType = checkMembershipType(membership);
-
-    	//TODO: Pay for monthly and yearly membership
-
+    	//create new membership instance
+		Membership membershipType = checkMembershipType(membership);
 		//create instance of customer object
 		CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membershipType);
 		//add customer account to customer account map
 		addCustomerAccount(customerAccount);
+		addMembership(membershipType, username);
 	}
 
+	static void addMembership(Membership membership, String username){
+		String sql = "INSERT INTO Membership(username, total_rides_left, last_payment, membership_since, type) " +
+				"VALUES(?,?,?,?,?)";
 
-	static Membership checkMembershipType(int membership, int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
+		//add customer account to database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setString(1, username);
+			pstmt.setInt(2, membership.getTotalRidesLeft());
+			pstmt.setString(3, membership.getLastPayment().toString());
+			pstmt.setString(4, membership.getMemberSince().toString());
+			pstmt.setDouble(5, membership.getMembershipInt());
+			pstmt.executeUpdate();
+		} catch (SQLException | ClassNotFoundException e) {
+			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+		}
+	}
+
+	static Membership checkMembershipType(int membership,  int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
 		if (membership == 1){
 			return new PayAsYouGoMembership(totalRidesLeft, lastPayment, memberSince);
 		}
@@ -1277,36 +1338,6 @@ public class ValleyBikeSim {
 			return new YearlyMembership(totalRidesLeft, lastPayment, memberSince);
 		}
 		return null;
-	}
-
-	/**
-	 * Verify username and password when a customer logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-	 */
-	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		//if the username entered by the user does not exist in the customer account map
-		/*
-		if (!customerAccountMap.containsKey(username)) {
-			//print that the account does not exist
-			System.out.println("This account does not exist.");
-			//prompt the user to input new account information again or log in
-			ValleyBikeController.initialMenu();
-		}
-		 */
-
-		//if the username exists but the password entered by the user does not match the password associated with that username
-		if (!password.equals(customerAccountMap.get(username).getPassword())) {
-			//print incorrect password
-			System.out.println("Incorrect password. Please try again.");
-			//prompt the user to input new account information again or log in
-			return;
-		}
-		//if the username and password both match with associated customer account object, lead the user to user account home
-		ValleyBikeController.customerAccountHome(username);
 	}
 
 	static Ride viewLongestRide(String username){
@@ -1320,37 +1351,6 @@ public class ValleyBikeSim {
 			}
 		}
 		return longestRide;
-	}
-
-
-	/**
-	 * Verify username and password when an internal staff logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-	 */
-	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		//if the username entered by the user does not exist in the internal account map
-		/*
-		if (!internalAccountMap.containsKey(username)) {
-			//print that the account does not exist
-			System.out.println("This account does not exist.");
-			//take the user back to the initial menu
-			return;
-		}
-		 */
-
-		//if the username exists but the password entered by the user does not match the password associated with that username
-		if (!password.equals(internalAccountMap.get(username).getPassword())) {
-			//print incorrect password
-			System.out.println("Incorrect password. Please try again.");
-			//take the user back to the initial menu
-			return;
-		}
-		//if the username and password both match with associated customer account object, lead the user to internal account home
-		ValleyBikeController.internalAccountHome(username);
 	}
 
 	/**
@@ -1407,8 +1407,8 @@ public class ValleyBikeSim {
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
 		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
 			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
-			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 			ValleyBikeController.initialMenu();
+			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
 		} else { //if bike valid, add to system
 			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
 					"VALUES(?,?,?,?,?)";
@@ -1479,7 +1479,6 @@ public class ValleyBikeSim {
 
 			//add ride to ride map
 			rideMap.put(ride.getRideId(), ride);
-			//TODO has this ride been added to customer list already? NS
 		}
 	}
 
@@ -1728,9 +1727,8 @@ public class ValleyBikeSim {
 	 * @param username username of account whose rides will be viewed
 	 * @return return the size of a customer's ride list
 	 */
-	static int viewTotalRides(String username) {
+	static int viewRideListLength(String username) {
 		return customerAccountMap.get(username).getRideIdList().size();
-		//TODO rename to get rideListLength ? NS
 	}
 
 	/**
@@ -1785,6 +1783,18 @@ public class ValleyBikeSim {
 	static CustomerAccount getCustomerObj(String key) {
 		return customerAccountMap.get(key);
 	}
+
+	/**
+	 * Helper method for controller class to get internal object by
+	 * finding it in internal account map and returning it
+	 *
+	 * @param key username of desired account
+	 * @return internal account matching inputted username
+	 */
+	static InternalAccount getInternalObj(String key) {
+		return internalAccountMap.get(key);
+	}
+
 
 	/**
 	 * Helper method for controller class to get bike object by
@@ -1911,4 +1921,48 @@ public class ValleyBikeSim {
 		}
 		return bikesAtStation;
 	}
+
+	/**
+	 * Verify username and password when an internal staff logs in to their account
+	 *
+	 * @param username is the username input by the user to log in
+	 * @param password is the password input by the user to log in
+	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
+	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
+
+	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+
+	//if the username exists but the password entered by the user does not match the password associated with that username
+	if (!password.equals(internalAccountMap.get(username).getPassword())) {
+	//print incorrect password
+	System.out.println("Incorrect password. Please try again.");
+	//take the user back to the initial menu
+	return;
+	}
+	//if the username and password both match with associated customer account object, lead the user to internal account home
+	ValleyBikeController.internalAccountHome(username);
+	}
+	 */
+
+	/**
+	 * Verify username and password when a customer logs in to their account
+	 *
+	 * @param username is the username input by the user to log in
+	 * @param password is the password input by the user to log in
+	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
+	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
+	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+
+	//if the username exists but the password entered by the user does not match the password associated with that username
+	if (!password.equals(customerAccountMap.get(username).getPassword())) {
+	//print incorrect password
+	System.out.println("Incorrect password. Please try again.");
+	//prompt the user to input new account information again or log in
+	return;
+	}
+	//if the username and password both match with associated customer account object, lead the user to user account home
+	ValleyBikeController.customerAccountHome(username);
+	}
+
+	 */
 }
