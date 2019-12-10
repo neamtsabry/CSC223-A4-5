@@ -517,7 +517,7 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * Allows a customer to rent a bike by asking for necessary input
+     * Allows a customer to rent a bike by asking for necessary inputs
      *
      * @throws IOException
      * @throws ParseException
@@ -535,17 +535,15 @@ public abstract class ValleyBikeController {
         // View stations
         System.out.println("STATION LIST:");
         ValleyBikeSim.viewStationList(); // view station list
-        //get input
-        //while input not valid station or 0
-            //
-
 
         // choose station to rent from or go back
         int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
                 "Enter the station ID ('11') or '0' to return to menu: ");
         Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
 
+        //keep running while loop until input valid station with available bikes
         while ((stationFrom == null || Objects.equals(stationFrom.getBikes(), 0)) && statId != 0) {
+            //if station doesnt exist, inform user
             if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
 
             //if station doesn't have bikes, equalize stations and have user re-select station
@@ -553,9 +551,10 @@ public abstract class ValleyBikeController {
                 System.out.println("The station entered does not have any bikes.\n" +
                         "We are notifying maintenance worker to resolve this, but in the meantime please " +
                         "choose another station");
-                //mocking notification to maintenance worker who immediately goes and equalizes stations
+                //mock notification to maintenance worker who immediately goes and equalizes stations
                 ValleyBikeSim.equalizeStations();
             }
+            //because station not valid, have user re-input and then validate
             statId = getResponse("Please pick a station to rent a bike from.\n" +
                     "Enter the station ID ('11') or '0' to return to menu: ");
             stationFrom = ValleyBikeSim.getStationObj(statId);
