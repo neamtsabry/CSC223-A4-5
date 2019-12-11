@@ -24,10 +24,8 @@ public abstract class ValleyBikeController {
      */
     static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //check whether it's time to renew customer's memberships
-        //ValleyBikeSim.checkMembershipRenewalTime();
+        ValleyBikeSim.checkMembershipRenewalTime();
 
-        System.out.println("");
-        ValleyBikeSim.viewBikeList();
         System.out.print("Please choose from one of the following menu options:\n"
                 + "1: Create Customer Account\t"
                 + "2: Log In\t"
