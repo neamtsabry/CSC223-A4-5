@@ -1137,42 +1137,45 @@ public abstract class ValleyBikeController {
         // prompt capacity for station
         Integer capacity = getResponseBetween(5, 37, "What is the station's capacity (5-37)?");
 
-        // number of kiosks
-        Integer kiosk = getResponseBetween(0, 5, "How many kiosks (0-5)?");
-        // since 0 is a valid option for number of kiosks, we chose to have a cancel key for this input
-        // instead we give the user the ability to cancel on the next step
+
+        // does it have a kiosk?
+        System.out.println("Does the station have a kiosk?" +
+                "\n1: Yes\t" +
+                "2: No\t" +
+                "0: Cancel\n");
+        Integer kiosk = getResponseBetween(0, 2, "Please enter your selection (0-2):");
+        boolean kioskBoolean = false;
+        // 
+        switch (kiosk){
+            case 0:
+                System.out.println("Station creation canceled.");
+                return;
+            case 1:
+                kioskBoolean = true;
+        }
 
         // prompt for the station's address
         System.out.println("Please enter station address or '0' to cancel: ");
         input.nextLine();
         String address = input.nextLine();
-
-        // confirmation
-        System.out.println("Are you sure you want to add a station with the info entered?(y/n)");
-        String confirm = input.nextLine();
-
-        switch(confirm.toLowerCase()){
-            case "y":
-                // create new station object with received data from user
-                Station stationOb = new Station(
-                        name,
-                        maintenanceRequest,
-                        capacity,
-                        kiosk,
-                        address);
-
-                // add new station to database and tree
-                ValleyBikeSim.addStation(stationOb, id);
-
-                System.out.println("Station has been added!");
-                break;
-            case"n":
-                System.out.println("The station was not added, taking you back to your account home...");
-                break;
-            default:
-                System.out.println("You have to answer with y (yes) or n (no)");
-                break;
+        if (Objects.equals(address, "0")){
+            System.out.println("Station creation canceled.");
+            return;
         }
+
+        // create new station object with received data from user
+        Station stationOb = new Station(
+                name,
+                maintenanceRequest,
+                capacity,
+                kioskBoolean,
+                address);
+
+        // add new station to database and tree
+        ValleyBikeSim.addStation(stationOb, id);
+
+        System.out.println("Station has been added!");
+
     }
 
     /**
