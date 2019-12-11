@@ -893,6 +893,9 @@ public abstract class ValleyBikeController {
             //TODO decrement rides remaining in membership database
             //otherwise decrement rides remaining in membership
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
+
+            ValleyBikeSim.updateMembershipRidesLeft(username, ridesLeft - 1);
+
             //calculate whether there is an overtime charge (for a ride longer than 1hr)
 
             if (rideLength > 60L) {

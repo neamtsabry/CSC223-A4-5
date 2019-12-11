@@ -344,8 +344,28 @@ public class ValleyBikeSim {
 
 	}
 
+	//TODO
+
 	/**
-<<<<<<< HEAD
+	 * updates membership rides left
+	 * @param username username of account membership to update
+	 * @param ridesLeft number of rides left to set membership to
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	static void updateMembershipRidesLeft(String username, int ridesLeft) throws SQLException, ClassNotFoundException {
+		String sql = "UPDATE Membership SET total_rides_left = ? WHERE username = ?";
+		System.out.println("updating ridesleft to" + ridesLeft);
+		try(Connection conn = connectToDatabase();
+			PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, ridesLeft);
+			pstmt.setString(2, username);
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update rides left in database at this time.");
+		}
+	}
+
+	/**
 	 * Adds a bike to a station
 	 *
 	 * @param stationId the station id that will get updated
