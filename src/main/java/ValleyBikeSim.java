@@ -802,6 +802,9 @@ public class ValleyBikeSim {
 		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
 				+ "WHERE username = ?";
 
+		//add new ride to customer's ride list
+		customerAccountMap.get(username).addNewRide(rideId);
+
 		String rideIdString = customerAccountMap.get(username).getRideIdListToString();
 
 		//update customer's ride list in database
@@ -814,8 +817,6 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 
-			//add new ride to customer's ride list
-			customerAccountMap.get(username).addNewRide(rideId);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}

@@ -597,6 +597,7 @@ public abstract class ValleyBikeController {
 
         // add ride to map as well as database
         if(!ValleyBikeSim.addRide(ride)){
+            //System.out.println("FAIL");
             customerAccountHome(username);
         }
 
@@ -801,12 +802,12 @@ public abstract class ValleyBikeController {
         //check how many included rides remain in account to determine how to charge for rental
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
         long rideLength = rideObj.getRideLength();
-        long paymentDue;
+        double paymentDue = 0.00;
         //if pay-as-you-go or no free rides remaining on membership, charge by time
         if (ridesLeft == 0) {
             //card was already validated before bike rented to ensure they can pay for the rental
             //ride cost is 15c per minute
-            paymentDue = rideLength * (long) .15;
+            paymentDue = rideLength * .15;
             //update balance to add new ride payment
             double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
@@ -821,14 +822,13 @@ public abstract class ValleyBikeController {
             if (rideLength > 60L) {
                 long paymentLength = rideLength - 60L;
                 //ride cost is 15c per minute after 1st hour
-                paymentDue = paymentLength * (long) .15;
+                paymentDue = paymentLength * .15;
                 //update balance to add new ride payment
                 double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
                 ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             } else {
                 //ride is free if under 1hr
-                paymentDue = 0L;
-                ValleyBikeSim.updateRidePayment(lastRideId, 0.00);
+                ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
             }
         }
         //inform customer of the charge
