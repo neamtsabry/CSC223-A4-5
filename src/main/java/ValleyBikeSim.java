@@ -1510,7 +1510,7 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kioskBoolean, address, bike_string) " +
+					"capacity, kiosk, address, bike_string) " +
 					"VALUES(?,?,?,?,?,?,?,?,?)";
 
 			//add station to database
@@ -1524,13 +1524,14 @@ public class ValleyBikeSim {
 				pstmt.setInt(6, station.getCapacity());
 				pstmt.setInt(7, booleanToInt(station.getKioskBoolean()));
 				pstmt.setString(8, station.getAddress());
-                pstmt.setString(9, "");
+                pstmt.setString(9, station.getBikeListToString());
                 pstmt.executeUpdate();
 
 				//add station to station map
 				stationsMap.put(id, station);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new station to database.");
+				System.out.println(e);
 			}
 		}
 	}
@@ -1555,7 +1556,7 @@ public class ValleyBikeSim {
 			pstmt.setInt(1, bike.getId());
 			pstmt.setInt(2, bike.getBikeLocation());
 			pstmt.setInt(3, bike.getStation());
-			pstmt.setBoolean(4, bike.getMnt());
+			pstmt.setInt(4, booleanToInt(bike.getMnt()));
 			pstmt.setString(5, bike.getMntReport());
 			pstmt.executeUpdate();
 
