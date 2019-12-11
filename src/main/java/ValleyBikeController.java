@@ -831,7 +831,7 @@ public abstract class ValleyBikeController {
             }
         }
         //inform customer of the charge
-        System.out.println("You have been charged " + paymentDue + "for your ride." );
+        System.out.println("You have been charged $" + paymentDue + " for your ride." );
     }
 
 
