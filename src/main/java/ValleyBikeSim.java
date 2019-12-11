@@ -402,14 +402,12 @@ public class ValleyBikeSim {
 
 			// set the corresponding param
 			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
+			pstmt.setInt(2, stationId);
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update station's bike list in database");
 		}
-		//adds bike to station map
-		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
 
@@ -1590,7 +1588,7 @@ public class ValleyBikeSim {
 		//TODO ME why check if bike's station is 0 then get the station?
 	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
-			oldStation.removeFromBikeList(bike); // remove bike from station's bike list
+			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
 		}
 
         updateBikeStationId(bike.getId(), newStationValue);
@@ -1599,6 +1597,7 @@ public class ValleyBikeSim {
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
 			updateStationBikeList(bike.getStation(), bike.getId());
 			updateBikeLocation(bike.getId(), 0);
+			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 		}
 
 		else {
