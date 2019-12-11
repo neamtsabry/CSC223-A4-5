@@ -620,7 +620,6 @@ public abstract class ValleyBikeController {
             System.out.println("The bikes have now been redistributed between the stations.");
             System.out.println();
         }
-
         System.out.println("All done renting!");
     }
 
