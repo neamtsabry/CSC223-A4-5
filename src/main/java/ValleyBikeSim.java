@@ -310,19 +310,21 @@ public class ValleyBikeSim {
 		String sql = "UPDATE Station SET trq_mnt = ? "
 		+ "WHERE id = ?";
 
+		//update station data in map
+		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
+
 		//update sql database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			// set the corresponding param
-			pstmt.setInt(2, mntRqsts);
+			pstmt.setInt(1, mntRqsts);
 			pstmt.setInt(2, stationId);
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update station maintenance requests in the database at this time.");
 		}
-		//update station data in map
-		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
+
 	}
 
 	/**

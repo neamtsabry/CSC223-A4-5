@@ -290,9 +290,9 @@ public abstract class ValleyBikeController {
             case 9:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
                 if (ride == null){
-                    System.out.println("You have not taken any rides yet.");
+                    System.out.println("You have not completed any rides yet.");
                 } else {
-                    System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
+                    System.out.println("Your longest ride was " + ride.getRideLength() + " minutes long.");
                     System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 }
                 break;
