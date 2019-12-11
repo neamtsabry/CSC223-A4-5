@@ -193,7 +193,7 @@ public abstract class ValleyBikeController {
         }
 
         // once valid username and password are obtained, print greeting and bring them to home menu
-        System.out.print("\nWelcome back, " + username + "!");
+        System.out.println("\nWelcome back, " + username + "!");
 
         switch (logIn){
             case 1:
