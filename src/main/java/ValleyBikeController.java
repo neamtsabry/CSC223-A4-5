@@ -69,38 +69,39 @@ public abstract class ValleyBikeController {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
-        //each field has its own method which calls itself until a valid input is entered
-        String username = enterUsername(1); // 1 specifies a customer username for validation
+        //each field has its own method which calls itself until a valid input is entered:
+        // get username from user
+        String username = enterUsername(1); // 1 specifies a customer username; this is used for validation
         if (Objects.equals(username, "0")){
             System.out.println("Account creation canceled.");
             initialMenu();
         }
-
+        // get password from user
         String password = enterPassword();
         if (Objects.equals(password, "0")){
             System.out.println("Account creation canceled.");
             initialMenu();
         }
-
+        // get email from user
         String emailAddress = enterEmail();
         if (Objects.equals(emailAddress, "0")){
             System.out.println("Account creation canceled.");
             initialMenu();
         }
-
+        // get credit card from user
         String creditCard = enterCreditCard();
         if (Objects.equals(creditCard, "0")){
             System.out.println("Account creation canceled.");
             initialMenu();
         }
-
+        // get membership type from user
         int membership = enterMembership();
         if (membership==0){
             System.out.println("Account creation canceled.");
             initialMenu();
         }
 
-        //once all the required fields have been input by the user, create new customer account
+        //once all the required fields have been inputted by user and verified, create new customer account
         //Assumption: initially the balance in customer account is always 0
         ValleyBikeSim.createCustomerAccount(username, password, emailAddress, creditCard, membership);
 
@@ -158,7 +159,6 @@ public abstract class ValleyBikeController {
         while ( (logIn == 1 && !ValleyBikeSim.accountMapsContain(username, 1) ) ||
                 (logIn == 2 && !ValleyBikeSim.accountMapsContain(username, 2)) ){
             System.out.println("Username does not exist. Please try again.");
-            // System.out.println();
             System.out.println("Enter your username or '0' to cancel:");
             username = input.nextLine();
 
@@ -655,7 +655,7 @@ public abstract class ValleyBikeController {
         return bikeID;
     }
 
-    //TODO comment
+    //TODO comment method
     private static int chooseRentStation() throws ClassNotFoundException {
         // View stations
         ValleyBikeSim.viewStationList(); // view station list
@@ -663,11 +663,14 @@ public abstract class ValleyBikeController {
         // choose station to rent from or go back
         int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
                 "Enter the station ID ('###') or '0' to return to menu: ");
+        // if user entered 0, return to menu
+        if (Objects.equals(statId, 0)){ return 0; }
+
         Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
 
         //keep running while loop until input valid station with available bikes
         while ((stationFrom == null || Objects.equals(stationFrom.getBikes(), 0)) && statId != 0) {
-            //if station doesnt exist, inform user
+            //if station doesn't exist, inform user
             if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
 
                 //if station doesn't have bikes, equalize stations and have user re-select station
@@ -681,11 +684,12 @@ public abstract class ValleyBikeController {
             //because station not valid, have user re-input and then validate
             statId = getResponse("Please pick a station to rent a bike from.\n" +
                     "Enter the station ID ('###') or '0' to return to menu: ");
+
+            // if user entered 0, return to menu
+            if (Objects.equals(statId, 0)){ return 0; }
+
             stationFrom = ValleyBikeSim.getStationObj(statId);
         }
-
-        // if user entered 0, return to menu
-        if (Objects.equals(statId, 0)){ return 0; }
         return statId;
     }
 
@@ -751,6 +755,7 @@ public abstract class ValleyBikeController {
         System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ".");
         System.out.println();
 
+        // check to see if stations need to be equalized
         if (stationTo.getAvailableDocks() <= 1){
             // if there's 1 available docks or less at station after bike is returned
             // notify maintenance worker to redistribute bikes
@@ -825,7 +830,7 @@ public abstract class ValleyBikeController {
      */
     private static void reportProblem(String username) throws ClassNotFoundException {
         int bikeId = getResponse("Please enter the ID of the bike you" +
-                " are experiencing problems with ('11') or '0' to return to the menu:");
+                " are experiencing problems with ('###') or '0' to return to the menu:");
 
         // if user entered 0, return to menu
         if (Objects.equals(bikeId, 0)){ return; }
@@ -833,23 +838,24 @@ public abstract class ValleyBikeController {
         //while input is not a bike ID, keep asking
         while (!ValleyBikeSim.bikesMapContains(bikeId)){
             System.out.println("The bike ID entered does not exist in our system. Please try again.");
-            bikeId = getResponse("Please enter bike ID ('11') or '0' to cancel:");
+            bikeId = getResponse("Please enter bike ID ('###') or '0' to cancel:");
             if (Objects.equals(bikeId, 0)){
                 System.out.println("Report problem has been canceled.");
                 return; } // if user entered 0, return to menu
         }
-
-        // prompt user for report detailing what's wrong
-        System.out.println("Please tell us what is wrong with this bike or enter '0' to cancel:");
         input.nextLine();
-        String mntReport = input.nextLine();
+        // prompt user for report detailing what's wrong
+        String mntReport = getUserString(50, "Please tell us what is wrong with this bike or enter '0' to cancel:");
+        // System.out.println("Please tell us what is wrong with this bike or enter '0' to cancel:");
+        // input.nextLine();
+        // String mntReport = input.nextLine();
 
         // if user entered 0, return to menu
         if (mntReport.contentEquals("0")){
             System.out.println("Report problem has been canceled.");
             return;
         }
-
+/*
         // keep prompting user while input is empty
         while(mntReport.isEmpty()){
             System.out.println("You must enter some string. Please try again.");
@@ -865,6 +871,8 @@ public abstract class ValleyBikeController {
                 return;
             }
         }
+
+ */
 
         // add to maintenance requests
         ValleyBikeSim.addToMntRqs(bikeId, mntReport);
@@ -926,7 +934,6 @@ public abstract class ValleyBikeController {
                 menuPath.push(3); // add this menu to stack in case we want to return
                 findCustomer(username);
                 menuPath.pop();
-                //TODO view and edit customer account
                 break;
             case 4:
                 //add station to station list

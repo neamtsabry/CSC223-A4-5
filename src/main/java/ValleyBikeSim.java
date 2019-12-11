@@ -1624,7 +1624,11 @@ public class ValleyBikeSim {
 	 * @param newStationValue - station ID of the station the bike is moving to
 	 */
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
-	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
+		//move bike from last station
+
+		// check if bike has a current station
+		// if bike's station is 0, that means that the bike is out with a customer
+	    if (! Objects.equals(bike.getStation(),0)) { // if bike is at a station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
 			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
 
@@ -1634,7 +1638,8 @@ public class ValleyBikeSim {
 
         updateBikeStationId(bike.getId(), newStationValue);
 
-		if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
+		// check if new station is a '0,' which is a placeholder station
+		if (! Objects.equals(newStationValue, 0)) {
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
 
 			//adds bike to station map
