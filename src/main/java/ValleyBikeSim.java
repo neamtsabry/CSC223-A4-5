@@ -117,6 +117,7 @@ public class ValleyBikeSim {
 			double balance = rs.getDouble("balance");
 			String rideIdString = rs.getString("ride_id_string");
 			ArrayList<UUID> rideIdList = new ArrayList<>();
+
 			if (rideIdString != null && rideIdString.length() > 0){
 				for (String ride : rideIdString.split(",")) {
 					String s2 = ride.replace("-", "");
@@ -843,12 +844,12 @@ public class ValleyBikeSim {
 			pstmt.setString(2, username);
 			// update
 			pstmt.executeUpdate();
+
+			//add new ride to customer's ride list
+			customerAccountMap.get(username).addNewRide(rideId);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
-
-		//add new ride to customer's ride list
-		customerAccountMap.get(username).addNewRide(rideId);
 	}
 
 	/**
@@ -949,39 +950,45 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerMembership(String username, int newMembership) throws ClassNotFoundException {
-		String sql = "UPDATE Customer_Account SET membership = ? "
-				+ "WHERE username = ?";
+		if (customerAccountMap.get(username).getMembership().getMembershipInt() == newMembership){
+			System.out.println("Your current membership is the same type as the one you are trying to update to. Membership change failed.");
+			return;
+		} else {
+			Membership membershipType = checkMembershipType(newMembership);
+			String sql = "UPDATE Membership SET type = ? , total_rides_left = ? , last_payment = ? , membership_since = ?"
+					+ "WHERE username = ?";
 
-		//TODO are you updating lastPaymentDate, number of rides remaining, etc?
-		// Everything would change when membership type changes
-		//update membership type in database
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			//update membership type in database
+			try (Connection conn = connectToDatabase();
+				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			// set the corresponding param
-			pstmt.setInt(1, newMembership);
-			pstmt.setString(2, username);
-			// update
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not update membership in database at this time.");
-		}
+				// set the corresponding param
+				pstmt.setInt(1, newMembership);
+				pstmt.setInt(2, membershipType.getTotalRidesLeft());
+				pstmt.setString(3, membershipType.getLastPayment().toString());
+				pstmt.setString(4, membershipType.getMemberSince().toString());
+				pstmt.setString(5, username);
+				// update
+				pstmt.executeUpdate();
 
-		//update membership type associated with user and date representing start of membership
-		customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
-		customerAccountMap.get(username).getMembership().setMemberSince(LocalDate.now());
-		System.out.println("Your membership has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
-		//inform user of the charge for their new membership
-		if (newMembership == 2) {
-			System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew each month, \n" +
-					" and you will get an email notification when your card is charged. \n" +
-					" If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
-					"and notified via email. ");
-		} else if (newMembership == 3) {
-			System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
-					" and you will get an email notification when your card is charged. \n" +
-					"If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
-					"and notified via email. ");
+				//update membership type associated with user and date representing start of membership
+				customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
+				System.out.println("Your membership has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
+				//inform user of the charge for their new membership
+				if (newMembership == 2) {
+					System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew each month, \n" +
+							" and you will get an email notification when your card is charged. \n" +
+							" If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+							"and notified via email. ");
+				} else if (newMembership == 3) {
+					System.out.println("You have been charged $90 for your monthly membership. Your membership will auto-renew each month,\n" +
+							" and you will get an email notification when your card is charged. \n" +
+							"If your credit card ever expires or becomes invalid, you will be switched to a Pay-As-You-Go member " +
+							"and notified via email. ");
+				}
+			} catch (SQLException e) {
+				System.out.println("Sorry, could not update membership in database at this time.");
+			}
 		}
 	}
 
@@ -1386,13 +1393,12 @@ public class ValleyBikeSim {
 				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
 				pstmt.setString(8, customerAccount.getRideIdListToString());
 				pstmt.executeUpdate();
+
+				//add the new customer account object to customer account map
+				customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
-
-			//if the username does not already exist
-			//add the new customer account object to customer account map
-			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
 //TODO comment methods
