@@ -321,25 +321,23 @@ public abstract class ValleyBikeController {
         // Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         // i.e. only internal staff can create new internal accounts
 
-        //add createInternalAccount index to our stack in case we need to return to this method
-        // menuPath.push(2);
         input.nextLine();
         //each field has its own method which calls itself until a valid input is entered
         String newUsername = enterUsername();
-        if (Objects.equals(newUsername, "0")){
+        if (Objects.equals(newUsername, "0")){ // check for cancel key
             System.out.println("Account creation canceled.");
-            returnToLastMenu(username);
+            return;
         }
 
         String password = enterPassword();
-        if (Objects.equals(password, "0")){
+        if (Objects.equals(password, "0")){ // check for cancel key
             System.out.println("Account creation canceled.");
-            returnToLastMenu(username);
+            return;
         }
         String emailAddress = enterEmail();
-        if (Objects.equals(emailAddress, "0")){
+        if (Objects.equals(emailAddress, "0")){ // check for cancel key
             System.out.println("Account creation canceled.");
-            returnToLastMenu(username);
+            return;
         }
 
         // create new internal account object from inputs
@@ -348,8 +346,6 @@ public abstract class ValleyBikeController {
 
         // Let the user know the account has been successfully created
         System.out.println("Internal account successfully created!");
-
-        // menuPath.pop();// we no longer need to remember this menu
     }
 
     /**
@@ -1192,10 +1188,16 @@ public abstract class ValleyBikeController {
      */
     static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // get new bike's id
-        int id = getResponseBetween(0, 1000, "Please enter the bike's ID ('111')");
+        int id = getResponseBetween(0, 1000, "Please enter the bike's ID ('###') or '0' to cancel");
         // assumption: since bike id cannot be greater than 1000,
         // we are assuming the system will never contain more than 10^3 bikes
         // therefore, each bike can have a unique id
+
+        //check for 0 input and return
+        if (id==0){
+            System.out.println("Bike creation canceled.");
+            return;
+        }
 
         // if the bike already exists
         while(ValleyBikeSim.getBikeObj(id) != null){
@@ -1204,22 +1206,38 @@ public abstract class ValleyBikeController {
 
             // prompt user to re-enter bike id
             id = getResponse("Please enter a new bike ID");
+
+            //check for 0 input and return
+            if (id==0){
+                System.out.println("Bike creation canceled.");
+                return;
+            }
         }
 
         // View stations
         System.out.println("Here's a list of stations and their info.");
-
-        // view station list
-        ValleyBikeSim.viewStationList();
+        ValleyBikeSim.viewStationList();// view station list
 
         // prompt for the station id bike will be located in
-        int stationId = getResponse("Please enter the ID for the station the bike is located at:");
+        int stationId = getResponse("Please enter the ID ('###') for the station where the bike will be located or '0' to cancel:");
+
+        //check for 0 input and return
+        if (stationId==0){
+            System.out.println("Bike creation canceled.");
+            return;
+        }
 
         // check if station doesn't exist
         while(ValleyBikeSim.getStationObj(stationId) == null){
             // let user know and prompt them to reenter the id
             System.out.println("Station with this ID doesn't exist");
-            stationId = getResponse("Please re-enter the ID for this station:");
+            stationId = getResponse("Please re-enter the ID for this station or '0' to cancel:");
+
+            //check for 0 input and return
+            if (stationId==0){
+                System.out.println("Bike creation canceled.");
+                return;
+            }
         }
 
         // assume bike starts off as not needing maintenance
@@ -1564,34 +1582,4 @@ public abstract class ValleyBikeController {
                 initialMenu();
         }
     }
-
-    /**
-     * Helper method to check if input is between two values
-     *
-     * @param num - the number to be validated
-     * @param a - the smallest value accepted for num
-     * @param b - the largest value accepted for num
-     * @return return true if a <= num <= b
-     */
-    static boolean isIntBetween(int num, int a, int b){
-        while(num < a || num > b){
-            System.out.println("That is not a valid response. Please try again.");
-            return false;
-        }
-        return true;
-    }
-
-
-
-    /**
-     * We are not currently using this method.
-     * Calls ValleyBikeSim's resolveData method to resolve ride data
-     *
-     * @throws IOException
-     * @throws ParseException
-     */
-    //    public void resolveData() throws IOException, ParseException {
-    //        String dataFile = input.next();
-    //        ValleyBikeSim.resolveData(dataFile);
-    //    }
 }
