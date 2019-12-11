@@ -491,9 +491,6 @@ public abstract class ValleyBikeController {
      * @throws NoSuchAlgorithmException
      */
     private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
-        //TODO handle edge case of not entering int
-        //TODO Grace
-
         //prompt user to choose which they want to edit
         System.out.println("\nPlease choose from one of the following menu options:\n" +
                 "1: Edit username\t" +
@@ -622,7 +619,7 @@ public abstract class ValleyBikeController {
         }
     }
 
-    //TODO comment
+    //TODO comment method
     private static int chooseRentBike(Station stationFrom, int statId) {
         // View available bike ids at station
         System.out.println("Here's a list of bike IDs at Station #" + statId);
@@ -1161,13 +1158,18 @@ public abstract class ValleyBikeController {
      * This method enables internal employees to add new bikes to the system
      * @throws IOException
      * @throws ParseException
+     *
+     * @param username - internal account who is adding the bike
      */
     static void addNewBike(String username) throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // check if there's any open slots in total of all stations
+        // assumption: we do not allow new bikes to be added if there are less than 5
+        // total spaces available in the stations
         if(ValleyBikeSim.viewTotalStationsCapacity() - ValleyBikeSim.viewTotalBikesCount() < 5){
             System.out.println("There's not enough space in total stations" +
                     "to add a new bike. Please try adding a new station");
-            internalAccountHome(username);
+            //internalAccountHome(username);
+            return;
         }
 
         // get new bike's id
