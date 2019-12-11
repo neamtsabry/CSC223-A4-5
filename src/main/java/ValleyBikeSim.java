@@ -1510,7 +1510,7 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kioskBoolean, address, bike_string) " +
+					"capacity, kiosk, address, bike_string) " +
 					"VALUES(?,?,?,?,?,?,?,?,?)";
 
 			//add station to database
@@ -1524,13 +1524,14 @@ public class ValleyBikeSim {
 				pstmt.setInt(6, station.getCapacity());
 				pstmt.setInt(7, booleanToInt(station.getKioskBoolean()));
 				pstmt.setString(8, station.getAddress());
-                pstmt.setString(9, "");
+                pstmt.setString(9, station.getBikeListToString());
                 pstmt.executeUpdate();
 
 				//add station to station map
 				stationsMap.put(id, station);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new station to database.");
+				System.out.println(e);
 			}
 		}
 	}
@@ -1555,7 +1556,7 @@ public class ValleyBikeSim {
 			pstmt.setInt(1, bike.getId());
 			pstmt.setInt(2, bike.getBikeLocation());
 			pstmt.setInt(3, bike.getStation());
-			pstmt.setBoolean(4, bike.getMnt());
+			pstmt.setInt(4, booleanToInt(bike.getMnt()));
 			pstmt.setString(5, bike.getMntReport());
 			pstmt.executeUpdate();
 
@@ -1576,15 +1577,16 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
+	static Boolean addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (rideMap.get(ride.getRideId()) != null) {
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
-			//TODO is this the message you want to say? Do you want to return to initial menu? NS
+
+			return false;
 		} else { //id ride id valid, add to system
 			String sql = "INSERT INTO Ride(ride_id, bike_id, username, is_returned, " +
 					"ride_length, start_time_stamp, end_time_stamp, payment, station_to, station_from) " +
-					"VALUES(?,?,?,?,?,?,?, ?,?, ?)";
+					"VALUES(?,?,?,?,?,?,?,?,?,?)";
 
 			//add ride to database
 			try (Connection conn = connectToDatabase();
@@ -1600,20 +1602,24 @@ public class ValleyBikeSim {
 					is_returned_int = 1;
 				}
 
-				pstmt.setInt(5, is_returned_int);
-				pstmt.setLong(6, ride.getRideLength());
-				pstmt.setString(7, ride.getStartTimeStamp().toString());
-				pstmt.setString(8, ride.getEndTimeStamp().toString());
+				pstmt.setInt(4, is_returned_int);
+				pstmt.setLong(5, ride.getRideLength());
+				pstmt.setString(6, ride.getStartTimeStamp().toString());
+				pstmt.setString(7, ride.getEndTimeStamp().toString());
+				pstmt.setDouble(8, ride.getPayment());
 				pstmt.setInt(9, ride.getStationFrom());
 				pstmt.setInt(10, ride.getStationTo());
 
 				pstmt.executeUpdate();
+
+				//add ride to ride map
+				rideMap.put(ride.getRideId(), ride);
+
+				return true;
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new ride to database.");
+				return false;
 			}
-
-			//add ride to ride map
-			rideMap.put(ride.getRideId(), ride);
 		}
 	}
 
@@ -1641,9 +1647,6 @@ public class ValleyBikeSim {
 		// check if new station is a '0,' which is a placeholder station
 		if (! Objects.equals(newStationValue, 0)) {
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
-
-			//adds bike to station map
-			stationsMap.get(newStationValue).addToBikeList(bike.getId());
 
 			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
