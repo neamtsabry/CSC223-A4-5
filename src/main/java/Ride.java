@@ -10,33 +10,35 @@ public class Ride {
 
     // ASSUME ONLY ONE RIDE PER USER AT A TIME
 
-    // should be random ride id, but consistent
+    /** should be random ride id, but consistent */
     private UUID rideId;
 
-    // bike id
+    /** bike id */
     private int bikeId;
 
-    // user name
+    /** user name */
     private String username;
 
-    // true if bike was returned
+    /** true if bike was returned */
     private boolean isReturned;
 
-    // ride length
+    /** ride length */
     private long rideLength;
 
-    // start time rented
+    /** start time rented */
     private Instant startTimeStamp;
 
-    // end time returned
-    // null if isReturned is false
+    /** end time returned
+    * null if isReturned is false */
     private Instant endTimeStamp;
 
-    //payment made for ride
+    /** payment made for ride */
     private double payment;
 
+    /** station at which the ride ends and bike is returned */
     private int stationTo;
 
+    /** startion at which the ride starts and bike is checked out from */
     private int stationFrom;
 
     /**
@@ -186,18 +188,30 @@ public class Ride {
         return this.isReturned;
     }
 
+    /**
+     * return station at which the bike is returned and ride ends
+     */
     public int getStationTo(){
         return this.stationTo;
     }
 
+    /**
+     * sets the station at which the bike is returned and ride ends
+     */
     public void setStationTo(int newStationTo){
         this.stationTo = newStationTo;
     }
 
+    /**
+     * return the station at which the bike is checked out and ride starts
+     */
     public int getStationFrom() {
         return stationFrom;
     }
 
+    /**
+     * set the station at which the bike is checked out and ride starts
+     */
     public void setStationFrom(int newStationFrom) {
         this.stationFrom = newStationFrom;
     }
@@ -205,10 +219,8 @@ public class Ride {
     /**
      * calculates whether bike has been checked out for over 24 hours
      * @return boolean representing whether bike has been out 24+ hours
-     * @throws ParseException
-     * @throws InterruptedException
      */
-    public Boolean isRented24Hours() throws ParseException, InterruptedException {
+    public Boolean isRented24Hours() {
         Instant now =  Instant.now();
 
         //calculating time between start and now

@@ -7,6 +7,7 @@ import java.util.Scanner;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/** this is the controller in our MVC */
 public abstract class ValleyBikeController {
 
     /** initialize input of type scanner */
@@ -19,8 +20,12 @@ public abstract class ValleyBikeController {
      * Basic option menu that shows at start of program and when no one is logged in
      * Allows user to create a new account or log in or exit
      *
-     * @throws IOException create account, log in, save bike list and save station list methods throw IOException
-     * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //check whether it's time to renew customer's memberships
@@ -65,6 +70,10 @@ public abstract class ValleyBikeController {
      *
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void createCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
@@ -131,6 +140,10 @@ public abstract class ValleyBikeController {
      *
      * @throws IOException customer log in and internal log in methods in model throw IOException
      * @throws ParseException customer log in and internal log in methods in model throw ParseException
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //prompt the user to choose which kind of account they want to log into
@@ -209,14 +222,16 @@ public abstract class ValleyBikeController {
         logIn();
     }
 
-
     /**
      * Standard menu page for a customer account after logging in
      *
      * @param username unique username associated with the customer account
-     *
      * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 
@@ -276,21 +291,27 @@ public abstract class ValleyBikeController {
                 } // if customer has ongoing rental, help user return bike
                 break;
             case 5:
+                //report a problem (maintenance report)
                 reportProblem(username);
                 break;
             case 6:
+                //view your ride history
                 viewCustomerInfo(customer);
                 break;
             case 7:
+                //view the total number of rides you've ever taken
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewRideListLength(username));
                 break;
             case 8:
+                //view the average time of all your ride lengths
                 int rideTime = ValleyBikeSim.viewAverageRideTime(username);
                 System.out.println("Your average ride time is " + rideTime + " minutes.");
                 break;
             case 9:
+                //view the longest ride length from all your rides
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
                 if (ride == null){
+                    //if no rides have been taken when ride obj is null since list is empty
                     System.out.println("You have not completed any rides yet.");
                 } else {
                     System.out.println("Your longest ride was " + ride.getRideLength() + " minutes long.");
@@ -298,6 +319,8 @@ public abstract class ValleyBikeController {
                 }
                 break;
             case 10:
+                //disable your customer
+                //username, password and email address are set to hashcodes and enabled boolean is set to false
                 ValleyBikeSim.disableCustomerAccount(username);
                 initialMenu();
                 break;
@@ -316,13 +339,14 @@ public abstract class ValleyBikeController {
 
     /**
      * prompts user to enter inputs that will allow creation of new internal account
-     * @throws IOException
-     * @throws ParseException
-     * @throws InterruptedException
-     * @throws ClassNotFoundException
-     * @throws NoSuchAlgorithmException
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
-    private static void createInternalAccount(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
+    private static void createInternalAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         // Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         // i.e. only internal staff can create new internal accounts
 
@@ -333,12 +357,13 @@ public abstract class ValleyBikeController {
             System.out.println("Account creation canceled.");
             return;
         }
-
+        //enter password for new internal account
         String password = enterPassword();
         if (Objects.equals(password, "0")){ // check for cancel key
             System.out.println("Account creation canceled.");
             return;
         }
+        //enter email address for new internal acccount
         String emailAddress = enterEmail();
         if (Objects.equals(emailAddress, "0")){ // check for cancel key
             System.out.println("Account creation canceled.");
@@ -377,7 +402,6 @@ public abstract class ValleyBikeController {
                 "\nMembership: " + customer.getMembership().getMembershipString());
     }
 
-
     /**
      * Menu page for editing customer account information
      *
@@ -385,6 +409,12 @@ public abstract class ValleyBikeController {
      * @param master if an internal account is editing a user account, this string
      *               is the internal account username; if customer is accessing
      *               their own account, this string is null
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void editCustomerAccount(String username, String master) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //prompt user to choose which field they want to edit
@@ -478,6 +508,8 @@ public abstract class ValleyBikeController {
                     }
                 }
 
+                //if user switched to pay as you go, no need to check credit card right away
+                //go to update membership directly
                 if (newMembership == 1){
                     if(!ValleyBikeSim.updateCustomerMembership(username, newMembership)){
                         customerAccountHome(username);
@@ -501,13 +533,14 @@ public abstract class ValleyBikeController {
     /**
      * Edit information of an internal account
      * @param username username of the account that will be edited
-     * @throws ParseException
-     * @throws InterruptedException
-     * @throws IOException
-     * @throws ClassNotFoundException
-     * @throws NoSuchAlgorithmException
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
-    private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
+    private static void editInternalAccount(String username) throws ClassNotFoundException, InterruptedException, SQLException, NoSuchAlgorithmException, ParseException, IOException {
         //prompt user to choose which they want to edit
         System.out.println("\nPlease choose from one of the following menu options:\n" +
                 "1: Edit username\t" +
@@ -515,6 +548,7 @@ public abstract class ValleyBikeController {
                 "3: Edit email address\t" +
                 "0: Return to account home");
 
+        //enter selection from menu
         int edit = getResponseBetween(0, 3, "Please enter your selection (0-5):");
         input.nextLine();
         switch (edit){
@@ -567,9 +601,13 @@ public abstract class ValleyBikeController {
 
     /**
      * Allows a customer to rent a bike by asking for necessary inputs
-     *
-     * @throws IOException
-     * @throws ParseException
+     * @param username unique username associated with the customer account
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //validate credit card before allowing rental- to make sure they can pay
@@ -696,7 +734,7 @@ public abstract class ValleyBikeController {
     /**
      * choose station to rent a bike from
      * @return station id to rent from
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
      */
     private static int chooseRentStation() throws ClassNotFoundException {
         // View stations
@@ -739,11 +777,12 @@ public abstract class ValleyBikeController {
      * Allows a user to return a bike by prompting for necessary information
      * @param username username of account returning bike
      * @param lastRideId ongoing ride object that will get updated
-     * @throws IOException
-     * @throws ParseException
-     * @throws InterruptedException
-     * @throws ClassNotFoundException
-     * @throws NoSuchAlgorithmException
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //get ongoing ride object
@@ -828,7 +867,7 @@ public abstract class ValleyBikeController {
      * @param username username of account that made the rental
      * @param rideObj ride object that represents the ride information
      * @param lastRideId id of the ride object
-     * @throws ClassNotFoundException
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
      */
     private static void calculateRentalCharge(String username, Ride rideObj, UUID lastRideId) throws ClassNotFoundException, InterruptedException, SQLException, NoSuchAlgorithmException, ParseException, IOException {
         //check how many included rides remain in account to determine how to charge for rental
@@ -874,11 +913,11 @@ public abstract class ValleyBikeController {
         System.out.println("You have been charged $" + paymentDue + " for your ride." );
     }
 
-
     /**
      * Report problem for regular user by adding bike's id to
      * maintenance request list and setting its fields to requiring
      * maintenance.
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
      */
     private static void reportProblem(String username) throws ClassNotFoundException, InterruptedException, SQLException, NoSuchAlgorithmException, ParseException, IOException {
         int bikeId = getResponse("Please enter the ID of the bike you" +
@@ -941,6 +980,10 @@ public abstract class ValleyBikeController {
      * @param username username of internal account
      * @throws IOException addStation, addBike, equalizeStations and initialMenu throw IOException
      * @throws ParseException addStation, addBike, equalizeStations and initialMenu throw ParseException
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //prompt user to pick option from main internal menu
@@ -966,7 +1009,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create new internal account (e.g. for a different employee)
-                createInternalAccount(username);
+                createInternalAccount();
                 break;
             case 2:
                 //edit this internal account
@@ -1005,13 +1048,17 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.viewStationList();
                 break;
             case 10:
+                //view total user of customers in customer accounts table in database
                 System.out.println("The total number of customers at ValleyBikes is " + ValleyBikeSim.viewTotalUsers());
                 break;
             case 11:
+                //view sum of all maintenance requests from all stations
                 System.out.println("The total number of maintenance requests currently from all stations is " + ValleyBikeSim.viewTotalMaintenanceRequests());
                 break;
             case 12:
+                //view most popular station based on ride data
                 if (ValleyBikeSim.viewMostPopularStation() == null){
+                    //if no rides have been taken, ride data is empty and therefore there is no most popular station
                     System.out.println("No rides have been taken yet, so there is no most popular station.");
                 } else {
                     System.out.println("The most popular station is " + ValleyBikeSim.viewMostPopularStation().getKey());
@@ -1030,9 +1077,13 @@ public abstract class ValleyBikeController {
     /**
      * Prints list of current usernames and prompts user to input valid username to view/edit;
      * then gives internal user menu options for view and editing account
-     *
-     * @throws IOException
-     * @throws ParseException
+     * @param username unique username associated with the customer account
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void findCustomer(String username) throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // view all customers' usernames
@@ -1068,13 +1119,18 @@ public abstract class ValleyBikeController {
         editCustomerMenu(username, customerUsername);
     }
 
-        /**
-         * Prints list of current usernames and prompts user to input valid username to view/edit;
-         * then gives internal user menu options for view and editing account
-         *
-         * @throws IOException
-         * @throws ParseException
-         */
+    /**
+     * Prints list of current usernames and prompts user to input valid username to view/edit;
+     * then gives internal user menu options for view and editing account
+     * @param username is the username for the internal account user
+     * @param customerUsername is the customer username that the internal account is trying to access
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
+     */
         private static void editCustomerMenu(String username, String customerUsername) throws InterruptedException, ParseException, NoSuchAlgorithmException, IOException, SQLException, ClassNotFoundException {
             //get customer object
             CustomerAccount customer = ValleyBikeSim.getCustomerObj(customerUsername);
@@ -1119,7 +1175,7 @@ public abstract class ValleyBikeController {
 
         //display rides the selected user has taken
         if(rideList.size() > 0){
-            System.out.format("%-10s%-10s%-13s%-20s%-10s%-10s%-10s\n", "Bike ID", "Is not returned? ",
+            System.out.format("%-10s%-10s%-13s%-20s%-10s%-10s%-10s\n", "Bike ID", "Is returned? ",
                     "Start Timestamp ", "End Timestamp ", "RideLength ", "Station from ", "Station to ");
 
             //format out printing of whole ride list
@@ -1143,8 +1199,12 @@ public abstract class ValleyBikeController {
     /**
      * Prompts user for all station data and then creates a new station
      * object which is added to the stationMap
-     * @throws IOException
-     * @throws ParseException
+     * @throws IOException failure during reading, writing and searching file or directory operations
+     * @throws ParseException fail to parse a String that is ought to have a special format
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // use helper function to check input is valid and save it
@@ -1233,11 +1293,9 @@ public abstract class ValleyBikeController {
 
     /**
      * This method enables internal employees to add new bikes to the system
-     * @throws IOException
-     * @throws ParseException
-     *
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
      */
-    static void addNewBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
+    static void addNewBike() throws ClassNotFoundException{
         // check if there's any open slots in total of all stations
         // assumption: we do not allow new bikes to be added if there are less than 5
         // total spaces available in the stations
@@ -1321,7 +1379,7 @@ public abstract class ValleyBikeController {
         // add to bike tree structure
         if(!ValleyBikeSim.addBike(bikeOb)){
             return;
-        };
+        }
 
         //move bike to the corresponding station
         ValleyBikeSim.moveStation(bikeOb, stationId);
@@ -1400,7 +1458,8 @@ public abstract class ValleyBikeController {
      * Prompts user to input username
      * Validates if username is between 6-14 characters
      * Loops until valid username input by user
-     * @return valid username input by user
+     * @param accountType the int for the type of account i.e. customer or internal
+     * @return returns username entered by user
      */
     private static String enterUsername(int accountType) {
         String username;
@@ -1627,11 +1686,13 @@ public abstract class ValleyBikeController {
     /**
      * Finds user's last menu by checking our menuPath stack
      * and sends them back to this point
-     *
      * @param username - the account username that we pass to the menus
-     *
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
+     * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+     * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+     * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+     * @throws SQLException for database access error
      */
     private static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 

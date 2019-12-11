@@ -7,7 +7,7 @@ import java.time.Period;
  */
 public class YearlyMembership extends Membership{
 
-    //rides that come included in membership each year
+    /** rides that come included in membership each year */
     private final int maxRides = 260;
 
     /**
@@ -17,6 +17,12 @@ public class YearlyMembership extends Membership{
         super();
     }
 
+    /**
+     * This is the constructor for an existing yearly membership
+     * @param totalRidesLeft is the total rides left for this membership for a customer
+     * @param lastPayment is the last time the customer made a payment for a yearly membership
+     * @param memberSince is the date since which a customer has been a yearly membership
+     */
     YearlyMembership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
         super(totalRidesLeft, lastPayment, memberSince);
     }
@@ -32,17 +38,17 @@ public class YearlyMembership extends Membership{
         return (diff >= 365);
     }
 
-    //checks whether there are 0 free rides left
+    /** checks whether there are 0 free rides left */
     public boolean checkMaxRidesExceeded(){
         return super.getTotalRidesLeft() >= maxRides;
     }
 
-    //returns 3, which represents a yearly membership
+    /** returns 3, which represents a yearly membership */
     public int getMembershipInt(){
         return 3;
     }
 
-    //returns type of membership as a string
+    /** returns type of membership as a string */
     public String getMembershipString(){
         return "Yearly";
     }
