@@ -323,7 +323,7 @@ public abstract class ValleyBikeController {
 
         //add createInternalAccount index to our stack in case we need to return to this method
         menuPath.push(2);
-
+        input.nextLine();
         //each field has its own method which calls itself until a valid input is entered
         String newUsername = enterUsername();
         if (Objects.equals(newUsername, "0")){
@@ -406,6 +406,7 @@ public abstract class ValleyBikeController {
                 String newUsername = enterUsername();
                 if (! Objects.equals(newUsername, "0")) { // check for cancel key
                     ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                    username = newUsername;
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -606,7 +607,7 @@ public abstract class ValleyBikeController {
 
         // Choose bike to rent
         int bikeID = getResponse("Please enter the ID number of the bike you" +
-                " would like to rent ('11') or '0' to return to menu: ");
+                " would like to rent ('##') or '0' to return to menu: ");
 
         // if user entered 0, return to menu
         if (Objects.equals(bikeID, 0)){ return; }
@@ -616,7 +617,7 @@ public abstract class ValleyBikeController {
         while (!bikeList.contains(bikeID)){
             System.out.println("The bike ID entered is not at this station.");
             bikeID = getResponse("Please enter the ID number of the bike you" +
-                    " would like to rent ('11') or '0' to return to menu: ");
+                    " would like to rent ('##') or '0' to return to menu: ");
 
             // if user entered 0, return to menu
             if (Objects.equals(bikeID, 0)){ return; }
@@ -689,7 +690,9 @@ public abstract class ValleyBikeController {
                 "or '0' to return to the menu");
 
         // if user entered 0, return to menu
-        if (Objects.equals(statId, 0)){ return; }
+        if (Objects.equals(statId, 0)){
+            System.out.println("Bike return canceled.");
+            return; }
 
         // designated station, whether bike returned to or bike rented from
         Station stationTo = ValleyBikeSim.getStationObj(statId);
@@ -701,7 +704,9 @@ public abstract class ValleyBikeController {
                     "or '0' to return to the menu");
 
             // if user entered 0, return to menu
-            if (Objects.equals(statId, 0)){ return; }
+            if (Objects.equals(statId, 0)){
+                System.out.println("Bike return canceled.");
+                return; }
 
             stationTo = ValleyBikeSim.getStationObj(statId);
         }
@@ -720,10 +725,9 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.updateRideEndTimeStamp(lastRideId, Instant.now());
 
         // set the same in customer account
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         ValleyBikeSim.updateCustomerLastRideisReturned(username, true);
 
-        System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
+        System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ".");
         System.out.println();
 
         if (stationTo.getAvailableDocks() <= 1){
@@ -969,6 +973,7 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.viewAllCustomers();
 
         // ask user to input customer username
+        input.nextLine();
         System.out.println("Please enter a customer's username to view their account or '0' to cancel:");
         String customerUsername = input.nextLine();
 
@@ -1010,7 +1015,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view customer balance
-                System.out.println("Account balance for" + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
+                System.out.println("Account balance for " + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
                 break;
             case 3:
                 // view customer ride data
@@ -1021,6 +1026,7 @@ public abstract class ValleyBikeController {
         }
 
         //if we get through the switch, revisit the beginning of menu
+        System.out.println("");
         findCustomer(username);
     }
 
@@ -1295,12 +1301,10 @@ public abstract class ValleyBikeController {
             //prompts user to input username
             System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel: ");
             username = input.nextLine();
-            //System.out.println("hihi"+username+"hihi");
+
             // check for '0' input and return to previous menu
             if (Objects.equals(username, "0")) {
-                // if (creator==null){
-                //     returnToLastMenu(null);
-                // } else returnToLastMenu(creator);
+
                 return username;
             }
         } while (!isValidUsername(username)); //validates that username is between 6-14 characters and unique in our system
@@ -1323,10 +1327,8 @@ public abstract class ValleyBikeController {
             System.out.println("Enter password (must be between 6-14 characters) or '0' to cancel:");
             password = input.nextLine();
 
-            // check for '0' input and return to previous menu
-            // creator string is null for customer account creation
+            // check for '0' input and return it
             if (Objects.equals(password, "0")) {
-                //returnToLastMenu(creator);
                 return password;
             }
 

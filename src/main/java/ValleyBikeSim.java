@@ -1078,7 +1078,7 @@ public class ValleyBikeSim {
 		//if there exist customers, print
 		if (customerAccountMap.size() > 0) {
 			// format table view
-			System.out.format("%-20s\n", "Customer username");
+			System.out.format("%-20s\n", "List of all customer account username:");
 
 			// while the iterator has a next value
 			for (String username : customerAccountMap.keySet()) {
