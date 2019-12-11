@@ -399,7 +399,8 @@ public abstract class ValleyBikeController {
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
                 "\nCredit Card: ************" + customer.getCreditCard().substring(12) +
-                "\nMembership: " + customer.getMembership().getMembershipString());
+                "\nMembership: " + customer.getMembership().getMembershipString() +
+                "\nTotal discounted rides left: " + customer.getMembership().getTotalRidesLeft());
     }
 
     /**
@@ -895,6 +896,7 @@ public abstract class ValleyBikeController {
             paymentDue = rideLength * .15;
             //update balance to add new ride payment
             double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+            //TODO update balance in database
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             //update ride payment in ride object
 
@@ -903,6 +905,7 @@ public abstract class ValleyBikeController {
             }
 
         } else {
+            //TODO decrement rides remaining in membership database
             //otherwise decrement rides remaining in membership
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
             //calculate whether there is an overtime charge (for a ride longer than 1hr)
@@ -913,6 +916,7 @@ public abstract class ValleyBikeController {
                 paymentDue = paymentLength * .15;
                 //update balance to add new ride payment
                 double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+                //TODO update balance in database
                 ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             } else {
                 //ride is free if under 1hr

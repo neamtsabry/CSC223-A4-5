@@ -14,6 +14,7 @@ public class MonthlyMembership extends Membership{
      */
     MonthlyMembership() {
         super();
+        super.setTotalRidesLeft(20);
     }
 
     /**
