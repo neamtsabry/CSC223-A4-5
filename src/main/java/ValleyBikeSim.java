@@ -1303,6 +1303,21 @@ public class ValleyBikeSim {
 		}
 	}
 
+	static int viewTotalStationsCapacity(){
+		//TODO implement Grace
+		int total = 0;
+		for (int key : stationsMap.keySet()){
+			Station station = stationsMap.get(key);
+			total += station.getCapacity();
+		}
+		return total;
+	}
+
+	static int viewTotalBikesCount(){
+		//TODO implement Grace
+		return bikesMap.size();
+	}
+
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
 	 *
