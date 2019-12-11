@@ -1421,7 +1421,7 @@ public class ValleyBikeSim {
 			pstmt.setDouble(5, membership.getMembershipInt());
 			pstmt.executeUpdate();
 		} catch (SQLException | ClassNotFoundException e) {
-			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			System.out.println("Sorry, something went wrong with adding new membership to database.");
 		}
 	}
 
@@ -1438,6 +1438,7 @@ public class ValleyBikeSim {
 		return null;
 	}
 
+	//TODO Comment Method
 	static Ride viewLongestRide(String username){
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
 		long longestRideLength = 0;
@@ -1485,7 +1486,7 @@ public class ValleyBikeSim {
                 pstmt.setString(9, "");
                 pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new station to database.");
 			}
 			//add station to station map
 			stationsMap.put(id, station);
@@ -1521,7 +1522,7 @@ public class ValleyBikeSim {
 				pstmt.setString(5, bike.getMntReport());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new bike to database.");
 			}
 
 			//add bike to bike map
@@ -1572,7 +1573,7 @@ public class ValleyBikeSim {
 
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new ride to database.");
 			}
 
 			//add ride to ride map
