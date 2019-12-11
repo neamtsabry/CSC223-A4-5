@@ -38,8 +38,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-//                createCustomerAccount();
-                rentBike("gracie");
+                createCustomerAccount();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -276,7 +275,7 @@ public abstract class ValleyBikeController {
                 } // if customer has ongoing rental, help user return bike
                 break;
             case 5:
-                reportProblem(username);
+                reportProblem();
                 break;
             case 6:
                 viewCustomerInfo(customer);
@@ -603,7 +602,6 @@ public abstract class ValleyBikeController {
 
         // Add ride to customer account
         // assume username is always valid
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
         ValleyBikeSim.updateRideIdList(username, rideId);
         ValleyBikeSim.updateCustomerLastRideisReturned(username, false);
 
@@ -842,10 +840,8 @@ public abstract class ValleyBikeController {
      * Report problem for regular user by adding bike's id to
      * maintenance request list and setting its fields to requiring
      * maintenance.
-     * @param username for user
-     * user reports a problem with the bike they checked out
      */
-    private static void reportProblem(String username) throws ClassNotFoundException {
+    private static void reportProblem() throws ClassNotFoundException {
         int bikeId = getResponse("Please enter the ID of the bike you" +
                 " are experiencing problems with ('###') or '0' to return to the menu:");
 
@@ -1342,7 +1338,7 @@ public abstract class ValleyBikeController {
      * Loops until valid username input by user
      * @return valid username input by user
      */
-    private static String enterUsername(int accountType) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterUsername(int accountType) {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
@@ -1367,7 +1363,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid password input by user
      */
-    private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterPassword() {
         String password;
         do {//loops until user inputs 0 or valid password
             //prompts user to input password
@@ -1392,7 +1388,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid email address input by user
      */
-    private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterEmail() {
         String emailAddress;
         do {//loops until user inputs 0 or valid password
             //prompts user to input email address
@@ -1417,7 +1413,7 @@ public abstract class ValleyBikeController {
      * Recursively calls itself until valid email address input by user
      * @return valid credit card input by user
      */
-    private static String enterCreditCard() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterCreditCard() {
         String creditCard;
         do {//loops until user inputs 0 or valid password
             //prompts user to input credit card
@@ -1442,7 +1438,7 @@ public abstract class ValleyBikeController {
      * Prompts user to input membership
      * @return membership string input by user
      */
-    private static int enterMembership() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static int enterMembership() {
         System.out.println("Choose membership type: \n" +
                 "1: Pay-as-you-go Membership. " +
                 "2: Monthly Membership. " +
