@@ -294,7 +294,8 @@ public abstract class ValleyBikeController {
                 break;
             case 9:
                 ValleyBikeSim.disableCustomerAccount(username);
-                System.out.println("Your account has been deleted. Have a great day!");
+                System.out.println("Congratulations, your account has been deleted. Have a great day!");
+                initialMenu();
                 break;
             case 0:
                 //return to homepage to log out
@@ -872,8 +873,6 @@ public abstract class ValleyBikeController {
                 + "1: Create new internal account \t"
                 + "2: Edit account information \t"
                 + "3: View and edit customer data \t"
-                // + "4: View customer balances\t"
-                // + "5: View customer activity\t"
                 + "4: Add new station \t"
                 + "5: Add new bike\n"
                 + "6: View station list \t"
@@ -904,17 +903,6 @@ public abstract class ValleyBikeController {
                 menuPath.pop();
                 //TODO view and edit customer account
                 break;
-
-                /*
-            case 4:
-                //TODO view customer balances
-                break;
-            case 5:
-                //view customer activity
-                viewCustomerActivity();
-                break;
-                 */
-
             case 4:
                 //add station to station list
                 addStation();
