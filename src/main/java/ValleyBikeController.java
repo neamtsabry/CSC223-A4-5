@@ -973,6 +973,7 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.viewAllCustomers();
 
         // ask user to input customer username
+        input.nextLine();
         System.out.println("Please enter a customer's username to view their account or '0' to cancel:");
         String customerUsername = input.nextLine();
 
@@ -1014,7 +1015,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view customer balance
-                System.out.println("Account balance for" + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
+                System.out.println("Account balance for " + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
                 break;
             case 3:
                 // view customer ride data
@@ -1025,6 +1026,7 @@ public abstract class ValleyBikeController {
         }
 
         //if we get through the switch, revisit the beginning of menu
+        System.out.println("");
         findCustomer(username);
     }
 
