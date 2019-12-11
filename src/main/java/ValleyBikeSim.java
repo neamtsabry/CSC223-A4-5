@@ -203,7 +203,6 @@ public class ValleyBikeSim {
 				for (String bikeId : bikeString.replaceAll(" ", "").split(",")) {
 					try{
                         bikeList.add(Integer.parseInt(bikeId));
-                        System.out.println(Integer.parseInt(bikeId));
                     } catch(NumberFormatException e){
 						System.out.println(e);
 					}

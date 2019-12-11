@@ -26,8 +26,6 @@ public abstract class ValleyBikeController {
         //check whether it's time to renew customer's memberships
         //ValleyBikeSim.checkMembershipRenewalTime();
 
-        System.out.println("");
-        ValleyBikeSim.viewBikeList();
         System.out.print("Please choose from one of the following menu options:\n"
                 + "1: Create Customer Account\t"
                 + "2: Log In\t"
@@ -240,10 +238,11 @@ public abstract class ValleyBikeController {
                 + "3: View station list\t"
                 + "4: " + rentReturnString + "\t"
                 + "5: Report a problem\n"
-                + "6: View total number of rides\t"
-                + "7: View average ride time\t"
-                + "8: View longest ride\t"
-                + "9: Delete account\t"
+                + "6: View your ride history\t"
+                + "7: View total number of rides\t"
+                + "8: View average ride time\t"
+                + "9: View longest ride\t"
+                + "10: Delete account\t"
                 + "0: Log out");
 
         //get and validate user response
@@ -280,13 +279,16 @@ public abstract class ValleyBikeController {
                 reportProblem(username);
                 break;
             case 6:
-                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewRideListLength(username));
+                viewCustomerActivity(customer);
                 break;
             case 7:
+                System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewRideListLength(username));
+                break;
+            case 8:
                 int rideTime = ValleyBikeSim.viewAverageRideTime(username);
                 System.out.println("Your average ride time is " + rideTime + " minutes.");
                 break;
-            case 8:
+            case 9:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
                 if (ride == null){
                     System.out.println("You have not taken any rides yet.");
@@ -295,7 +297,7 @@ public abstract class ValleyBikeController {
                     System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 }
                 break;
-            case 9:
+            case 10:
                 ValleyBikeSim.disableCustomerAccount(username);
                 initialMenu();
                 break;
@@ -949,6 +951,8 @@ public abstract class ValleyBikeController {
             case 9:
                 //equalize stations
                 ValleyBikeSim.equalizeStations();
+                System.out.println("Thank you for equalizing the stations! Here is how you reassigned the bikes: ");
+                ValleyBikeSim.viewStationList();
                 break;
             case 10:
                 System.out.println("The total number of customers at ValleyBikes is " + ValleyBikeSim.viewTotalUsers());
