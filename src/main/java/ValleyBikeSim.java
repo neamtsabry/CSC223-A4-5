@@ -1082,19 +1082,13 @@ public class ValleyBikeSim {
 	 *
      */
     static boolean accountMapsContain(String username, int num) {
-    	switch (num){
+    	switch(num) {
 			case 1: //search customer map
-				if (customerAccountMap.containsKey(username)){
-					return true;
-				}
+				return customerAccountMap.containsKey(username);
 			case 2: //search internal map
-				if (internalAccountMap.containsKey(username)){
-					return true;
-				}
+				return internalAccountMap.containsKey(username);
 			case 3: //search both maps
-				if (customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username)){
-				return true;
-			}
+				return customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username);
 		}
         return false;
     }
@@ -1267,6 +1261,8 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	static void viewStationList() {
+		System.out.println("STATION LIST:");
+
 		// format table view
 		System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
 				"AvDocs", "MainReq", "Capacity", "Kiosk", "Name - Address");
