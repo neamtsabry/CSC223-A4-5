@@ -6,13 +6,13 @@ import java.time.LocalDate;
  */
 public abstract class Membership {
 
-    //total rides left that come included with membership
+    /** total rides left that come included with membership */
     private int totalRidesLeft;
 
-    //date the last payment was made
+    /** date the last payment was made */
     private LocalDate lastPayment;
 
-    //date when customer began current membership subscription
+    /** date when customer began current membership subscription */
     private LocalDate memberSince;
 
     /**
@@ -25,6 +25,12 @@ public abstract class Membership {
         this.memberSince = LocalDate.now();
     }
 
+    /**
+     * This constructor is used for existing memberships associated with existing customer accounts
+     * @param totalRidesLeft is the rides left for the membership associated with a customer
+     * @param lastPayment is the date for the last time the customer made a payment for their membership
+     * @param memberSince is the date for when the customer signed up for a membership of a given type
+     */
     Membership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
         this.totalRidesLeft = totalRidesLeft;
         this.lastPayment = lastPayment;
@@ -32,35 +38,40 @@ public abstract class Membership {
     }
 
     /**
-     * returns total number of rides left
+     * This is the getter method for the total number of rides left for a membership
+     * @return the total rides left
      */
     int getTotalRidesLeft() {
         return totalRidesLeft;
     }
 
     /**
-     * sets new total rides left amount
+     * sets new total rides left amount for a membership
+     * @param totalRidesLeft is the new total rides left
      */
     void setTotalRidesLeft(int totalRidesLeft) {
         this.totalRidesLeft = totalRidesLeft;
     }
 
     /**
-     * returns date of last payment
+     * This is the getter method for the last time a user made a payment
+     * @return the last payment date
      */
     LocalDate getLastPayment() {
         return lastPayment;
     }
 
     /**
-     * sets new date of last payment
+     * sets new date of last payment for a membership
+     * @param lastPayment is the new last payment date
      */
     void setLastPayment(LocalDate lastPayment) {
         this.lastPayment = lastPayment;
     }
 
     /**
-     * returns when user began current membership subscription
+     * This is the getter method for the date since which the user had a membership of this type
+     * @return date since which the user had a membership of this type
      */
     LocalDate getMemberSince() {
         return memberSince;
@@ -68,6 +79,7 @@ public abstract class Membership {
 
     /**
      * sets date when user began current membership subscription
+     * @param memberSince
      */
     void setMemberSince(LocalDate memberSince) {
         this.memberSince = memberSince;

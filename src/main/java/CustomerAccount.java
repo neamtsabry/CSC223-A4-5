@@ -16,11 +16,13 @@ public class CustomerAccount extends Account{
     /** This field is the running total of money customer has spent paying for rides */
     private double balance;
 
-    // stack of ride ids user has
+    /** This field is the stack of ride ids for rides the user has taken */
     private ArrayList<UUID> rideIdList;
 
+    /** This field is true is user currently has bike rented, and false otherwise */
     private boolean lastRideIsReturned;
 
+    /** This field is false if user deletes account */
     private boolean enabled;
 
     /**
@@ -110,34 +112,68 @@ public class CustomerAccount extends Account{
         return creditCard;
     }
 
+    /**
+     * This method adds a new ride to the ride list associated with the customer account
+     * @param rideID is the ride id for the new ride taken by the user
+     */
     void addNewRide(UUID rideID){
         this.rideIdList.add(rideID);
     }
 
+    /**
+     * This is the getter method for whether the user has a bike currently rented
+     * @return true if user has bike currently rented and false otherwise
+     */
     Boolean getIsReturned(){
         return this.lastRideIsReturned;
     }
 
+    /**
+     * This is the getter method for ride id list associated with the customer account
+     * @return the ride id list associated with the customer account
+     */
     ArrayList<UUID> getRideIdList() {
         return rideIdList;
     }
 
+    /**
+     * This is the getter method for the most recent ride taken by the user
+     * @return the ride id of the most recent ride taken by the user
+     */
     UUID getLastRideId(){
         return rideIdList.get(rideIdList.size()- 1);
     }
 
+    /**
+     * This is the getter method to check if customer account is active or deleted
+     * Deleted accounts cannot be logged into
+     * @return true if active and false if deleted
+     */
     public boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * This is the setter method to activative/deactivate account
+     * Only used to deactivate account
+     * @param enabled is the new status (active, deleted) for the account
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * This method converts the ride id list to a string for the database
+     * @return the ride id string, where all the ride ids in the ride id list are seperated by a comma
+     */
     public String getRideIdListToString(){
         return rideIdList.toString().replaceAll("\\[", "").replaceAll("\\]","");
     }
 
+    /**
+     * This is the setter method for whether the most recent ride has been returned
+     * @param lastRideIsReturned true if ride returned, false otherwise
+     */
     public void setLastRideIsReturned(boolean lastRideIsReturned) {
         this.lastRideIsReturned = lastRideIsReturned;
     }
