@@ -210,7 +210,7 @@ public class ValleyBikeSim {
 			}
 
 			//create new station instance
-			Station station = new Station(name, reqMnt, capacity, kiosk, address, bikeList);
+			Station station = new Station(name, reqMnt, capacity, intToBoolean(kiosk), address, bikeList);
 
 			// add to the station tree
 			stationsMap.put(id, station);
@@ -1325,6 +1325,21 @@ public class ValleyBikeSim {
 		}
 	}
 
+	static int viewTotalStationsCapacity(){
+		//TODO implement Grace
+		int total = 0;
+		for (int key : stationsMap.keySet()){
+			Station station = stationsMap.get(key);
+			total += station.getCapacity();
+		}
+		return total;
+	}
+
+	static int viewTotalBikesCount(){
+		//TODO implement Grace
+		return bikesMap.size();
+	}
+
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
 	 *
@@ -1364,10 +1379,18 @@ public class ValleyBikeSim {
 			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
-
+//TODO add comments to these methods
 	private static int booleanToInt(boolean myBoolean) {
 		return myBoolean ? 1 : 0;
 	}
+
+	private static boolean intToBoolean(int myInt) {
+		if (Objects.equals(myInt, 0)){
+			return false;
+		}
+		return true;
+	}
+
 
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
@@ -1489,7 +1512,7 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kiosk, address, bike_string) " +
+					"capacity, kioskBoolean, address, bike_string) " +
 					"VALUES(?,?,?,?,?,?,?,?,?)";
 
 			//add station to database
@@ -1501,7 +1524,7 @@ public class ValleyBikeSim {
 				pstmt.setInt(4, station.getAvailableDocks());
 				pstmt.setInt(5, station.getMaintenanceRequest());
 				pstmt.setInt(6, station.getCapacity());
-				pstmt.setInt(7, station.getKioskNum());
+				pstmt.setInt(7, booleanToInt(station.getKioskBoolean()));
 				pstmt.setString(8, station.getAddress());
                 pstmt.setString(9, "");
                 pstmt.executeUpdate();
