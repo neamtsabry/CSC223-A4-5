@@ -18,7 +18,7 @@ public class Station {
     private boolean kioskBoolean;
 
     // number of kiosks if kioskBoolean is true
-    private int kioskNumber;
+    // private int kioskNumber;
 
     // address of the station
     private String address;
@@ -32,18 +32,19 @@ public class Station {
      * @param nameValue               station name
      * @param maintenanceRequestValue number of maintenance requests
      * @param capacityValue           the station capacity
-     * @param kiosk                   number of kiosks
+     * @param kioskBoolean            true if station has kiosk; otherwise false
      * @param address1                station address
      */
     Station(String nameValue,
                    Integer maintenanceRequestValue,
                    Integer capacityValue,
-                   Integer kiosk, String address1) {
+                   Boolean kioskBoolean,
+            String address1) {
         this.name = nameValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
-        this.kioskNumber = kiosk;
-        this.kioskBoolean = (kiosk > 0);
+        // this.kioskNumber = kiosk;
+        this.kioskBoolean = kioskBoolean;
         this.address = address1;
         this.bikeList = new LinkedList<>();
     }
@@ -53,19 +54,19 @@ public class Station {
      * @param nameValue name of station
      * @param maintenanceRequestValue number of maintenance requests
      * @param capacityValue the station capacity
-     * @param kiosk number of kiosks
+     * @param kioskBoolean true if station has kiosk
      * @param address1 station address
      * @param bikeList list of bikes at station
      */
     Station(String nameValue,
             Integer maintenanceRequestValue,
             Integer capacityValue,
-            Integer kiosk, String address1, LinkedList<Integer> bikeList) {
+            Boolean kioskBoolean, String address1, LinkedList<Integer> bikeList) {
         this.name = nameValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
-        this.kioskNumber = kiosk;
-        this.kioskBoolean = (kiosk > 0);
+        // this.kioskNumber = kiosk;
+        this.kioskBoolean = kioskBoolean;
         this.address = address1;
         this.bikeList = bikeList;
     }
@@ -143,16 +144,16 @@ public class Station {
     /**
      * return number of kiosks at station
      */
-    int getKioskNum() {
-        return this.kioskNumber;
-    }
+    // int getKioskNum() {
+    //     return this.kioskNumber;
+    // }
 
     /**
      * set number of kiosks at station
      */
-    void setKioskNum(int newKioskNum) {
-        this.kioskNumber = newKioskNum;
-    }
+    // void setKioskNum(int newKioskNum) {
+    //     this.kioskNumber = newKioskNum;
+    // }
 
     /**
      * return address of station

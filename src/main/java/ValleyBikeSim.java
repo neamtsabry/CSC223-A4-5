@@ -75,7 +75,7 @@ public class ValleyBikeSim {
 		}
 
 		// start the initial menu
-		System.out.print("\nWelcome to ValleyBike Share!");
+		System.out.print("Welcome to ValleyBike Share! ");
 		ValleyBikeController.initialMenu();
 	}
 
@@ -201,16 +201,14 @@ public class ValleyBikeSim {
 
 			if (bikeString != null) {
 				for (String bikeId : bikeString.replaceAll(" ", "").split(",")) {
-					try{
-                        bikeList.add(Integer.parseInt(bikeId));
-                    } catch(NumberFormatException e){
-						System.out.println(e);
+					if (bikeString.length() > 0) {
+						bikeList.add(Integer.parseInt(bikeId));
 					}
 				}
 			}
 
 			//create new station instance
-			Station station = new Station(name, reqMnt, capacity, kiosk, address, bikeList);
+			Station station = new Station(name, reqMnt, capacity, intToBoolean(kiosk), address, bikeList);
 
 			// add to the station tree
 			stationsMap.put(id, station);
@@ -1257,7 +1255,7 @@ public class ValleyBikeSim {
 	 */
 	static void viewBikeList() {
 		// format table view
-		System.out.format("%-10s%-10s%-10s%-10s%-10s\n", "ID", "Location", "Stat. ID",
+		System.out.format("%-10s%-10s%-20s%-10s%-10s\n", "ID", "Stat. ID"," Location",
 				"Main. Req", "Main. Report");
 
 		// while the iterator has a next value
@@ -1266,13 +1264,31 @@ public class ValleyBikeSim {
 			// use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
 
+			String locString = " ";
+			int loc = bike.getBikeLocation();
+			if (loc == 0) {
+				locString = "available at station  ";
+			} else if (loc == 1) {
+				locString = "not available for rent";
+			} else if (loc == 2) {
+				locString = "currently rented      ";
+			}
+
+			String station = " ";
+			int stat  = bike.getStation();
+			if (stat == 0) {
+				station = "out";
+			} else {
+				station = Integer.toString(stat);
+			}
 			// format the view of the bike object values
-			System.out.format("%-10d%-10d%-10d%-10s%-10s\n",
+			System.out.format("%-10d%-10s%-10s%-10s%-10s\n",
 					key,
-					bike.getBikeLocation(),
-					bike.getStation(),
+					station,
+					locString,
 					bike.getMnt(),
 					bike.getMntReport()
+
 			);
 		}
 	}
@@ -1305,6 +1321,21 @@ public class ValleyBikeSim {
 					station.getKioskBoolean(),
 					station.getStationName() + "-" + station.getAddress());
 		}
+	}
+
+	static int viewTotalStationsCapacity(){
+		//TODO implement Grace
+		int total = 0;
+		for (int key : stationsMap.keySet()){
+			Station station = stationsMap.get(key);
+			total += station.getCapacity();
+		}
+		return total;
+	}
+
+	static int viewTotalBikesCount(){
+		//TODO implement Grace
+		return bikesMap.size();
 	}
 
 	/**
@@ -1346,10 +1377,18 @@ public class ValleyBikeSim {
 			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
-
+//TODO add comments to these methods
 	private static int booleanToInt(boolean myBoolean) {
 		return myBoolean ? 1 : 0;
 	}
+
+	private static boolean intToBoolean(int myInt) {
+		if (Objects.equals(myInt, 0)){
+			return false;
+		}
+		return true;
+	}
+
 
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
@@ -1471,7 +1510,7 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kiosk, address, bike_string) " +
+					"capacity, kioskBoolean, address, bike_string) " +
 					"VALUES(?,?,?,?,?,?,?,?,?)";
 
 			//add station to database
@@ -1483,7 +1522,7 @@ public class ValleyBikeSim {
 				pstmt.setInt(4, station.getAvailableDocks());
 				pstmt.setInt(5, station.getMaintenanceRequest());
 				pstmt.setInt(6, station.getCapacity());
-				pstmt.setInt(7, station.getKioskNum());
+				pstmt.setInt(7, booleanToInt(station.getKioskBoolean()));
 				pstmt.setString(8, station.getAddress());
                 pstmt.setString(9, "");
                 pstmt.executeUpdate();
