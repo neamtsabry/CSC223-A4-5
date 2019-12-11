@@ -290,7 +290,8 @@ public class ValleyBikeSim {
 					end_time_stamp_instant, station_from, station_to);
 
 			ride.setRideLength(rideLength);
-			updateRidePayment(uuid_id, payment);
+			ride.setPayment(payment);
+			//updateRidePayment(uuid_id, payment);
 
 			// add to the bike tree
 			rideMap.put(uuid_id, ride);
