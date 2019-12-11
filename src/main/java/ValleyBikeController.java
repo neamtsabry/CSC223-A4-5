@@ -408,6 +408,7 @@ public abstract class ValleyBikeController {
                 String newUsername = enterUsername(1); // 1 specifies a customer account for validation
                 if (! Objects.equals(newUsername, "0")) { // check for cancel key
                     ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                    System.out.println("Your username has been successfully updated to " + newUsername);
                     username = newUsername;
                 }
                 else { // if 0 was entered, cancel and return to menu
@@ -419,6 +420,7 @@ public abstract class ValleyBikeController {
                 String newPassword = enterPassword();
                 if (! Objects.equals(newPassword, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerPassword(username, newPassword);
+                    System.out.println("Your password has been successfully updated to " + newPassword);
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -429,6 +431,7 @@ public abstract class ValleyBikeController {
                 String newEmail = enterEmail();
                 if (! Objects.equals(newEmail, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
+                    System.out.println("Your email address has been successfully updated to " + newEmail);
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -466,6 +469,10 @@ public abstract class ValleyBikeController {
                         //if credit card is valid, switch memberships
                         ValleyBikeSim.updateCustomerMembership(username, newMembership);
                     }
+                }
+
+                if (newMembership == 1){
+                    ValleyBikeSim.updateCustomerMembership(username, newMembership);
                 }
                 break;
             case 0:
