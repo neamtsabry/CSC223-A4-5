@@ -1088,12 +1088,8 @@ public class ValleyBikeSim {
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
 
-				//TODO where are we adding that balance to the credit card?
-
 				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
 				//and tell them to contact customer service
-
-				//TODO end station is 0
 
 				//ASSUMPTION: if bike has been rented over 24 hours, it is probably lost or stolen forever
 				//so proceed like ride has been returned, to "station 0" (the checked-out station)
