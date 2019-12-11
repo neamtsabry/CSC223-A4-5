@@ -849,6 +849,8 @@ public abstract class ValleyBikeController {
             customerAccountHome(username);
         }
 
+        ValleyBikeSim.updateRideStationTo(lastRideId, statId);
+
         // set the same in customer account
         if(!ValleyBikeSim.updateCustomerLastRideisReturned(username, true)){
             customerAccountHome(username);

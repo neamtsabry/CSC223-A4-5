@@ -70,11 +70,12 @@ public class ValleyBikeSim {
 		//read in data from database to data structures
 		if (conn != null) {
 			Statement stmt = conn.createStatement();
+			readRideData(stmt);
 			readCustomerAccountData(stmt);
 			readInternalAccountData(stmt);
 			readStationData(stmt);
 			readBikeData(stmt);
-			readRideData(stmt);
+
 			conn.close();
 		} else {
 			System.out.println("Sorry, something went wrong connecting to the ValleyBike Database.");
@@ -126,6 +127,7 @@ public class ValleyBikeSim {
 				for (String ride : rideIdString.split(",")) {
 					UUID uuid = UUID.fromString(ride.replaceAll(" ", ""));
 					rideIdList.add(uuid);
+					System.out.println("CAD"+rideMap.get(uuid).getStationFrom()+" "+rideMap.get(uuid).getStationTo()+" "+rideMap.size());
 				}
 			}
 			//create customer account from info
@@ -285,8 +287,8 @@ public class ValleyBikeSim {
 			String start_time_stamp = rs.getString("start_time_stamp");
 			String end_time_stamp = rs.getString("end_time_stamp");
 			double payment = rs.getDouble("payment");
-			int station_from = rs.getInt("station_from");
 			int station_to = rs.getInt("station_to");
+			int station_from = rs.getInt("station_from");
 
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
@@ -307,8 +309,10 @@ public class ValleyBikeSim {
 			ride.setRideLength(rideLength);
 			ride.setPayment(payment);
 
-			// add to the bike tree
+			// add to the ride tree
 			rideMap.put(uuid_id, ride);
+			System.out.println("RRD"+rideMap.get(uuid_id).getStationFrom()+" "+rideMap.get(uuid_id).getStationTo()+rideMap.size());
+
 		}
 	}
 
@@ -1021,7 +1025,7 @@ public class ValleyBikeSim {
 				+ "WHERE username = ?";
 
 		//add new ride to customer's ride list
-		customerAccountMap.get(username).addNewRide(rideId);
+		//customerAccountMap.get(username).addNewRide(rideId);
 
 		String rideIdString = customerAccountMap.get(username).getRideIdListToString();
 
@@ -1925,8 +1929,8 @@ public class ValleyBikeSim {
 				pstmt.setString(6, ride.getStartTimeStamp().toString());
 				pstmt.setString(7, ride.getEndTimeStamp().toString());
 				pstmt.setDouble(8, ride.getPayment());
-				pstmt.setInt(9, ride.getStationFrom());
-				pstmt.setInt(10, ride.getStationTo());
+				pstmt.setInt(9, ride.getStationTo());
+				pstmt.setInt(10, ride.getStationFrom());
 
 				pstmt.executeUpdate();
 

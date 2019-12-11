@@ -38,7 +38,7 @@ public class Ride {
     /** station at which the ride ends and bike is returned */
     private int stationTo;
 
-    /** startion at which the ride starts and bike is checked out from */
+    /** station at which the ride starts and bike is checked out from */
     private int stationFrom;
 
     /**
@@ -60,9 +60,9 @@ public class Ride {
         this.isReturned = isReturnedVal;
         this.startTimeStamp = startTimeStampVal;
         this.endTimeStamp = endTimeStampVal;
-
-        this.stationFrom = stationFromVal;
         this.stationTo = stationToVal;
+        this.stationFrom = stationFromVal;
+
 
         if(endTimeStamp != null){
             this.getRideLength(); //if ride has ended calculate ride length
