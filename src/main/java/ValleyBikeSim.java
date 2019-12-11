@@ -119,10 +119,7 @@ public class ValleyBikeSim {
 
 			if (rideIdString != null && rideIdString.length() > 0){
 				for (String ride : rideIdString.split(",")) {
-					String s2 = ride.replace("-", "");
-					UUID uuid = new UUID(
-							new BigInteger(s2.substring(0, 16), 16).longValue(),
-							new BigInteger(s2.substring(16), 16).longValue());
+					UUID uuid = UUID.fromString(ride.replaceAll(" ", ""));
 					rideIdList.add(uuid);
 				}
 			}

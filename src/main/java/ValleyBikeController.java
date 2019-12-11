@@ -1057,7 +1057,7 @@ public abstract class ValleyBikeController {
 
         //display rides the selected user has taken
         if(rideList.size() > 0){
-            System.out.format("%-10s%-10s%-13s%-20s%-10s%-10s%-10s\n", "Bike ID", "Is returned? ",
+            System.out.format("%-10s%-10s%-13s%-20s%-10s%-10s%-10s\n", "Bike ID", "Is not returned? ",
                     "Start Timestamp ", "End Timestamp ", "RideLength ", "Station from ", "Station to ");
 
             //format out printing of whole ride list
