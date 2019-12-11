@@ -75,7 +75,7 @@ public class ValleyBikeSim {
 		}
 
 		// start the initial menu
-		System.out.print("\nWelcome to ValleyBike Share!");
+		System.out.print("Welcome to ValleyBike Share! ");
 		ValleyBikeController.initialMenu();
 	}
 
@@ -201,11 +201,8 @@ public class ValleyBikeSim {
 
 			if (bikeString != null) {
 				for (String bikeId : bikeString.replaceAll(" ", "").split(",")) {
-					try{
-                        bikeList.add(Integer.parseInt(bikeId));
-                        System.out.println(Integer.parseInt(bikeId));
-                    } catch(NumberFormatException e){
-						System.out.println(e);
+					if (bikeString.length() > 0) {
+						bikeList.add(Integer.parseInt(bikeId));
 					}
 				}
 			}
