@@ -117,6 +117,7 @@ public class ValleyBikeSim {
 			double balance = rs.getDouble("balance");
 			String rideIdString = rs.getString("ride_id_string");
 			ArrayList<UUID> rideIdList = new ArrayList<>();
+
 			if (rideIdString != null && rideIdString.length() > 0){
 				for (String ride : rideIdString.split(",")) {
 					String s2 = ride.replace("-", "");
@@ -843,12 +844,12 @@ public class ValleyBikeSim {
 			pstmt.setString(2, username);
 			// update
 			pstmt.executeUpdate();
+
+			//add new ride to customer's ride list
+			customerAccountMap.get(username).addNewRide(rideId);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
-
-		//add new ride to customer's ride list
-		customerAccountMap.get(username).addNewRide(rideId);
 	}
 
 	/**
@@ -1386,13 +1387,12 @@ public class ValleyBikeSim {
 				pstmt.setInt(7, booleanToInt(customerAccount.isEnabled()));
 				pstmt.setString(8, customerAccount.getRideIdListToString());
 				pstmt.executeUpdate();
+
+				//add the new customer account object to customer account map
+				customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new customer account to database.");
 			}
-
-			//if the username does not already exist
-			//add the new customer account object to customer account map
-			customerAccountMap.put(customerAccount.getUsername(), customerAccount);
 		}
 	}
 //TODO add comments to these methods

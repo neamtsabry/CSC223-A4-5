@@ -38,7 +38,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                createCustomerAccount();
+//                createCustomerAccount();
+                rentBike("gracie");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -279,7 +280,7 @@ public abstract class ValleyBikeController {
                 reportProblem(username);
                 break;
             case 6:
-                viewCustomerActivity(customer);
+                viewCustomerInfo(customer);
                 break;
             case 7:
                 System.out.println("The total number of rides you've taken is " + ValleyBikeSim.viewRideListLength(username));
@@ -620,6 +621,8 @@ public abstract class ValleyBikeController {
             System.out.println("The bikes have now been redistributed between the stations.");
             System.out.println();
         }
+
+        System.out.println("All done renting!");
     }
 
     //TODO comment
@@ -1047,7 +1050,7 @@ public abstract class ValleyBikeController {
                 break;
             case 3:
                 // view customer ride data
-                viewCustomerActivity(customer);
+                viewCustomerInfo(customer);
                 break;
             case 0:
                 returnToLastMenu(username);
@@ -1062,7 +1065,7 @@ public abstract class ValleyBikeController {
      * view rides specified customer has taken
      * @param customer customer whose rides will be displayed
      */
-    private static void viewCustomerActivity(CustomerAccount customer){
+    private static void viewCustomerInfo(CustomerAccount customer){
         ArrayList<UUID> rideList = customer.getRideIdList();
 
         //display rides the selected user has taken
@@ -1074,7 +1077,7 @@ public abstract class ValleyBikeController {
             for(UUID rideId : rideList){
                 Ride rideObj = ValleyBikeSim.getRideObj(rideId);
 
-                System.out.format("%-10d%-10b%-10s%-10s%-10d%-10d%-10d\n",
+                System.out.format("%-10d%-10b%-20s%-20s%-10d%-10d%-10d\n",
                         rideObj.getBikeId(),
                         rideObj.getIsReturned(),
                         rideObj.getStartTimeStamp(),
@@ -1649,7 +1652,7 @@ public abstract class ValleyBikeController {
             customer = ValleyBikeSim.getCustomerObj(username);
         }
 
-        viewCustomerActivity(customer);
+        viewCustomerInfo(customer);
     }
 
 }
