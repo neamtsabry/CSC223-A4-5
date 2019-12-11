@@ -406,6 +406,7 @@ public abstract class ValleyBikeController {
                 String newUsername = enterUsername();
                 if (! Objects.equals(newUsername, "0")) { // check for cancel key
                     ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                    username = newUsername;
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -1295,12 +1296,10 @@ public abstract class ValleyBikeController {
             //prompts user to input username
             System.out.println("Enter username (must be between 6-14 characters) or '0' to cancel: ");
             username = input.nextLine();
-            //System.out.println("hihi"+username+"hihi");
+
             // check for '0' input and return to previous menu
             if (Objects.equals(username, "0")) {
-                // if (creator==null){
-                //     returnToLastMenu(null);
-                // } else returnToLastMenu(creator);
+
                 return username;
             }
         } while (!isValidUsername(username)); //validates that username is between 6-14 characters and unique in our system
@@ -1323,10 +1322,8 @@ public abstract class ValleyBikeController {
             System.out.println("Enter password (must be between 6-14 characters) or '0' to cancel:");
             password = input.nextLine();
 
-            // check for '0' input and return to previous menu
-            // creator string is null for customer account creation
+            // check for '0' input and return it
             if (Objects.equals(password, "0")) {
-                //returnToLastMenu(creator);
                 return password;
             }
 
