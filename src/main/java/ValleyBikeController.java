@@ -827,7 +827,7 @@ public abstract class ValleyBikeController {
      */
     private static void reportProblem(String username) throws ClassNotFoundException {
         int bikeId = getResponse("Please enter the ID of the bike you" +
-                " are experiencing problems with ('11') or '0' to return to the menu:");
+                " are experiencing problems with ('##') or '0' to return to the menu:");
 
         // if user entered 0, return to menu
         if (Objects.equals(bikeId, 0)){ return; }
@@ -835,7 +835,7 @@ public abstract class ValleyBikeController {
         //while input is not a bike ID, keep asking
         while (!ValleyBikeSim.bikesMapContains(bikeId)){
             System.out.println("The bike ID entered does not exist in our system. Please try again.");
-            bikeId = getResponse("Please enter bike ID ('11') or '0' to cancel:");
+            bikeId = getResponse("Please enter bike ID ('##') or '0' to cancel:");
             if (Objects.equals(bikeId, 0)){
                 System.out.println("Report problem has been canceled.");
                 return; } // if user entered 0, return to menu
@@ -1055,8 +1055,8 @@ public abstract class ValleyBikeController {
 
         //display rides the selected user has taken
         if(rideList.size() > 0){
-            System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-10s\n", "Bike ID", "Is returned",
-                    "Start Timestamp", "End Timestamp", "RideLength", "Station from", "Station to");
+            System.out.format("%-10s%-10s%-13s%-20s%-10s%-10s%-10s\n", "Bike ID", "Is returned? ",
+                    "Start Timestamp ", "End Timestamp ", "RideLength ", "Station from ", "Station to ");
 
             //format out printing of whole ride list
             for(UUID rideId : rideList){
