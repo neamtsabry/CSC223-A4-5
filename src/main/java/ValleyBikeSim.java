@@ -1508,11 +1508,17 @@ public class ValleyBikeSim {
 		return null;
 	}
 
-	//TODO Comment Method
+	/**
+	 * view longest ride made by user
+	 * @param username username of account to check
+	 * @return longest ride object
+	 */
 	static Ride viewLongestRide(String username){
+		//fetch all rides belonging to customer
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
 		long longestRideLength = 0;
 		Ride longestRide = null;
+		//search through every ride checking for longest one
 		for (UUID ride: rideIdList){
 			if (rideMap.get(ride).getRideLength() > longestRideLength){
 				longestRideLength = rideMap.get(ride).getRideLength();
@@ -2024,123 +2030,4 @@ public class ValleyBikeSim {
 	static Boolean bikesMapContains(int key) {
 		return bikesMap.containsKey(key);
 	}
-
-
-
-	//TODO remove this method if we are sure- it takes in data files eesh
-	/**
-	 * We are not currently using this method.
-	 * <p>
-	 * Takes in a ride data file name from user
-	 * Parses and iterates through file and uses ride timestamps
-	 * to determine average ride time.
-	 * <p>
-	 * Prints out number of rides for that day and average time
-	 *
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	static void resolveData(String dataFile) throws IOException, ParseException {
-		System.out.println("Enter the file name (including extension) of the file located"
-				+ "in data-files: ");
-
-		FileReader fileReader = new FileReader("data-files/" + dataFile);
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		String rideLine;
-
-		int rides = 0;
-		long totalTime = 0;
-		long averageTime;
-
-		bufferedReader.readLine();
-
-		while ((rideLine = bufferedReader.readLine()) != null) {
-			rides = rides + 1;
-			String[] values = rideLine.split(",");
-
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-			Date startDate = dateFormat.parse(values[3]);
-			Timestamp startTime = new Timestamp(startDate.getTime());
-			Date endDate = dateFormat.parse(values[4]);
-			Timestamp endTime = new Timestamp(endDate.getTime());
-			totalTime = totalTime + (endTime.getTime() - startTime.getTime());
-		}
-
-		bufferedReader.close();
-
-		//Just averaging to the closest number of minutes here for simplicity
-		averageTime = (totalTime / rides) / 60000;
-		System.out.println("Number of rides: " + rides);
-		System.out.println("Average ride time in minutes: " + averageTime);
-	}
-
-	/**
-	 * Return a stack of bikes docked at a particular station
-	 *
-	 * @param statId The int ID of the station from which we will
-	 *               collect the list of docked bikes.
-	 * @return bikesAtStation - a stack of bikes docked at this station
-	 */
-	static Deque<Bike> getBikesAtStation(int statId) {
-		//TODO We don't need this method!!!
-		//initiate our bike stack
-		Deque<Bike> bikesAtStation = new ArrayDeque<>();
-		// initiate iterator
-		Iterator bikeKeyIterator = ValleyBikeSim.createIterator(true);
-
-		// keep looping until there is no next value
-		while (bikeKeyIterator.hasNext()) {
-			Integer key = (Integer) bikeKeyIterator.next();
-			Bike bike = ValleyBikeSim.getBikeObj(key);
-			if (statId == bike.getStation()) { // if the bike's station ID matches this station
-				bikesAtStation.push(bike); // add it to stack
-			}
-		}
-		return bikesAtStation;
-	}
-
-	/**
-	 * Verify username and password when an internal staff logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-
-	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-
-	//if the username exists but the password entered by the user does not match the password associated with that username
-	if (!password.equals(internalAccountMap.get(username).getPassword())) {
-	//print incorrect password
-	System.out.println("Incorrect password. Please try again.");
-	//take the user back to the initial menu
-	return;
-	}
-	//if the username and password both match with associated customer account object, lead the user to internal account home
-	ValleyBikeController.internalAccountHome(username);
-	}
-	 */
-
-	/**
-	 * Verify username and password when a customer logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-
-	//if the username exists but the password entered by the user does not match the password associated with that username
-	if (!password.equals(customerAccountMap.get(username).getPassword())) {
-	//print incorrect password
-	System.out.println("Incorrect password. Please try again.");
-	//prompt the user to input new account information again or log in
-	return;
-	}
-	//if the username and password both match with associated customer account object, lead the user to user account home
-	ValleyBikeController.customerAccountHome(username);
-	}
-
-	 */
 }
