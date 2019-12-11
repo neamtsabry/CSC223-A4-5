@@ -5,25 +5,22 @@ import java.util.*;
  */
 public class Station {
 
-    // station name
+    /** station name */
     private String name;
 
-    // number of maintenance requests
+    /** number of maintenance requests */
     private int maintenanceRequest;
 
-    // the station capacity (how many bikes can it take?)
+    /** the station capacity (how many bikes can it take?) */
     private int capacity;
 
-    // true if station has a kiosk
+    /** true if station has a kiosk */
     private boolean kioskBoolean;
 
-    // number of kiosks if kioskBoolean is true
-    // private int kioskNumber;
-
-    // address of the station
+    /** address of the station */
     private String address;
 
-    // list of bike ids associated with station
+    /** list of bike ids associated with station */
     private LinkedList<Integer> bikeList;
 
     /**
@@ -43,7 +40,6 @@ public class Station {
         this.name = nameValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
-        // this.kioskNumber = kiosk;
         this.kioskBoolean = kioskBoolean;
         this.address = address1;
         this.bikeList = new LinkedList<>();
@@ -65,7 +61,6 @@ public class Station {
         this.name = nameValue;
         this.maintenanceRequest = maintenanceRequestValue;
         this.capacity = capacityValue;
-        // this.kioskNumber = kiosk;
         this.kioskBoolean = kioskBoolean;
         this.address = address1;
         this.bikeList = bikeList;
@@ -76,13 +71,6 @@ public class Station {
      */
     String getStationName() {
         return this.name;
-    }
-
-    /**
-     * sets name of station
-     */
-    public void setStationName(String newName) {
-        this.name = newName;
     }
 
     /**
@@ -121,13 +109,6 @@ public class Station {
     }
 
     /**
-     * set capacity of station
-     */
-    void setCapacity(int newCap) {
-        this.capacity = newCap;
-    }
-
-    /**
      * return whether station has kiosk
      */
     boolean getKioskBoolean() {
@@ -135,38 +116,10 @@ public class Station {
     }
 
     /**
-     * set whether station has kiosk
-     */
-    void setKioskBoolean(boolean newKioskBool) {
-        this.kioskBoolean = newKioskBool;
-    }
-
-    /**
-     * return number of kiosks at station
-     */
-    // int getKioskNum() {
-    //     return this.kioskNumber;
-    // }
-
-    /**
-     * set number of kiosks at station
-     */
-    // void setKioskNum(int newKioskNum) {
-    //     this.kioskNumber = newKioskNum;
-    // }
-
-    /**
      * return address of station
      */
     String getAddress() {
         return this.address;
-    }
-
-    /**
-     * set address of station
-     */
-    void setAddress(String newAdd) {
-        this.address = newAdd;
     }
 
     /**

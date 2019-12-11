@@ -79,14 +79,15 @@ public abstract class Membership {
 
     /**
      * sets date when user began current membership subscription
-     * @param memberSince
+     * @param memberSince is the new date when user began current membership subscription
      */
     void setMemberSince(LocalDate memberSince) {
         this.memberSince = memberSince;
     }
 
     /**
-     * returns int which represents which membership type user has
+     * This is the getter method for which membership type user has
+     * @return int which represents which membership type user has
      */
     public int getMembershipInt(){
         return 0;
@@ -94,7 +95,7 @@ public abstract class Membership {
 
     /**
      * check whether a new payment is due
-     * default is false
+     * @return the default which is false
      */
     public boolean checkPaymentDue(){
         return false;
@@ -102,15 +103,15 @@ public abstract class Membership {
 
     /**
      * check whether user has exceeded number of free rides
-     * default is false
+     * @return the default which is false
      */
     public boolean checkMaxRidesExceeded() {
         return false;
     }
 
     /**
-     * returns a string with membership type
-     * default is null
+     * This method returns the string that is equivalent to membership type, eg. monthly for int 2
+     * @return the default which is null
      */
     public String getMembershipString(){
         return null;

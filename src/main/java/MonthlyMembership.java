@@ -6,7 +6,7 @@ import java.time.Period;
  */
 public class MonthlyMembership extends Membership{
 
-    //rides that come included in membership each month
+    /** rides that come included in membership each month */
     private final int maxRides = 20;
 
     /**
@@ -28,21 +28,36 @@ public class MonthlyMembership extends Membership{
         return (diff >= 30);
     }
 
+    /**
+     * This is the constructor for an existing monthly membership
+     * @param totalRidesLeft is the total rides left for this membership for a customer
+     * @param lastPayment is the last time the customer made a payment for a monthly membership
+     * @param memberSince is the date since which a customer has been a monthly membership
+     */
     MonthlyMembership(int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
         super(totalRidesLeft, lastPayment, memberSince);
     }
 
-    //checks whether there are 0 free rides left
+    /**
+     * checks whether there are 0 free rides left
+     * @return true if max rides has been exceeded, at which point customer is switched to pay red ride
+     */
     public boolean checkMaxRidesExceeded(){
         return super.getTotalRidesLeft() >= maxRides;
     }
 
-    //returns 2, which represents a monthly membership
+    /**
+     * get int which represents a monthly membership
+     * @return 2 which is the int for monthly membership
+     */
     public int getMembershipInt(){
         return 2;
     }
 
-    //returns type of membership as a string
+    /**
+     * returns type of membership as a string
+     * @return string Monthly for monthly membership
+     */
     public String getMembershipString(){
         return "Monthly";
     }

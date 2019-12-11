@@ -1,6 +1,4 @@
-
 import java.io.*;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +11,7 @@ import java.text.ParseException;
 
 /**
  * Class that tracks, updates, edits data involved in the ValleyBike Share system
- *
+ * This is our model in the MVC
  * We make the assumption in this bike that our system only has
  * pedelecs. Every time we use the word 'bike' in this code, we mean
  * pedelecs/electric bikes.
@@ -44,8 +42,14 @@ public class ValleyBikeSim {
 	 */
 	private static Map<String, InternalAccount> internalAccountMap = new HashMap<>();
 
+	/**
+	 * data structure for keeping track of rides
+	 */
 	private static Map<UUID, Ride> rideMap = new HashMap<>();
 
+	/**
+	 * this data formatter is used for local date parsing
+	 */
 	private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	/**
@@ -53,13 +57,12 @@ public class ValleyBikeSim {
 	 * mapped by id for easy access and manipulation throughout program
 	 *
 	 * Then outputs welcome message and menu selector
-	 * @param args
-	 * @throws IOException
-	 * @throws ParseException
-	 * @throws InterruptedException
-	 * @throws SQLException
+	 * @throws IOException failure during reading, writing and searching file or directory operations
+	 * @throws ParseException fail to parse a String that is ought to have a special format
+	 * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
+	 * @throws SQLException for database access error
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	public static void main(String[] args) throws IOException, ParseException, InterruptedException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 		// connect to sqlite database and read all required tables
@@ -134,9 +137,9 @@ public class ValleyBikeSim {
 	/**
 	 * reads in membership data from database
 	 * @param username username who has membership
-	 * @return
+	 * @return the membership object associated with the given user
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws SQLException
+	 * @throws SQLException for database access error
 	 */
 	private static Membership readMembershipData(String username) throws ClassNotFoundException, SQLException{
 		String sql = "SELECT * FROM Membership WHERE username = ?";
@@ -161,11 +164,12 @@ public class ValleyBikeSim {
 		}
 		return checkMembershipType(type, totalRidesLeft, lastPayment, memberSince);
 	}
-		/**
+
+	/**
 	 * Reads in info from database and converts to internal account objects that get stored in data structure
 	 *
 	 * @param stmt allows execution of SQL queries
-	 * @throws SQLException
+	 * @throws SQLException for database access error
 	 */
 	private static void readInternalAccountData(Statement stmt) throws SQLException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Internal_Account");
@@ -186,7 +190,7 @@ public class ValleyBikeSim {
 	 * Reads in info from database and converts to station objects that get stored in data structure
 	 *
 	 * @param stmt allows execution of SQL queries
-	 * @throws SQLException
+	 * @throws SQLException for database access error
 	 */
 	private static void readStationData(Statement stmt) throws SQLException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Station");
@@ -221,10 +225,9 @@ public class ValleyBikeSim {
 	 * Reads in info from database and converts to bike objects that get stored in data structure
 	 *
 	 * @param stmt allows execution of SQL queries
-	 * @throws SQLException
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 * @throws SQLException for database access error
 	 */
-	private static void readBikeData(Statement stmt) throws SQLException, ClassNotFoundException {
+	private static void readBikeData(Statement stmt) throws SQLException{
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Bike");
 		//get values from each line in table
 		while (rs.next()) {
@@ -253,8 +256,8 @@ public class ValleyBikeSim {
 	 * Reads in info from database and converts to ride objects that get stored in data structure
 	 *
 	 * @param stmt allows execution of SQL queries
-	 * @throws SQLException
-	 * @throws ParseException
+	 * @throws SQLException for database access error
+	 * @throws ParseException fail to parse a String that is ought to have a special format
 	 */
 	private static void readRideData(Statement stmt) throws SQLException, ParseException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Ride");
@@ -353,10 +356,9 @@ public class ValleyBikeSim {
 	/**
 	 * update actual bike object at station
 	 * @param stationId station to update
-	 * @param bikeId bike id to add
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
-	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
+	static void updateStationBikeList(int stationId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
 
@@ -567,7 +569,8 @@ public class ValleyBikeSim {
 	/**
 	 * Updates cost of ride
 	 *
-	 * @param rideId  ride being updated
+	 * @param rideId ride being updated
+	 * @param station_to is the station id for the station the ride is being returned to
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateRideStationTo(UUID rideId, int station_to) throws ClassNotFoundException {
@@ -625,7 +628,7 @@ public class ValleyBikeSim {
 	 * if customer deletes their account, disable account so cannot be logged into but preserve data
 	 *
 	 * @param username username of account to disable
-	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void disableCustomerAccount(String username) throws NoSuchAlgorithmException, ClassNotFoundException {
@@ -747,6 +750,11 @@ public class ValleyBikeSim {
 		updateMembershipUsername(username, newUsername);
 	}
 
+	/**
+	 * update username in ride table in database and in ride map
+	 * @param username is the old username for the customer
+	 * @param newUsername is the new username for the customer
+	 */
 	private static void updateRideUsername(String username, String newUsername){
 		String sql = "UPDATE Ride SET username = ? "
 				+ "WHERE username = ?";
@@ -770,6 +778,11 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * update username in membership table in the database
+	 * @param username is the old username for the customer
+	 * @param newUsername is the new username for the customer
+	 */
 	private static void updateMembershipUsername(String username, String newUsername){
 		String sql = "UPDATE Membership SET username = ? "
 				+ "WHERE username = ?";
@@ -1090,11 +1103,9 @@ public class ValleyBikeSim {
 	 * gone on for too long (in which case they are charged)
 	 * Credit card was validated when bike was rented so does not need to be validated again to charge them
 	 * @param username is the unique username associated with the customer account
-	 * @throws ParseException
-	 * @throws InterruptedException
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
-	static void checkBikeRented(String username) throws ParseException, InterruptedException, ClassNotFoundException {
+	static void checkBikeRented(String username) throws ClassNotFoundException {
 		// get customer object
 		CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
 
@@ -1157,8 +1168,8 @@ public class ValleyBikeSim {
 
 	/**
 	 *
-	 * @return
-	 * @throws SQLException
+	 * @return an int which is the total number of customer accounts in database
+	 * @throws SQLException for database access error
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static int viewTotalUsers() throws SQLException, ClassNotFoundException {
@@ -1178,8 +1189,8 @@ public class ValleyBikeSim {
 
 	/**
 	 *
-	 * @return
-	 * @throws SQLException
+	 * @return an int which is the sum of all the maintenance requests totaled from all stations in the database
+	 * @throws SQLException for database access error
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static int viewTotalMaintenanceRequests() throws SQLException, ClassNotFoundException {
@@ -1199,8 +1210,9 @@ public class ValleyBikeSim {
 
 	/**
 	 *
-	 * @return
-	 * @throws SQLException
+	 * @return a map entry consisting of station id and the number of times that station was involved in rides taken
+	 * which represents the station found in most number of rides
+	 * @throws SQLException for database access error
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Map.Entry<Integer, Integer> viewMostPopularStation() throws SQLException, ClassNotFoundException {
@@ -1285,8 +1297,6 @@ public class ValleyBikeSim {
 	/**
 	 * Loops through station objects in stations map data structure
 	 * formats them to a table view for the user
-	 *
-	 * @throws ParseException
 	 */
 	static void viewStationList() {
 		System.out.println("STATION LIST:");
@@ -1312,6 +1322,10 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * the total capacity of all the stations added together
+	 * @return the int that represents the total  capacity of all the stations added together
+	 */
 	static int viewTotalStationsCapacity(){
 		//TODO comment method
 		int total = 0;
@@ -1322,6 +1336,10 @@ public class ValleyBikeSim {
 		return total;
 	}
 
+	/**
+	 * the total bikes in Valley Bike system
+	 * @return the int that is the total count for all the bikes in bike map
+	 */
 	static int viewTotalBikesCount(){
 		//TODO comment method
 		return bikesMap.size();
@@ -1333,10 +1351,10 @@ public class ValleyBikeSim {
 	 * @param customerAccount this is the new customer account object to be added to the map
 	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
-	 * @throws InterruptedException
+	 * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws NoSuchAlgorithmException
-	 * @throws SQLException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws SQLException for database access error
 	 */
 	public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
@@ -1369,11 +1387,21 @@ public class ValleyBikeSim {
 			}
 		}
 	}
-//TODO comment methods
+
+	/**
+	 * converts boolean to integer (true = 1, false = 0)
+	 * @param myBoolean is the boolean we want to convert
+	 * @return is the equivalent int for the boolean
+	 */
 	private static int booleanToInt(boolean myBoolean) {
 		return myBoolean ? 1 : 0;
 	}
 
+	/**
+	 * converts int to boolean (0 = false)
+	 * @param myInt is the int we want to convert
+	 * @return is the equivalent boolean for the int
+	 */
 	private static boolean intToBoolean(int myInt) {
 		if (Objects.equals(myInt, 0)){
 			return false;
@@ -1384,18 +1412,19 @@ public class ValleyBikeSim {
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
 	 *
-	 * @param internalAccount
-	 * @param username
+	 * @param internalAccount is the new internal account to be created
+	 * @param username is the username for the internal account user who is creating this internal account
+	 *                 only existing internal accounts can create new internal accounts
 	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
-	 * @throws InterruptedException
+	 * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws NoSuchAlgorithmException
-	 * @throws SQLException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
+	 * @throws SQLException for database access error
 	 */
 	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
-		//if the username for the new customer account is already in the customer account map
-		if (customerAccountMap.get(internalAccount.getUsername()) != null) {
+		//if the username for the new internal account is already in the customer account map
+		if (internalAccountMap.get(internalAccount.getUsername()) != null) {
 			//print that the username already exists
 			System.out.println("Internal account with this username already exists.\nPlease try again with another username or log in.");
 			//prompt the user to input new account information again or log in
@@ -1429,11 +1458,11 @@ public class ValleyBikeSim {
 	 * @param emailAddress email address of new customer account
 	 * @param creditCard   credit card of new customer account
 	 * @param membership   membership type of new customer account
-	 * @throws IOException
-	 * @throws ParseException
-	 * @throws InterruptedException
+	 * @throws IOException failure during reading, writing and searching file or directory operations
+	 * @throws ParseException fail to parse a String that is ought to have a special format
+	 * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
     	//create new membership instance
@@ -1445,6 +1474,11 @@ public class ValleyBikeSim {
 		addMembership(membershipType, username);
 	}
 
+	/**
+	 * adds new membership to database
+	 * @param membership is the membership object associated with customer
+	 * @param username is the username for the customer who signed up for a membership
+	 */
 	static void addMembership(Membership membership, String username){
 		String sql = "INSERT INTO Membership(username, total_rides_left, last_payment, membership_since, type) " +
 				"VALUES(?,?,?,?,?)";
@@ -1463,6 +1497,14 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * returns membership object for the specific int associated with membership type
+	 * @param membership is the int for the membership type
+	 * @param totalRidesLeft is the rides left for the user for their membership
+	 * @param lastPayment is the last time the user made a payment for their membership
+	 * @param memberSince is the day since which the user has had this membership type
+	 * @return the membership object for the membership type
+	 */
 	static Membership checkMembershipType(int membership,  int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
 		if (membership == 1){
 			return new PayAsYouGoMembership(totalRidesLeft, lastPayment, memberSince);
@@ -1501,11 +1543,11 @@ public class ValleyBikeSim {
 	 *
 	 * @param station station instance to be added to system
 	 * @param id      id of new station
-	 * @throws IOException
-	 * @throws ParseException
-	 * @throws InterruptedException
+	 * @throws IOException failure during reading, writing and searching file or directory operations
+	 * @throws ParseException fail to parse a String that is ought to have a special format
+	 * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (stationsMap.get(id) != null) { //if station id already exists, inform user
@@ -1534,7 +1576,6 @@ public class ValleyBikeSim {
 				stationsMap.put(id, station);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new station to database.");
-				System.out.println(e);
 			}
 		}
 	}
@@ -1571,11 +1612,11 @@ public class ValleyBikeSim {
 	 * add a new ride to the system
 	 *
 	 * @param ride ride object to add
-	 * @throws IOException
-	 * @throws ParseException
-	 * @throws InterruptedException
+	 * @throws IOException failure during reading, writing and searching file or directory operations
+	 * @throws ParseException fail to parse a String that is ought to have a special format
+	 * @throws InterruptedException when a thread that is sleeping, waiting, or is occupied is interrupted
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchAlgorithmException when a particular cryptographic algorithm is requested but is not available in the environment.
 	 */
 	static Boolean addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (rideMap.get(ride.getRideId()) != null) {
@@ -1640,7 +1681,7 @@ public class ValleyBikeSim {
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
 			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
 			// update new station bike list to database
-			updateStationBikeList(bike.getStation(), bike.getId());
+			updateStationBikeList(bike.getStation());
 		}
 
 	    //update station id registered to bike
@@ -1651,7 +1692,7 @@ public class ValleyBikeSim {
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
 			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 			// update to database
-			updateStationBikeList(bike.getStation(), bike.getId());
+			updateStationBikeList(bike.getStation());
 			updateBikeLocation(bike.getId(), 0);
 		}
 		else {
@@ -1718,7 +1759,7 @@ public class ValleyBikeSim {
 	 * @param stationsCapacity - Map of stations to actual percentages
 	 * @param idealPercentage  - Percentage stations should ideally have
 	 * @param extraBikes       - Stack of bikes taken from high percentage stations
-	 * @return
+	 * @return all extra bikes that need to get reassigned
 	 */
 	private static Deque<Bike> reassignHighPercentage(Map<Integer, Integer> stationsCapacity,
 													  int idealPercentage, Deque<Bike> extraBikes) throws ClassNotFoundException {
@@ -1793,6 +1834,7 @@ public class ValleyBikeSim {
 	 * Resolve all maintenance requests by viewing bike ids
 	 * in need of maintenance then setting them to not require
 	 * maintenance anymore
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void resolveMntReqs() throws ClassNotFoundException {
 		// if there are maintenance requests
@@ -1853,10 +1895,6 @@ public class ValleyBikeSim {
 		//if incorrect input, return null
 		return null;
 	}
-
-
-
-
 
 	/**
 	 * get length of ride list for a customer
@@ -1983,52 +2021,4 @@ public class ValleyBikeSim {
 	static Boolean bikesMapContains(int key) {
 		return bikesMap.containsKey(key);
 	}
-
-	/*
-	*//**
-	 * Helper method for controller class to return a key set
-	 * iterator
-	 *
-	 * @param isBike If true, we're working with a bike object.
-	 *               If not, we're working with a station object.
-	 * @return if isBike is true, we're returning a bikesMap iterator.
-	 * if not, we're returning a stationsMap iterator.
-	 *//*
-	private static Iterator createIterator(Boolean isBike) {
-		if (isBike) {
-			return bikesMap.keySet().iterator();
-		} else {
-			return stationsMap.keySet().iterator();
-		}
-	}*/
-
-	/**
-	 * Adds a bike to a station
-	 *
-	 * @param stationId the station id that will get updated
-	 * @param bikeId    the bike to be added to the station
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 */
-	/*
-	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
-		String sql = "UPDATE Station SET bike_string = ? "
-				+ "WHERE id = ?";
-		//add bike to list of bikes at station in station map
-
-		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
-
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			// set the corresponding param
-			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
-			// update
-			pstmt.executeUpdate();
-
-			//add bike to station in database
-			stationsMap.get(stationId).addToBikeList(bikeId);
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
-		}
-	}*/
 }
