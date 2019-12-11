@@ -1253,7 +1253,7 @@ public class ValleyBikeSim {
 	 */
 	static void viewBikeList() {
 		// format table view
-		System.out.format("%-10s%-10s%-10s%-10s%-10s\n", "ID", "Location", "Stat. ID",
+		System.out.format("%-10s%-10s%-20s%-10s%-10s\n", "ID", "Stat. ID"," Location",
 				"Main. Req", "Main. Report");
 
 		// while the iterator has a next value
@@ -1262,13 +1262,31 @@ public class ValleyBikeSim {
 			// use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
 
+			String locString = " ";
+			int loc = bike.getBikeLocation();
+			if (loc == 0) {
+				locString = "available at station  ";
+			} else if (loc == 1) {
+				locString = "not available for rent";
+			} else if (loc == 2) {
+				locString = "currently rented      ";
+			}
+
+			String station = " ";
+			int stat  = bike.getStation();
+			if (stat == 0) {
+				station = "out";
+			} else {
+				station = Integer.toString(stat);
+			}
 			// format the view of the bike object values
-			System.out.format("%-10d%-10d%-10d%-10s%-10s\n",
+			System.out.format("%-10d%-10s%-10s%-10s%-10s\n",
 					key,
-					bike.getBikeLocation(),
-					bike.getStation(),
+					station,
+					locString,
 					bike.getMnt(),
 					bike.getMntReport()
+
 			);
 		}
 	}
