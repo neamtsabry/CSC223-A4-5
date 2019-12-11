@@ -1245,6 +1245,7 @@ public class ValleyBikeSim {
 	 * in a nicely formatted table
 	 */
 	static void viewBikeList() {
+		System.out.println("BIKE LIST:");
 		// format table view
 		System.out.format("%-10s%-10s%-20s%-10s%-10s\n", "ID", "Stat. ID"," Location",
 				"Main. Req", "Main. Report");

@@ -211,9 +211,6 @@ public class Ride {
     public Boolean isRented24Hours() throws ParseException, InterruptedException {
         Instant now =  Instant.now();
 
-        //testing start time stamp
-        System.out.println(getStartTimeStamp());
-
         //calculating time between start and now
         long between = Duration.between(getStartTimeStamp(), now).toHours();
 
