@@ -1345,7 +1345,7 @@ public class ValleyBikeSim {
 	}
 
 	static int viewTotalStationsCapacity(){
-		//TODO implement Grace
+		//TODO comment method
 		int total = 0;
 		for (int key : stationsMap.keySet()){
 			Station station = stationsMap.get(key);
@@ -1355,7 +1355,7 @@ public class ValleyBikeSim {
 	}
 
 	static int viewTotalBikesCount(){
-		//TODO implement Grace
+		//TODO comment method
 		return bikesMap.size();
 	}
 
@@ -1401,7 +1401,7 @@ public class ValleyBikeSim {
 			}
 		}
 	}
-//TODO add comments to these methods
+//TODO comment methods
 	private static int booleanToInt(boolean myBoolean) {
 		return myBoolean ? 1 : 0;
 	}
