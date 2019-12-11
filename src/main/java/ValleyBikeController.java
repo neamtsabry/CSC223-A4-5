@@ -39,7 +39,6 @@ public abstract class ValleyBikeController {
             case 1:
                 //create a new customer account
                 createCustomerAccount();
-//                reportProblem("graciegracie");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -891,9 +890,12 @@ public abstract class ValleyBikeController {
         // bike is now out of commission until fixed
         ValleyBikeSim.updateBikeLocation(bikeId, 1);
 
-        // increase maintenance requests for the station
-        Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
-        ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+        // if the station is not live with customer
+        if(! Objects.equals(bike.getStation(), 0)){
+            // increase maintenance requests for the station
+            Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
+            ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+        }
 
         // let user know the process is done
         System.out.println("Maintenance report has been successfully filed!");
