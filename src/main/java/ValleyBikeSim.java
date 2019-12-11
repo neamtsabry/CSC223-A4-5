@@ -1215,7 +1215,7 @@ public class ValleyBikeSim {
 		return total;
 	}
 
-	static int viewMostPopularStation() throws SQLException, ClassNotFoundException {
+	static Map.Entry<Integer, Integer> viewMostPopularStation() throws SQLException, ClassNotFoundException {
 		HashMap<Integer, Integer> stationCountMap = new HashMap<>();
 		Connection conn = connectToDatabase();
 		//read in data from database to data structures
@@ -1246,7 +1246,7 @@ public class ValleyBikeSim {
 				maxEntry = entry;
 			}
 		}
-		return maxEntry.getKey();
+		return maxEntry;
 	}
 
 	/**
