@@ -9,8 +9,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 
 /**
  * Class that tracks, updates, edits data involved in the ValleyBike Share system
@@ -99,7 +98,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to customer objects that get stored in data structure
 	 *
-	 * @param stmt
+	 * @param stmt statement necessary to run sql query
 	 * @throws SQLException for database access error
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
@@ -258,10 +257,9 @@ public class ValleyBikeSim {
 	 *
 	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws ParseException
 	 */
-	private static void readRideData(Statement stmt) throws SQLException, ClassNotFoundException, ParseException {
+	private static void readRideData(Statement stmt) throws SQLException, ParseException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Ride");
 		//get each value from each line in table
 		while (rs.next()) {
@@ -328,35 +326,6 @@ public class ValleyBikeSim {
 		}
 		//update station data in map
 		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
-	}
-
-	/**
-	 * Adds a bike to a station
-	 *
-	 * @param stationId the station id that will get updated
-	 * @param bikeId    the bike to be added to the station
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 */
-	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
-		String sql = "UPDATE Station SET bike_string = ? "
-				+ "WHERE id = ?";
-		//add bike to list of bikes at station in station map
-
-		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
-
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			// set the corresponding param
-			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
-			// update
-			pstmt.executeUpdate();
-
-			//add bike to station in database
-			stationsMap.get(stationId).addToBikeList(bikeId);
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
-		}
 	}
 
 	/**
@@ -833,6 +802,9 @@ public class ValleyBikeSim {
 		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
 				+ "WHERE username = ?";
 
+		//add new ride to customer's ride list
+		customerAccountMap.get(username).addNewRide(rideId);
+
 		String rideIdString = customerAccountMap.get(username).getRideIdListToString();
 
 		//update customer's ride list in database
@@ -845,8 +817,6 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 
-			//add new ride to customer's ride list
-			customerAccountMap.get(username).addNewRide(rideId);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not add ride id to list in database at this time.");
 		}
@@ -1275,6 +1245,7 @@ public class ValleyBikeSim {
 	 * in a nicely formatted table
 	 */
 	static void viewBikeList() {
+		System.out.println("BIKE LIST:");
 		// format table view
 		System.out.format("%-10s%-10s%-20s%-10s%-10s\n", "ID", "Stat. ID"," Location",
 				"Main. Req", "Main. Report");
@@ -1508,11 +1479,17 @@ public class ValleyBikeSim {
 		return null;
 	}
 
-	//TODO Comment Method
+	/**
+	 * view longest ride made by user
+	 * @param username username of account to check
+	 * @return longest ride object
+	 */
 	static Ride viewLongestRide(String username){
+		//fetch all rides belonging to customer
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
 		long longestRideLength = 0;
 		Ride longestRide = null;
+		//search through every ride checking for longest one
 		for (UUID ride: rideIdList){
 			if (rideMap.get(ride).getRideLength() > longestRideLength){
 				longestRideLength = rideMap.get(ride).getRideLength();
@@ -1653,7 +1630,7 @@ public class ValleyBikeSim {
 	 * Move a bike to a different (or no) station
 	 * Also sets station data to match this move
 	 *
-	 * @param bike
+	 * @param bike bike that is being moved
 	 * @param newStationValue station ID of the station the bike is moving to
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be foun
 	 */
@@ -1880,22 +1857,7 @@ public class ValleyBikeSim {
 		return null;
 	}
 
-	/**
-	 * Helper method for controller class to return a key set
-	 * iterator
-	 *
-	 * @param isBike If true, we're working with a bike object.
-	 *               If not, we're working with a station object.
-	 * @return if isBike is true, we're returning a bikesMap iterator.
-	 * if not, we're returning a stationsMap iterator.
-	 */
-	private static Iterator createIterator(Boolean isBike) {
-		if (isBike) {
-			return bikesMap.keySet().iterator();
-		} else {
-			return stationsMap.keySet().iterator();
-		}
-	}
+
 
 
 
@@ -2025,122 +1987,51 @@ public class ValleyBikeSim {
 		return bikesMap.containsKey(key);
 	}
 
-
-
-	//TODO remove this method if we are sure- it takes in data files eesh
-	/**
-	 * We are not currently using this method.
-	 * <p>
-	 * Takes in a ride data file name from user
-	 * Parses and iterates through file and uses ride timestamps
-	 * to determine average ride time.
-	 * <p>
-	 * Prints out number of rides for that day and average time
+	/*
+	*//**
+	 * Helper method for controller class to return a key set
+	 * iterator
 	 *
-	 * @throws IOException
-	 * @throws ParseException
-	 */
-	static void resolveData(String dataFile) throws IOException, ParseException {
-		System.out.println("Enter the file name (including extension) of the file located"
-				+ "in data-files: ");
-
-		FileReader fileReader = new FileReader("data-files/" + dataFile);
-		BufferedReader bufferedReader = new BufferedReader(fileReader);
-		String rideLine;
-
-		int rides = 0;
-		long totalTime = 0;
-		long averageTime;
-
-		bufferedReader.readLine();
-
-		while ((rideLine = bufferedReader.readLine()) != null) {
-			rides = rides + 1;
-			String[] values = rideLine.split(",");
-
-			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-			Date startDate = dateFormat.parse(values[3]);
-			Timestamp startTime = new Timestamp(startDate.getTime());
-			Date endDate = dateFormat.parse(values[4]);
-			Timestamp endTime = new Timestamp(endDate.getTime());
-			totalTime = totalTime + (endTime.getTime() - startTime.getTime());
+	 * @param isBike If true, we're working with a bike object.
+	 *               If not, we're working with a station object.
+	 * @return if isBike is true, we're returning a bikesMap iterator.
+	 * if not, we're returning a stationsMap iterator.
+	 *//*
+	private static Iterator createIterator(Boolean isBike) {
+		if (isBike) {
+			return bikesMap.keySet().iterator();
+		} else {
+			return stationsMap.keySet().iterator();
 		}
-
-		bufferedReader.close();
-
-		//Just averaging to the closest number of minutes here for simplicity
-		averageTime = (totalTime / rides) / 60000;
-		System.out.println("Number of rides: " + rides);
-		System.out.println("Average ride time in minutes: " + averageTime);
-	}
+	}*/
 
 	/**
-	 * Return a stack of bikes docked at a particular station
+	 * Adds a bike to a station
 	 *
-	 * @param statId The int ID of the station from which we will
-	 *               collect the list of docked bikes.
-	 * @return bikesAtStation - a stack of bikes docked at this station
+	 * @param stationId the station id that will get updated
+	 * @param bikeId    the bike to be added to the station
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
-	static Deque<Bike> getBikesAtStation(int statId) {
-		//TODO We don't need this method!!!
-		//initiate our bike stack
-		Deque<Bike> bikesAtStation = new ArrayDeque<>();
-		// initiate iterator
-		Iterator bikeKeyIterator = ValleyBikeSim.createIterator(true);
+	/*
+	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
+		String sql = "UPDATE Station SET bike_string = ? "
+				+ "WHERE id = ?";
+		//add bike to list of bikes at station in station map
 
-		// keep looping until there is no next value
-		while (bikeKeyIterator.hasNext()) {
-			Integer key = (Integer) bikeKeyIterator.next();
-			Bike bike = ValleyBikeSim.getBikeObj(key);
-			if (statId == bike.getStation()) { // if the bike's station ID matches this station
-				bikesAtStation.push(bike); // add it to stack
-			}
+		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			// set the corresponding param
+			pstmt.setString(1, bikeIdsString);
+			pstmt.setInt(2, bikeId);
+			// update
+			pstmt.executeUpdate();
+
+			//add bike to station in database
+			stationsMap.get(stationId).addToBikeList(bikeId);
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
 		}
-		return bikesAtStation;
-	}
-
-	/**
-	 * Verify username and password when an internal staff logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-
-	static void internalLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-
-	//if the username exists but the password entered by the user does not match the password associated with that username
-	if (!password.equals(internalAccountMap.get(username).getPassword())) {
-	//print incorrect password
-	System.out.println("Incorrect password. Please try again.");
-	//take the user back to the initial menu
-	return;
-	}
-	//if the username and password both match with associated customer account object, lead the user to internal account home
-	ValleyBikeController.internalAccountHome(username);
-	}
-	 */
-
-	/**
-	 * Verify username and password when a customer logs in to their account
-	 *
-	 * @param username is the username input by the user to log in
-	 * @param password is the password input by the user to log in
-	 * @throws IOException    the initial menu and user account home method in the controller throw IOException
-	 * @throws ParseException the initial menu and user account home method in the controller throw ParseException
-	static void customerLogIn(String username, String password) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-
-	//if the username exists but the password entered by the user does not match the password associated with that username
-	if (!password.equals(customerAccountMap.get(username).getPassword())) {
-	//print incorrect password
-	System.out.println("Incorrect password. Please try again.");
-	//prompt the user to input new account information again or log in
-	return;
-	}
-	//if the username and password both match with associated customer account object, lead the user to user account home
-	ValleyBikeController.customerAccountHome(username);
-	}
-
-	 */
+	}*/
 }

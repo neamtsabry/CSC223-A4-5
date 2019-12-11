@@ -79,7 +79,7 @@ public abstract class Membership {
 
     /**
      * sets date when user began current membership subscription
-     * @param memberSince 
+     * @param memberSince
      */
     void setMemberSince(LocalDate memberSince) {
         this.memberSince = memberSince;

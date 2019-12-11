@@ -38,8 +38,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-//                createCustomerAccount();
-                rentBike("gracie");
+                createCustomerAccount();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -193,7 +192,7 @@ public abstract class ValleyBikeController {
         }
 
         // once valid username and password are obtained, print greeting and bring them to home menu
-        System.out.print("\nWelcome back, " + username + "!");
+        System.out.println("\nWelcome back, " + username + "!");
 
         switch (logIn){
             case 1:
@@ -276,7 +275,7 @@ public abstract class ValleyBikeController {
                 } // if customer has ongoing rental, help user return bike
                 break;
             case 5:
-                reportProblem(username);
+                reportProblem();
                 break;
             case 6:
                 viewCustomerInfo(customer);
@@ -598,12 +597,12 @@ public abstract class ValleyBikeController {
 
         // add ride to map as well as database
         if(!ValleyBikeSim.addRide(ride)){
+            //System.out.println("FAIL");
             customerAccountHome(username);
         }
 
         // Add ride to customer account
         // assume username is always valid
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
         ValleyBikeSim.updateRideIdList(username, rideId);
         ValleyBikeSim.updateCustomerLastRideisReturned(username, false);
 
@@ -622,11 +621,16 @@ public abstract class ValleyBikeController {
             System.out.println("The bikes have now been redistributed between the stations.");
             System.out.println();
         }
-
         System.out.println("All done renting!");
     }
 
-    //TODO comment method
+
+    /**
+     * choose bike to rent
+     * @param stationFrom station which bike rental will come from
+     * @param statId id of station
+     * @return bike id that will be rented
+     */
     private static int chooseRentBike(Station stationFrom, int statId) {
         // View available bike ids at station
         System.out.println("Here's a list of bike IDs at Station #" + statId);
@@ -661,7 +665,12 @@ public abstract class ValleyBikeController {
         return bikeID;
     }
 
-    //TODO comment method
+
+    /**
+     * choose station to rent a bike from
+     * @return station id to rent from
+     * @throws ClassNotFoundException
+     */
     private static int chooseRentStation() throws ClassNotFoundException {
         // View stations
         ValleyBikeSim.viewStationList(); // view station list
@@ -792,12 +801,12 @@ public abstract class ValleyBikeController {
         //check how many included rides remain in account to determine how to charge for rental
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
         long rideLength = rideObj.getRideLength();
-        long paymentDue;
+        double paymentDue = 0.00;
         //if pay-as-you-go or no free rides remaining on membership, charge by time
         if (ridesLeft == 0) {
             //card was already validated before bike rented to ensure they can pay for the rental
             //ride cost is 15c per minute
-            paymentDue = rideLength * (long) .15;
+            paymentDue = rideLength * .15;
             //update balance to add new ride payment
             double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
@@ -812,14 +821,13 @@ public abstract class ValleyBikeController {
             if (rideLength > 60L) {
                 long paymentLength = rideLength - 60L;
                 //ride cost is 15c per minute after 1st hour
-                paymentDue = paymentLength * (long) .15;
+                paymentDue = paymentLength * .15;
                 //update balance to add new ride payment
                 double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
                 ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             } else {
                 //ride is free if under 1hr
-                paymentDue = 0L;
-                ValleyBikeSim.updateRidePayment(lastRideId, 0.00);
+                ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
             }
         }
         //inform customer of the charge
@@ -831,10 +839,8 @@ public abstract class ValleyBikeController {
      * Report problem for regular user by adding bike's id to
      * maintenance request list and setting its fields to requiring
      * maintenance.
-     * @param username for user
-     * user reports a problem with the bike they checked out
      */
-    private static void reportProblem(String username) throws ClassNotFoundException {
+    private static void reportProblem() throws ClassNotFoundException {
         int bikeId = getResponse("Please enter the ID of the bike you" +
                 " are experiencing problems with ('###') or '0' to return to the menu:");
 
@@ -1331,7 +1337,7 @@ public abstract class ValleyBikeController {
      * Loops until valid username input by user
      * @return valid username input by user
      */
-    private static String enterUsername(int accountType) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterUsername(int accountType) {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
@@ -1356,7 +1362,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid password input by user
      */
-    private static String enterPassword() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterPassword() {
         String password;
         do {//loops until user inputs 0 or valid password
             //prompts user to input password
@@ -1381,7 +1387,7 @@ public abstract class ValleyBikeController {
      *
      * @return valid email address input by user
      */
-    private static String enterEmail() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterEmail() {
         String emailAddress;
         do {//loops until user inputs 0 or valid password
             //prompts user to input email address
@@ -1406,7 +1412,7 @@ public abstract class ValleyBikeController {
      * Recursively calls itself until valid email address input by user
      * @return valid credit card input by user
      */
-    private static String enterCreditCard() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterCreditCard() {
         String creditCard;
         do {//loops until user inputs 0 or valid password
             //prompts user to input credit card
@@ -1431,7 +1437,7 @@ public abstract class ValleyBikeController {
      * Prompts user to input membership
      * @return membership string input by user
      */
-    private static int enterMembership() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static int enterMembership() {
         System.out.println("Choose membership type: \n" +
                 "1: Pay-as-you-go Membership. " +
                 "2: Monthly Membership. " +
@@ -1577,40 +1583,4 @@ public abstract class ValleyBikeController {
                 initialMenu();
         }
     }
-
-
-    //TODO delete
-    /**
-     * This method is not currently being used
-     * internal employee can view customer activity
-     * @throws InterruptedException
-     * @throws ClassNotFoundException
-     * @throws NoSuchAlgorithmException
-     * @throws ParseException
-     * @throws IOException
-     */
-    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException, SQLException {
-        // view all customers' usernames
-        ValleyBikeSim.viewAllCustomers();
-
-        // ask user to input customer username
-        System.out.println("Please input a customer's username to view their activity");
-        String username = input.nextLine();
-
-        // check for '0' input and return to previous menu
-        if (Objects.equals(username, "0")) { returnToLastMenu(null); }
-
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
-
-        while( customer == null){
-            // ask user to input customer username
-            System.out.println("Username entered does not exist.");
-            System.out.println("Please input a customer's username to view their activity");
-            username = input.nextLine();
-            customer = ValleyBikeSim.getCustomerObj(username);
-        }
-
-        viewCustomerInfo(customer);
-    }
-
 }
