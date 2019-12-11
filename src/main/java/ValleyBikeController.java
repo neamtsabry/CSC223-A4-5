@@ -398,7 +398,8 @@ public abstract class ValleyBikeController {
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
                 "\nCredit Card: ************" + customer.getCreditCard().substring(12) +
-                "\nMembership: " + customer.getMembership().getMembershipString());
+                "\nMembership: " + customer.getMembership().getMembershipString() +
+                "\nTotal discounted rides left: " + customer.getMembership().getTotalRidesLeft());
     }
 
     /**
@@ -887,6 +888,7 @@ public abstract class ValleyBikeController {
             }
 
         } else {
+            //TODO decrement rides remaining in membership database
             //otherwise decrement rides remaining in membership
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
             //calculate whether there is an overtime charge (for a ride longer than 1hr)
