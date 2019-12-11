@@ -1082,19 +1082,13 @@ public class ValleyBikeSim {
 	 *
      */
     static boolean accountMapsContain(String username, int num) {
-    	switch (num){
+    	switch(num) {
 			case 1: //search customer map
-				if (customerAccountMap.containsKey(username)){
-					return true;
-				}
+				return customerAccountMap.containsKey(username);
 			case 2: //search internal map
-				if (internalAccountMap.containsKey(username)){
-					return true;
-				}
+				return internalAccountMap.containsKey(username);
 			case 3: //search both maps
-				if (customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username)){
-				return true;
-			}
+				return customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username);
 		}
         return false;
     }
