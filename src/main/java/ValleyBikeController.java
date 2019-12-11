@@ -881,6 +881,7 @@ public abstract class ValleyBikeController {
             paymentDue = rideLength * .15;
             //update balance to add new ride payment
             double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+            //TODO update balance in database
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             //update ride payment in ride object
 
@@ -900,6 +901,7 @@ public abstract class ValleyBikeController {
                 paymentDue = paymentLength * .15;
                 //update balance to add new ride payment
                 double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
+                //TODO update balance in database
                 ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             } else {
                 //ride is free if under 1hr
