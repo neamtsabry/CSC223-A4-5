@@ -200,9 +200,13 @@ public class ValleyBikeSim {
 			String bikeString = rs.getString("bike_string");
 			LinkedList<Integer> bikeList = new LinkedList<>();
 
+			// if the bike list string is not null
 			if (bikeString != null) {
+				// loop through bike ids in string
 				for (String bikeId : bikeString.replaceAll(" ", "").split(",")) {
+					// if there are bike ids in the string
 					if (bikeString.length() > 0) {
+						// add it to the bike list
 						bikeList.add(Integer.parseInt(bikeId));
 					}
 				}
@@ -225,6 +229,7 @@ public class ValleyBikeSim {
 	 */
 	private static void readBikeData(Statement stmt) throws SQLException, ClassNotFoundException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Bike");
+
 		//get values from each line in table
 		while (rs.next()) {
 			int id = rs.getInt("id");
@@ -232,13 +237,16 @@ public class ValleyBikeSim {
 			int stationId = rs.getInt("station_id");
 			int reqMnt = rs.getInt("req_mnt");
 
+			// set maintenance report to n
 			String maintenance = "n";
 
+			// if it does require maintenance, set to y
 			if (reqMnt == 1) {
 				maintenance = "y";
 			}
 
 			String mntReport = rs.getString("mnt_report");
+
 			//create instance of bike object
 			Bike bike = new Bike(id, location, stationId, maintenance, mntReport);
 
@@ -289,9 +297,9 @@ public class ValleyBikeSim {
 					is_returned_bool, start_time_stamp_instant,
 					end_time_stamp_instant, station_from, station_to);
 
+			// set the ride length and payment as well
 			ride.setRideLength(rideLength);
 			ride.setPayment(payment);
-			//updateRidePayment(uuid_id, payment);
 
 			// add to the bike tree
 			rideMap.put(uuid_id, ride);
@@ -303,6 +311,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param stationId the station id that will get updated
 	 * @param mntRqsts  the number of maintenance requests the station should have
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateStationMntRqsts(int stationId, int mntRqsts) throws ClassNotFoundException {
@@ -337,14 +346,18 @@ public class ValleyBikeSim {
 	 *
 	 * @param stationId the station id that will get updated
 	 * @param bikeId    the bike to be added to the station
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
+		// set sql query
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
 
+		// get station bike list string
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
+		// try connection
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			// set the corresponding param
@@ -368,6 +381,7 @@ public class ValleyBikeSim {
 	 * updae number of bikes at station
 	 * @param stationId station to update
 	 * @param bikes number of bikes at station
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
@@ -397,12 +411,14 @@ public class ValleyBikeSim {
 	 * update actual bike object at station
 	 * @param stationId station to update
 	 * @param bikeId bike id to add
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
 
+		// get bike list to string
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
 		try (Connection conn = connectToDatabase();
@@ -428,6 +444,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param bikeId       the bike to update
 	 * @param newStationId the station id to assign to the bike
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateBikeStationId(int bikeId, int newStationId) throws ClassNotFoundException {
@@ -443,6 +460,7 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 
+			// update in map as well
 			bikesMap.get(bikeId).setStation(newStationId);
 
 			return true;
@@ -457,6 +475,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param bikeId          the bike to receive a new location
 	 * @param newBikeLocation integer representing bike location
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateBikeLocation(int bikeId, int newBikeLocation) throws ClassNotFoundException {
@@ -474,6 +493,7 @@ public class ValleyBikeSim {
 			// update
 			pstmt.executeUpdate();
 
+			// update in map
 			bikesMap.get(bikeId).setBikeLocation(newBikeLocation);
 
 			return true;
