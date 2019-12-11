@@ -409,7 +409,10 @@ public class ValleyBikeSim {
 			// set the corresponding param
 			pstmt.setString(1, bikeIdsString);
 			pstmt.setInt(2, stationId);
+<<<<<<< HEAD
 
+=======
+>>>>>>> 83a06de5384e5d2e766d02837e0e006f1832b051
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
@@ -1441,6 +1444,7 @@ public class ValleyBikeSim {
 		return null;
 	}
 
+	//TODO Comment Method
 	static Ride viewLongestRide(String username){
 		ArrayList<UUID> rideIdList = customerAccountMap.get(username).getRideIdList();
 		long longestRideLength = 0;
@@ -1587,11 +1591,15 @@ public class ValleyBikeSim {
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
 	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
+<<<<<<< HEAD
 
 			oldStation.removeFromBikeList(bike); // remove bike from station's bike list
 
 			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
+=======
+			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
+>>>>>>> 83a06de5384e5d2e766d02837e0e006f1832b051
 		}
 
         updateBikeStationId(bike.getId(), newStationValue);
@@ -1605,6 +1613,7 @@ public class ValleyBikeSim {
 			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 			updateBikeLocation(bike.getId(), 0);
+			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 		}
 
 		else {

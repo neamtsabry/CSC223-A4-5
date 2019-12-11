@@ -187,7 +187,7 @@ public class Station {
      * @param bike bike to be removed from station
      * @return boolean representing whether operation was successful
      */
-    boolean removeFromBikeList(Bike bike) {
+    boolean removeFromBikeList(int bike) {
         // find index of bike ID in our linked list
         int bikeIndex = bikeList.indexOf(bike);
 
