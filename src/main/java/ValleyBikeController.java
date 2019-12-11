@@ -971,6 +971,7 @@ public abstract class ValleyBikeController {
                 editInternalAccount(username);
                 break;
             case 3:
+                input.nextLine();
                 menuPath.push(3); // add this menu to stack in case we want to return
                 findCustomer(username);
                 menuPath.pop();
@@ -1036,15 +1037,17 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.viewAllCustomers();
 
         // ask user to input customer username
-        input.nextLine();
+        // input.nextLine();
         System.out.println("Please enter a customer's username to view their account or '0' to cancel:");
         String customerUsername = input.nextLine();
 
         // check for '0' input and return to previous menu
-        if (Objects.equals(customerUsername, "0")) { returnToLastMenu(username); }
+        if (Objects.equals(customerUsername, "0")) {
+            internalAccountHome(username);
+        }
 
         // keep asking for input if it isn't a valid customer username
-        while (! ValleyBikeSim.accountMapsContain(customerUsername, 1)){ // 1 specifies that it's a customer account
+        while (!ValleyBikeSim.accountMapsContain(customerUsername, 1)) { // 1 specifies that it's a customer account
             System.out.println("Username entered does not exist. Please try again.");
 
             // ask user to input customer username
@@ -1052,45 +1055,58 @@ public abstract class ValleyBikeController {
             customerUsername = input.nextLine();
 
             // check for '0' input and return to previous menu
-            if (customerUsername.contentEquals("0")) { returnToLastMenu(username); }
+            if (customerUsername.contentEquals("0")) {
+                internalAccountHome(username);
+            }
         }
-
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(customerUsername);
-
         //view customer account info (sensitive information is censored)
         viewCustomerAccount(customerUsername);
 
-        System.out.print("\n Choose from the following:\n"
-                + "1: Edit customer account\t"
-                + "2: View customer balances\t"
-                + "3: View customer activity\t"
-                + "0: Return to menu\n");
-
-        //get and validate user response
-        int num = getResponseBetween(0,3, "Please enter your selection (0-3):");
-
-        if (num==0){returnToLastMenu(username);}
-
-        switch(num) {
-            case 1:
-                //edit customer account
-                editCustomerAccount(customerUsername, username);
-                break;
-            case 2:
-                //view customer balance
-                System.out.println("Account balance for " + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
-                break;
-            case 3:
-                // view customer ride data
-                viewCustomerInfo(customer);
-                break;
-            case 0:
-                returnToLastMenu(username);
-        }
-
-        //if we get through the switch, revisit the beginning of menu
-        findCustomer(username);
+        menuPath.push(4);
+        editCustomerMenu(username, customerUsername);
     }
+
+        /**
+         * Prints list of current usernames and prompts user to input valid username to view/edit;
+         * then gives internal user menu options for view and editing account
+         *
+         * @throws IOException
+         * @throws ParseException
+         */
+        private static void editCustomerMenu(String username, String customerUsername) throws InterruptedException, ParseException, NoSuchAlgorithmException, IOException, SQLException, ClassNotFoundException {
+            //get customer object
+            CustomerAccount customer = ValleyBikeSim.getCustomerObj(customerUsername);
+
+            // print menu options:
+            System.out.print("\n Choose from the following:\n"
+                    + "1: Edit customer account\t"
+                    + "2: View customer balances\t"
+                    + "3: View customer activity\t"
+                    + "0: Return to menu\n");
+
+            //get and validate user response
+            int num = getResponseBetween(0,3, "Please enter your selection (0-3):");
+
+            switch(num) {
+                case 1:
+                    //edit customer account
+                    editCustomerAccount(customerUsername, username);
+                    break;
+                case 2:
+                    //view customer balance
+                    System.out.println("Account balance for " + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
+                    break;
+                case 3:
+                    // view customer ride data
+                    viewCustomerInfo(customer);
+                    break;
+                case 0:
+                    input.nextLine();
+                    findCustomer(username);
+            }
+            //if we get through the switch, revisit the beginning of menu
+            editCustomerMenu(username, customerUsername);
+        }
 
     /**
      * view rides specified customer has taken
@@ -1368,6 +1384,7 @@ public abstract class ValleyBikeController {
                 System.out.println("This input is too long! Please try again " +
                         "with a string that is " + a + " characters long or less.");
             }
+            System.out.println(request);
             response = input.nextLine();
             stringLen = response.length();
         }
@@ -1627,6 +1644,8 @@ public abstract class ValleyBikeController {
                 customerAccountHome(username);
             case 3: // if we indexed a '3', we will return to the internal home menu
                 internalAccountHome(username);
+            case 4:
+                findCustomer(username);
             default: // in any other case, we use our safety net
                 initialMenu();
         }
