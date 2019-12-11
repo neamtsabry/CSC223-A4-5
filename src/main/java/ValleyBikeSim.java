@@ -5,11 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -280,20 +279,9 @@ public class ValleyBikeSim {
 				is_returned_bool = true;
 			}
 
-			// change starting time stamp string to instant
-			Instant start_time_stamp_instant = LocalDateTime.parse(start_time_stamp,
-					DateTimeFormatter.ofPattern("hh:mm a, MM/dd/yyy", Locale.US)
-			).atZone(ZoneId.of("America/New_York")).toInstant();
+			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
 
-			// initialize end time stamp as nul since the ride could not have been returned
-			Instant end_time_stamp_instant = null;
-
-			// if it was returned, set ending time stamp too
-			if (is_returned_bool) {
-				end_time_stamp_instant = LocalDateTime.parse(end_time_stamp,
-						DateTimeFormatter.ofPattern("hh:mm a, MM/dd/yyy", Locale.US)
-				).atZone(ZoneId.of("America/New_York")).toInstant();
-			}
+			Instant end_time_stamp_instant = Instant.parse(end_time_stamp);
 
 			// create new ride object with fields
 			Ride ride = new Ride(uuid_id, bike_id, username,
@@ -462,11 +450,11 @@ public class ValleyBikeSim {
 
 			// update
 			pstmt.executeUpdate();
+
+			bikesMap.get(bikeId).setBikeLocation(newBikeLocation);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update bike location in database at this time.");
 		}
-
-		bikesMap.get(bikeId).setBikeLocation(newBikeLocation);
 	}
 
 	/**
@@ -1561,6 +1549,7 @@ public class ValleyBikeSim {
 
 			//add bike to bike map
 			bikesMap.put(bike.getId(), bike);
+
 		} catch (SQLException e) {
 			System.out.println("Sorry, something went wrong with adding new bike to database.");
 		}

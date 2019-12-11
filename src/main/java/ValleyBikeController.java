@@ -936,7 +936,7 @@ public abstract class ValleyBikeController {
                 break;
             case 5:
                 //add bike to bike list
-                addNewBike();
+                addNewBike(username);
                 break;
             case 6:
                 //view station list
@@ -1176,7 +1176,14 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    static void addNewBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
+    static void addNewBike(String username) throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
+        // check if there's any open slots in total of all stations
+        if(ValleyBikeSim.viewTotalStationsCapacity() - ValleyBikeSim.viewTotalBikesCount() < 5){
+            System.out.println("There's not enough space in total stations" +
+                    "to add a new bike. Please try adding a new station");
+            internalAccountHome(username);
+        }
+
         // get new bike's id
         int id = getResponseBetween(0, 1000, "Please enter the bike's ID ('###') or '0' to cancel");
         // assumption: since bike id cannot be greater than 1000,
