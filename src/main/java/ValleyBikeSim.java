@@ -95,7 +95,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to customer objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 */
 	private static void readCustomerAccountData(Statement stmt) throws SQLException, ClassNotFoundException {
@@ -124,14 +124,18 @@ public class ValleyBikeSim {
 			//create customer account from info
 			CustomerAccount customerAccount = new CustomerAccount(username, password, emailAddress, creditCard, membership, balance, lastRideIsReturned == 1, enabled == 1, rideIdList);
 
-			//TODO AG - Here's where our null pointer is coming from! getLastPayment field is not being updated when we read in account data, so it stays null...
-			//TODO AG - We also have to read in max rides for memberships
-
 			// add to the customer account map
 			customerAccountMap.put(username, customerAccount);
 		}
 	}
 
+	/**
+	 * reads in membership data from database
+	 * @param username username who has membership
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	private static Membership readMembershipData(String username) throws ClassNotFoundException, SQLException{
 		String sql = "SELECT * FROM Membership WHERE username = ?";
 
@@ -158,7 +162,7 @@ public class ValleyBikeSim {
 		/**
 	 * Reads in info from database and converts to internal account objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 */
 	private static void readInternalAccountData(Statement stmt) throws SQLException {
@@ -179,7 +183,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to station objects that get stored in data structure
 	 *
-	 * @param stmt
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 */
 	private static void readStationData(Statement stmt) throws SQLException {
@@ -196,10 +200,13 @@ public class ValleyBikeSim {
 			LinkedList<Integer> bikeList = new LinkedList<>();
 
 			if (bikeString != null) {
-				for (String bikeId : bikeString.split(",")) {
+				for (String bikeId : bikeString.replaceAll(" ", "").split(",")) {
 					try{
                         bikeList.add(Integer.parseInt(bikeId));
-                    } catch(NumberFormatException e){}
+                        System.out.println(Integer.parseInt(bikeId));
+                    } catch(NumberFormatException e){
+						System.out.println(e);
+					}
 				}
 			}
 
@@ -214,7 +221,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to bike objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 */
@@ -246,7 +253,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to ride objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 * @throws ParseException
@@ -341,10 +348,9 @@ public class ValleyBikeSim {
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
 		//add bike to list of bikes at station in station map
-		stationsMap.get(stationId).addToBikeList(bikeId);
+
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
-		//add bike to station in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			// set the corresponding param
@@ -352,15 +358,25 @@ public class ValleyBikeSim {
 			pstmt.setInt(2, bikeId);
 			// update
 			pstmt.executeUpdate();
+
+			//add bike to station in database
+			stationsMap.get(stationId).addToBikeList(bikeId);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
 		}
 	}
 
+	/**
+	 * updae number of bikes at station
+	 * @param stationId station to update
+	 * @param bikes number of bikes at station
+	 * @throws ClassNotFoundException
+	 */
 	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bikes = ? "
 				+ "WHERE id = ?";
 
+		//update station in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -375,9 +391,16 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * update actual bike object at station
+	 * @param stationId station to update
+	 * @param bikeId bike id to add
+	 * @throws ClassNotFoundException
+	 */
 	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
+
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
 		try (Connection conn = connectToDatabase();
@@ -385,13 +408,13 @@ public class ValleyBikeSim {
 
 			// set the corresponding param
 			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
+			pstmt.setInt(2, stationId);
+
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update station's bike list in database");
 		}
-		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
 
@@ -648,8 +671,6 @@ public class ValleyBikeSim {
 	 */
 	static void disableCustomerAccount(String username) throws NoSuchAlgorithmException, ClassNotFoundException {
 		CustomerAccount customerAccount = customerAccountMap.get(username);
-		//remove customer from map of customers
-		customerAccountMap.remove(username);
 		MessageDigest md = MessageDigest.getInstance("MD5");
 		//update password to random hashcode
 		StringBuilder sb = new StringBuilder();
@@ -664,8 +685,7 @@ public class ValleyBikeSim {
 		for (byte b : hashInBytesEmailAddress) {
 			sb.append(String.format("%02x", b));
 		}
-		//TODO internal email address? why?? AG
-		updateInternalEmailAddress(username, sb.toString());
+		updateCustomerEmailAddress(username, sb.toString());
 		//update username to random hashcode
 		sb.setLength(0);
 		byte[] hashInBytesUsername = md.digest(customerAccount.getUsername().getBytes(StandardCharsets.UTF_8));
@@ -701,8 +721,6 @@ public class ValleyBikeSim {
 		}
 
 		//update account in customer map
-		//TODO the username was removed from the map in disableCustomerAccount- should that be changed?
-		// the username passed in to this account has already been changed to hash as well- AG
 		customerAccountMap.get(username).setEnabled(false);
 		System.out.println("Your account has been successfully deleted.");
 	}
@@ -766,8 +784,49 @@ public class ValleyBikeSim {
 		customerAccountMap.remove(username);
 		customerAccountMap.put(newUsername, customerAccount);
 		System.out.println("Your username has been successfully updated to " + newUsername);
-		//TODO do existing ride objects associated with user get their username updated? AG or NS
+		updateRideUsername(username, newUsername);
+		updateMembershipUsername(username, newUsername);
+	}
 
+	private static void updateRideUsername(String username, String newUsername){
+		String sql = "UPDATE Ride SET username = ? "
+				+ "WHERE username = ?";
+
+		//update customer username in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newUsername);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException | ClassNotFoundException e) {
+			System.out.println("Sorry, could not update username in database at this time.");
+		}
+		for (Map.Entry<UUID, Ride> ride: rideMap.entrySet()){
+			if (ride.getValue().getUsername().equals(username)){
+				ride.getValue().setUsername(newUsername);
+			}
+		}
+	}
+
+	private static void updateMembershipUsername(String username, String newUsername){
+		String sql = "UPDATE Membership SET username = ? "
+				+ "WHERE username = ?";
+
+		//update customer username in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newUsername);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException | ClassNotFoundException e) {
+			System.out.println("Sorry, could not update username in database at this time.");
+		}
 	}
 
 	/**
@@ -1024,7 +1083,7 @@ public class ValleyBikeSim {
 		//if there exist customers, print
 		if (customerAccountMap.size() > 0) {
 			// format table view
-			System.out.format("%-20s\n", "Customer username");
+			System.out.format("%-20s\n", "List of all customer account username:");
 
 			// while the iterator has a next value
 			for (String username : customerAccountMap.keySet()) {
@@ -1049,19 +1108,13 @@ public class ValleyBikeSim {
 	 *
      */
     static boolean accountMapsContain(String username, int num) {
-    	switch (num){
+    	switch(num) {
 			case 1: //search customer map
-				if (customerAccountMap.containsKey(username)){
-					return true;
-				}
+				return customerAccountMap.containsKey(username);
 			case 2: //search internal map
-				if (internalAccountMap.containsKey(username)){
-					return true;
-				}
+				return internalAccountMap.containsKey(username);
 			case 3: //search both maps
-				if (customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username)){
-				return true;
-			}
+				return customerAccountMap.containsKey(username)||internalAccountMap.containsKey(username);
 		}
         return false;
     }
@@ -1088,14 +1141,9 @@ public class ValleyBikeSim {
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
 
-				//TODO where are we adding that balance to the credit card?
-
-				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
-				//and tell them to contact customer service
-
-				//proceed like ride has been returned, but the bike is still in "station 0" (the checked-out station)
-				//this allows users to continue to rent bikes, since they have paid the charge
-
+				//ASSUMPTION: if bike has been rented over 24 hours, it is probably lost or stolen forever
+				//so proceed like ride has been returned, to "station 0" (the checked-out station)
+				//this allows user to rent bikes again, and prevents them from being fined again for same bike
 				updateRideIsReturned(ride, true);
 				updateRideEndTimeStamp(ride, Instant.now());
 				updateRideStationTo(ride, 0);
@@ -1140,16 +1188,68 @@ public class ValleyBikeSim {
 		}
 	}
 
-	static void viewTotalUsers(){
-		//TODO Asmita
+	static int viewTotalUsers() throws SQLException, ClassNotFoundException {
+		Connection conn = connectToDatabase();
+		int count = 0;
+		//read in data from database to data structures
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Customer_Account");
+			while (rs.next()) {
+				count = rs.getInt("COUNT(*)");
+			}
+			conn.close();
+		}
+		return count;
 	}
 
-	static void viewTotalMaintenanceRequests(){
-		//TODO Asmita
+	static int viewTotalMaintenanceRequests() throws SQLException, ClassNotFoundException {
+		Connection conn = connectToDatabase();
+		int total = 0;
+		//read in data from database to data structures
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT SUM(req_mnt) FROM Station");
+			while (rs.next()) {
+				total = rs.getInt("SUM(req_mnt)");
+			}
+			conn.close();
+		}
+		return total;
 	}
 
-	static void viewMostPopularStation(){
-		//TODO Asmita
+	static Map.Entry<Integer, Integer> viewMostPopularStation() throws SQLException, ClassNotFoundException {
+		HashMap<Integer, Integer> stationCountMap = new HashMap<>();
+		Connection conn = connectToDatabase();
+		//read in data from database to data structures
+		if (conn != null) {
+			Statement stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT station_to, station_from FROM Ride");
+			while (rs.next()) {
+				int stationTo = rs.getInt("station_to");
+				int stationFrom = rs.getInt("station_from");
+				if (!stationCountMap.containsKey(stationTo)){
+					stationCountMap.put(stationTo, 1);
+				} else {
+					stationCountMap.put(stationTo, stationCountMap.get(stationTo)+1);
+				}
+				if (!stationCountMap.containsKey(stationFrom)){
+					stationCountMap.put(stationFrom, 1);
+				} else {
+					stationCountMap.put(stationFrom, stationCountMap.get(stationFrom)+1);
+				}
+			}
+			conn.close();
+		}
+		Map.Entry<Integer, Integer> maxEntry = null;
+		for (Map.Entry<Integer, Integer> entry : stationCountMap.entrySet())
+		{
+			if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0)
+			{
+				maxEntry = entry;
+			}
+		}
+		return maxEntry;
 	}
 
 	/**
@@ -1185,6 +1285,8 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	static void viewStationList() {
+		System.out.println("STATION LIST:");
+
 		// format table view
 		System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
 				"AvDocs", "MainReq", "Capacity", "Kiosk", "Name - Address");
@@ -1213,7 +1315,7 @@ public class ValleyBikeSim {
 	 * @throws IOException    the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-	public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
 		if (customerAccountMap.get(customerAccount.getUsername()) != null) {
 			//print that the username already exists
@@ -1256,7 +1358,7 @@ public class ValleyBikeSim {
 	 * @throws IOException    the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
 	 */
-	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
 		if (customerAccountMap.get(internalAccount.getUsername()) != null) {
 			//print that the username already exists
@@ -1298,7 +1400,7 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
     	//create new membership instance
 		Membership membershipType = checkMembershipType(membership);
 		//create instance of customer object
@@ -1322,7 +1424,7 @@ public class ValleyBikeSim {
 			pstmt.setDouble(5, membership.getMembershipInt());
 			pstmt.executeUpdate();
 		} catch (SQLException | ClassNotFoundException e) {
-			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			System.out.println("Sorry, something went wrong with adding new membership to database.");
 		}
 	}
 
@@ -1363,30 +1465,35 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
-		String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-				"capacity, kiosk, address, bike_string) " +
-				"VALUES(?,?,?,?,?,?,?,?,?)";
+	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
+		if (stationsMap.get(id) != null) { //if station id already exists, inform user
+			System.out.println("Station with this id already exists.\nPlease try again with another username or log in.");
+			ValleyBikeController.initialMenu();
+		} else { //if station is valid, add to system
+			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
+					"capacity, kiosk, address, bike_string) " +
+					"VALUES(?,?,?,?,?,?,?,?,?)";
 
-		//add station to database
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			pstmt.setInt(1, id);
-			pstmt.setString(2, station.getStationName());
-			pstmt.setInt(3, station.getBikes());
-			pstmt.setInt(4, station.getAvailableDocks());
-			pstmt.setInt(5, station.getMaintenanceRequest());
-			pstmt.setInt(6, station.getCapacity());
-			pstmt.setInt(7, station.getKioskNum());
-			pstmt.setString(8, station.getAddress());
-			pstmt.setString(9, "");
-			pstmt.executeUpdate();
-		} catch (SQLException e) {
-			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			//add station to database
+			try (Connection conn = connectToDatabase();
+				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+				pstmt.setInt(1, id);
+				pstmt.setString(2, station.getStationName());
+				pstmt.setInt(3, station.getBikes());
+				pstmt.setInt(4, station.getAvailableDocks());
+				pstmt.setInt(5, station.getMaintenanceRequest());
+				pstmt.setInt(6, station.getCapacity());
+				pstmt.setInt(7, station.getKioskNum());
+				pstmt.setString(8, station.getAddress());
+                pstmt.setString(9, "");
+                pstmt.executeUpdate();
+
+				//add station to station map
+				stationsMap.put(id, station);
+			} catch (SQLException e) {
+				System.out.println("Sorry, something went wrong with adding new station to database.");
+			}
 		}
-
-		//add station to station map
-		stationsMap.put(id, station);
 	}
 
 	/**
@@ -1399,9 +1506,9 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
-					"VALUES(?,?,?,?,?)";
+				"VALUES(?,?,?,?,?)";
 
 		//add bike to database
 		try (Connection conn = connectToDatabase();
@@ -1412,13 +1519,12 @@ public class ValleyBikeSim {
 			pstmt.setBoolean(4, bike.getMnt());
 			pstmt.setString(5, bike.getMntReport());
 			pstmt.executeUpdate();
+
+			//add bike to bike map
+			bikesMap.put(bike.getId(), bike);
 		} catch (SQLException e) {
-			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			System.out.println("Sorry, something went wrong with adding new bike to database.");
 		}
-
-		//add bike to bike map
-		bikesMap.put(bike.getId(), bike);
-
 	}
 
 	/**
@@ -1431,7 +1537,7 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException
 	 * @throws NoSuchAlgorithmException
 	 */
-	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+	static void addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		if (rideMap.get(ride.getRideId()) != null) {
 			System.out.println("Ride with this id already exists.\nPlease try again with another username or log in.");
 			ValleyBikeController.initialMenu();
@@ -1464,7 +1570,7 @@ public class ValleyBikeSim {
 
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new ride to database.");
 			}
 
 			//add ride to ride map
@@ -1479,16 +1585,24 @@ public class ValleyBikeSim {
 	 * @param newStationValue - station ID of the station the bike is moving to
 	 */
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
-		//TODO ME why check if bike's station is 0 then get the station?
 	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
+
 			oldStation.removeFromBikeList(bike); // remove bike from station's bike list
+
+			// update to database
+			updateStationBikeList(bike.getStation(), bike.getId());
 		}
 
         updateBikeStationId(bike.getId(), newStationValue);
 
 		if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
+
+			//adds bike to station map
+			stationsMap.get(newStationValue).addToBikeList(bike.getId());
+
+			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 			updateBikeLocation(bike.getId(), 0);
 		}

@@ -203,7 +203,7 @@ public class Station {
      * returns the bike list converted to a printable string
      */
     public String getBikeListToString(){
-        return bikeList.toString().replaceAll("\\[", "").replaceAll("\\]","");
+        return bikeList.toString().replaceAll("\\[", "").replaceAll("\\]","").replaceAll(" ", "");
     }
 
 }
