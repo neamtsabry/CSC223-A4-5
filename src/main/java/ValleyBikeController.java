@@ -494,7 +494,7 @@ public abstract class ValleyBikeController {
         //TODO handle edge case of not entering int
         //TODO Grace
 
-        //prompt user to choose which field they want to edit
+        //prompt user to choose which they want to edit
         System.out.println("\nPlease choose from one of the following menu options:\n" +
                 "1: Edit username\t" +
                 "2: Edit password\t" +
@@ -595,7 +595,9 @@ public abstract class ValleyBikeController {
                 0);
 
         // add ride to map as well as database
-        ValleyBikeSim.addRide(ride);
+        if(!ValleyBikeSim.addRide(ride)){
+            customerAccountHome(username);
+        }
 
         // Add ride to customer account
         // assume username is always valid
@@ -934,7 +936,7 @@ public abstract class ValleyBikeController {
                 break;
             case 5:
                 //add bike to bike list
-                addBike();
+                addNewBike();
                 break;
             case 6:
                 //view station list
@@ -1043,41 +1045,6 @@ public abstract class ValleyBikeController {
         System.out.println("");
         findCustomer(username);
     }
-
-
-    /**
-     * internal employee can view customer activity
-     * @throws InterruptedException
-     * @throws ClassNotFoundException
-     * @throws NoSuchAlgorithmException
-     * @throws ParseException
-     * @throws IOException
-     */
-    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException, SQLException {
-        // view all customers' usernames
-        ValleyBikeSim.viewAllCustomers();
-
-        // ask user to input customer username
-        System.out.println("Please input a customer's username to view their activity");
-        String username = input.nextLine();
-
-        // check for '0' input and return to previous menu
-        //TODO Grace - check on this return call
-        if (Objects.equals(username, "0")) { returnToLastMenu(null); }
-
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
-
-        while( customer == null){
-            // ask user to input customer username
-            System.out.println("Username entered does not exist.");
-            System.out.println("Please input a customer's username to view their activity");
-            username = input.nextLine();
-            customer = ValleyBikeSim.getCustomerObj(username);
-        }
-
-        viewCustomerActivity(customer);
-    }
-
 
     /**
      * view rides specified customer has taken
@@ -1209,7 +1176,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
+    static void addNewBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // get new bike's id
         int id = getResponseBetween(0, 1000, "Please enter the bike's ID ('###') or '0' to cancel");
         // assumption: since bike id cannot be greater than 1000,
@@ -1284,12 +1251,13 @@ public abstract class ValleyBikeController {
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 
-        //TODO delete
         //move bike to the corresponding station
         ValleyBikeSim.moveStation(bikeOb, stationId);
 
         // update station's number of bikes in database
         ValleyBikeSim.updateStationBikesNum(stationId, ValleyBikeSim.getStationObj(stationId).getBikes());
+
+        System.out.println("Bike has been successfully added!");
     }
 
     /**
@@ -1628,4 +1596,41 @@ public abstract class ValleyBikeController {
                 initialMenu();
         }
     }
+
+
+    //TODO delete
+    /**
+     * This method is not currently being used
+     * internal employee can view customer activity
+     * @throws InterruptedException
+     * @throws ClassNotFoundException
+     * @throws NoSuchAlgorithmException
+     * @throws ParseException
+     * @throws IOException
+     */
+    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException, SQLException {
+        // view all customers' usernames
+        ValleyBikeSim.viewAllCustomers();
+
+        // ask user to input customer username
+        System.out.println("Please input a customer's username to view their activity");
+        String username = input.nextLine();
+
+        // check for '0' input and return to previous menu
+        //TODO Grace - check on this return call
+        if (Objects.equals(username, "0")) { returnToLastMenu(null); }
+
+        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
+
+        while( customer == null){
+            // ask user to input customer username
+            System.out.println("Username entered does not exist.");
+            System.out.println("Please input a customer's username to view their activity");
+            username = input.nextLine();
+            customer = ValleyBikeSim.getCustomerObj(username);
+        }
+
+        viewCustomerActivity(customer);
+    }
+
 }
