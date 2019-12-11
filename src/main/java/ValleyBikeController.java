@@ -26,6 +26,8 @@ public abstract class ValleyBikeController {
         //check whether it's time to renew customer's memberships
         //ValleyBikeSim.checkMembershipRenewalTime();
 
+        System.out.println("");
+        ValleyBikeSim.viewBikeList();
         System.out.print("Please choose from one of the following menu options:\n"
                 + "1: Create Customer Account\t"
                 + "2: Log In\t"
@@ -548,7 +550,6 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
-        //TODO somewhere says something went wrong with adding new customer account to database
         //validate credit card before allowing rental- to make sure they can pay
         //check validity of credit card, send them back to home menu if not valid
         if (!isValidCreditCard(ValleyBikeSim.viewCreditCard(username))) { // if cc isn't valid
@@ -557,77 +558,30 @@ public abstract class ValleyBikeController {
             return; // return to customerAccountHome
         }
 
-        // View stations
-        ValleyBikeSim.viewStationList(); // view station list
-
-        // choose station to rent from or go back
-        int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
-                "Enter the station ID ('###') or '0' to return to menu: ");
-        Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
-
-        //keep running while loop until input valid station with available bikes
-        while ((stationFrom == null || Objects.equals(stationFrom.getBikes(), 0)) && statId != 0) {
-            //if station doesnt exist, inform user
-            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
-
-            //if station doesn't have bikes, equalize stations and have user re-select station
-            else if (Objects.equals(stationFrom.getBikes(), 0)) {
-                System.out.println("The station entered does not have any bikes.\n" +
-                        "We are notifying maintenance worker to resolve this, but in the meantime please " +
-                        "choose another station");
-                //mock notification to maintenance worker who immediately goes and equalizes stations
-                ValleyBikeSim.equalizeStations();
-            }
-            //because station not valid, have user re-input and then validate
-            statId = getResponse("Please pick a station to rent a bike from.\n" +
-                    "Enter the station ID ('###') or '0' to return to menu: ");
-            stationFrom = ValleyBikeSim.getStationObj(statId);
+        //user inputs valid station to rent from
+        int statId = chooseRentStation();
+        //if user presses 0 to cancel, return them to customer home
+        if (statId == 0) {
+            return;
         }
+        //get station object inputted
+        Station stationFrom = ValleyBikeSim.getStationObj(statId);
 
-        // if user entered 0, return to menu
-        if (Objects.equals(statId, 0)){ return; }
-
-        // View available bike ids at station
-        System.out.println("Here's a list of bike IDs at Station #" + statId);
-        System.out.format("%-10s\n", "Bike ID");
-
-        // Get list iterator of bikes at station
-        LinkedList<Integer> bikeList = stationFrom.getBikeList();
-
-        ListIterator<Integer> bikesAtStation = bikeList.listIterator();
-
-        // Print bikes at station
-        while(bikesAtStation.hasNext()){
-            int bikeInt = bikesAtStation.next();
-            System.out.format("%-10s\n", bikeInt);
+        //user inputs valid bike to rent
+        int bikeID = chooseRentBike(stationFrom, statId);
+        //if user inputted 0, return to customer home
+        if (bikeID == 0) {
+            return;
         }
+        //get bike object inputted
+        Bike someBike = ValleyBikeSim.getBikeObj(bikeID);
 
-        // Choose bike to rent
-        int bikeID = getResponse("Please enter the ID number of the bike you" +
-                " would like to rent ('##') or '0' to return to menu: ");
-
-        // if user entered 0, return to menu
-        if (Objects.equals(bikeID, 0)){ return; }
-
-        Bike someBike = ValleyBikeSim.getBikeObj(bikeID); // get bike object or null from bike ID
-
-        while (!bikeList.contains(bikeID)){
-            System.out.println("The bike ID entered is not at this station.");
-            bikeID = getResponse("Please enter the ID number of the bike you" +
-                    " would like to rent ('##') or '0' to return to menu: ");
-
-            // if user entered 0, return to menu
-            if (Objects.equals(bikeID, 0)){ return; }
-
-            someBike = ValleyBikeSim.getBikeObj(bikeID);
-        }
-
+        //move bike to "checked-out" station (0)
         ValleyBikeSim.moveStation(someBike, 0); // move bike to station '0' <- our "non-station" ID
 
+        //create new ride id to then create new ride
         UUID rideId = UUID.randomUUID();
-
         Instant timeStamp = Instant.now();
-
         // create new ride object
         Ride ride = new Ride(rideId,
                 bikeID,
@@ -662,6 +616,75 @@ public abstract class ValleyBikeController {
             System.out.println("The bikes have now been redistributed between the stations.");
             System.out.println();
         }
+    }
+
+    //TODO comment
+    private static int chooseRentBike(Station stationFrom, int statId) {
+        // View available bike ids at station
+        System.out.println("Here's a list of bike IDs at Station #" + statId);
+        System.out.format("%-10s\n", "Bike ID");
+
+        // Get list iterator of bikes at station
+        LinkedList<Integer> bikeList = stationFrom.getBikeList();
+
+        // Print bikes at station
+        for (int bikeInt : bikeList) {
+            System.out.format("%-10s\n", bikeInt);
+        }
+
+        // Choose bike to rent
+        int bikeID = getResponse("Please enter the ID number of the bike you" +
+                " would like to rent ('##') or '0' to return to menu: ");
+
+        //Bike someBike = ValleyBikeSim.getBikeObj(bikeID); // get bike object or null from bike ID
+
+        while (!bikeList.contains(bikeID) && (!Objects.equals(bikeID, 0))){
+            System.out.println("The bike ID entered is not at this station.");
+            bikeID = getResponse("Please enter the ID number of the bike you" +
+                    " would like to rent ('##') or '0' to return to menu: ");
+
+            // if user entered 0, return to menu
+            //if (Objects.equals(bikeID, 0)){ return; }
+            //someBike = ValleyBikeSim.getBikeObj(bikeID);
+        }
+        // if user entered 0, return to menu
+        if (Objects.equals(bikeID, 0)){ return 0; }
+
+        return bikeID;
+    }
+
+    //TODO comment
+    private static int chooseRentStation() throws ClassNotFoundException {
+        // View stations
+        ValleyBikeSim.viewStationList(); // view station list
+
+        // choose station to rent from or go back
+        int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
+                "Enter the station ID ('###') or '0' to return to menu: ");
+        Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
+
+        //keep running while loop until input valid station with available bikes
+        while ((stationFrom == null || Objects.equals(stationFrom.getBikes(), 0)) && statId != 0) {
+            //if station doesnt exist, inform user
+            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
+
+                //if station doesn't have bikes, equalize stations and have user re-select station
+            else if (Objects.equals(stationFrom.getBikes(), 0)) {
+                System.out.println("The station entered does not have any bikes.\n" +
+                        "We are notifying maintenance worker to resolve this, but in the meantime please " +
+                        "choose another station");
+                //mock notification to maintenance worker who immediately goes and equalizes stations
+                ValleyBikeSim.equalizeStations();
+            }
+            //because station not valid, have user re-input and then validate
+            statId = getResponse("Please pick a station to rent a bike from.\n" +
+                    "Enter the station ID ('###') or '0' to return to menu: ");
+            stationFrom = ValleyBikeSim.getStationObj(statId);
+        }
+
+        // if user entered 0, return to menu
+        if (Objects.equals(statId, 0)){ return 0; }
+        return statId;
     }
 
     /**
@@ -951,8 +974,7 @@ public abstract class ValleyBikeController {
     }
 
     /**
-     * Prompts user for all station data and then creates a new station
-     * object which is added to the stationMap
+     * makes sure username inputted is valid customer
      * @throws IOException
      * @throws ParseException
      */
@@ -1254,15 +1276,13 @@ public abstract class ValleyBikeController {
                 mnt,
                 mntReport
         );
+
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 
         //TODO delete
         //move bike to the corresponding station
-        //ValleyBikeSim.moveStation(bikeOb, stationId);
-
-        // update database and station object with bike list
-        ValleyBikeSim.addBikeToStation(stationId, id);
+        ValleyBikeSim.moveStation(bikeOb, stationId);
 
         // update station's number of bikes in database
         ValleyBikeSim.updateStationBikesNum(stationId, ValleyBikeSim.getStationObj(stationId).getBikes());

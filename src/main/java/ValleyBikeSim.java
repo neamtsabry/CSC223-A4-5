@@ -200,10 +200,13 @@ public class ValleyBikeSim {
 			LinkedList<Integer> bikeList = new LinkedList<>();
 
 			if (bikeString != null) {
-				for (String bikeId : bikeString.split(",")) {
+				for (String bikeId : bikeString.replaceAll(" ", "").split(",")) {
 					try{
                         bikeList.add(Integer.parseInt(bikeId));
-                    } catch(NumberFormatException e){}
+                        System.out.println(Integer.parseInt(bikeId));
+                    } catch(NumberFormatException e){
+						System.out.println(e);
+					}
 				}
 			}
 
@@ -345,10 +348,9 @@ public class ValleyBikeSim {
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
 		//add bike to list of bikes at station in station map
-		stationsMap.get(stationId).addToBikeList(bikeId);
+
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
-		//add bike to station in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			// set the corresponding param
@@ -356,6 +358,9 @@ public class ValleyBikeSim {
 			pstmt.setInt(2, bikeId);
 			// update
 			pstmt.executeUpdate();
+
+			//add bike to station in database
+			stationsMap.get(stationId).addToBikeList(bikeId);
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
 		}
@@ -395,6 +400,7 @@ public class ValleyBikeSim {
 	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
+
 		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
 
 		try (Connection conn = connectToDatabase();
@@ -402,14 +408,13 @@ public class ValleyBikeSim {
 
 			// set the corresponding param
 			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
+			pstmt.setInt(2, stationId);
+
 			// update
 			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update station's bike list in database");
 		}
-		//adds bike to station map
-		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
 
@@ -1136,9 +1141,6 @@ public class ValleyBikeSim {
 				System.out.println("Your bike rental has exceeded 24 hours. You have been charged a late fee of " +
 						"$150 to your credit card.");
 
-				//ASSUMPTION: In a real system, here we would send an email confirmation of their credit card charge
-				//and tell them to contact customer service
-
 				//ASSUMPTION: if bike has been rented over 24 hours, it is probably lost or stolen forever
 				//so proceed like ride has been returned, to "station 0" (the checked-out station)
 				//this allows user to rent bikes again, and prevents them from being fined again for same bike
@@ -1146,6 +1148,7 @@ public class ValleyBikeSim {
 				updateRideEndTimeStamp(ride, Instant.now());
 				updateRideStationTo(ride, 0);
 				updateCustomerLastRideisReturned(username, true);
+
 			} else {
 				//if rental is under 24 hours, just remind them they have a rental
 				System.out.println("Reminder that you currently have a bike rented. " +
@@ -1255,7 +1258,7 @@ public class ValleyBikeSim {
 	 */
 	static void viewBikeList() {
 		// format table view
-		System.out.format("%-10s%-10s%-10s%-10s%-10s\n", "ID", "Location", "Stat. ID",
+		System.out.format("%-10s%-10s%-20s%-10s%-10s\n", "ID", "Stat. ID"," Location",
 				"Main. Req", "Main. Report");
 
 		// while the iterator has a next value
@@ -1264,13 +1267,31 @@ public class ValleyBikeSim {
 			// use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
 
+			String locString = " ";
+			int loc = bike.getBikeLocation();
+			if (loc == 0) {
+				locString = "available at station  ";
+			} else if (loc == 1) {
+				locString = "not available for rent";
+			} else if (loc == 2) {
+				locString = "currently rented      ";
+			}
+
+			String station = " ";
+			int stat  = bike.getStation();
+			if (stat == 0) {
+				station = "out";
+			} else {
+				station = Integer.toString(stat);
+			}
 			// format the view of the bike object values
-			System.out.format("%-10d%-10d%-10d%-10s%-10s\n",
+			System.out.format("%-10d%-10s%-10s%-10s%-10s\n",
 					key,
-					bike.getBikeLocation(),
-					bike.getStation(),
+					station,
+					locString,
 					bike.getMnt(),
 					bike.getMntReport()
+
 			);
 		}
 	}
@@ -1303,6 +1324,21 @@ public class ValleyBikeSim {
 					station.getKioskBoolean(),
 					station.getStationName() + "-" + station.getAddress());
 		}
+	}
+
+	static int viewTotalStationsCapacity(){
+		//TODO implement Grace
+		int total = 0;
+		for (int key : stationsMap.keySet()){
+			Station station = stationsMap.get(key);
+			total += station.getCapacity();
+		}
+		return total;
+	}
+
+	static int viewTotalBikesCount(){
+		//TODO implement Grace
+		return bikesMap.size();
 	}
 
 	/**
@@ -1485,11 +1521,12 @@ public class ValleyBikeSim {
 				pstmt.setString(8, station.getAddress());
                 pstmt.setString(9, "");
                 pstmt.executeUpdate();
+
+				//add station to station map
+				stationsMap.put(id, station);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new station to database.");
 			}
-			//add station to station map
-			stationsMap.put(id, station);
 		}
 	}
 
@@ -1504,29 +1541,23 @@ public class ValleyBikeSim {
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
-		if (bikesMap.get(bike.getId()) != null){//if bike id already in system, inform user
-			System.out.println("Bike with this id already exists.\nPlease try again with another username or log in.");
-			ValleyBikeController.initialMenu();
-			//TODO is this ^ the message you want to say? Do you want to return to initial menu? NS
-		} else { //if bike valid, add to system
-			String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
-					"VALUES(?,?,?,?,?)";
+		String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
+				"VALUES(?,?,?,?,?)";
 
-			//add bike to database
-			try (Connection conn = connectToDatabase();
-				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-				pstmt.setInt(1, bike.getId());
-				pstmt.setInt(2, bike.getBikeLocation());
-				pstmt.setInt(3, bike.getStation());
-				pstmt.setBoolean(4, bike.getMnt());
-				pstmt.setString(5, bike.getMntReport());
-				pstmt.executeUpdate();
-			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new bike to database.");
-			}
+		//add bike to database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, bike.getId());
+			pstmt.setInt(2, bike.getBikeLocation());
+			pstmt.setInt(3, bike.getStation());
+			pstmt.setBoolean(4, bike.getMnt());
+			pstmt.setString(5, bike.getMntReport());
+			pstmt.executeUpdate();
 
 			//add bike to bike map
 			bikesMap.put(bike.getId(), bike);
+		} catch (SQLException e) {
+			System.out.println("Sorry, something went wrong with adding new bike to database.");
 		}
 	}
 
@@ -1588,18 +1619,26 @@ public class ValleyBikeSim {
 	 * @param newStationValue - station ID of the station the bike is moving to
 	 */
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
-		//TODO ME why check if bike's station is 0 then get the station?
 	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
-			oldStation.removeFromBikeList(bike); // remove bike from station's bike list
+			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
+
+			// update to database
+			updateStationBikeList(bike.getStation(), bike.getId());
 		}
 
         updateBikeStationId(bike.getId(), newStationValue);
 
 		if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
+
+			//adds bike to station map
+			stationsMap.get(newStationValue).addToBikeList(bike.getId());
+
+			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 			updateBikeLocation(bike.getId(), 0);
+			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 		}
 
 		else {
