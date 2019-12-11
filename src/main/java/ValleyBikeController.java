@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.Scanner;
@@ -21,7 +22,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    static void initialMenu() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //check whether it's time to renew customer's memberships
         //ValleyBikeSim.checkMembershipRenewalTime();
 
@@ -64,7 +65,7 @@ public abstract class ValleyBikeController {
      * @throws IOException add customer account and user account home methods throw IOException
      * @throws ParseException add customer account and user account home methods throw ParseException
      */
-    private static void createCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void createCustomerAccount() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
@@ -129,7 +130,7 @@ public abstract class ValleyBikeController {
      * @throws IOException customer log in and internal log in methods in model throw IOException
      * @throws ParseException customer log in and internal log in methods in model throw ParseException
      */
-    private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void logIn() throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //prompt the user to choose which kind of account they want to log into
         System.out.println("Please choose from one of the following menu options:\n" +
                 "1: Log in to customer account\t" +
@@ -215,7 +216,7 @@ public abstract class ValleyBikeController {
      * @throws IOException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw IOException
      * @throws ParseException editCustomerAccount, viewStationList, recordRide, reportProblem, initialMenu, viewBikeList throw ParseException
      */
-    static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    static void customerAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 
         //checks whether user has a rental, and if so whether it exceeds 24 hours
         ValleyBikeSim.checkBikeRented(username);
@@ -311,7 +312,7 @@ public abstract class ValleyBikeController {
      * @throws ClassNotFoundException
      * @throws NoSuchAlgorithmException
      */
-    private static void createInternalAccount(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void createInternalAccount(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         //i.e. only internal staff can create new internal accounts
 
@@ -380,7 +381,7 @@ public abstract class ValleyBikeController {
      *               is the internal account username; if customer is accessing
      *               their own account, this string is null
      */
-    private static void editCustomerAccount(String username, String master) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void editCustomerAccount(String username, String master) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //TODO save edited fields
 
         //prompt user to choose which field they want to edit
@@ -546,7 +547,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //validate credit card before allowing rental- to make sure they can pay
         String creditCard = ValleyBikeSim.viewCreditCard(username);
         //check validity of credit card, send them back to home menu if not valid
@@ -671,7 +672,7 @@ public abstract class ValleyBikeController {
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
         ValleyBikeSim.updateRideIdList(username, rideId);
-        ValleyBikeSim.updateLastRideisReturned(username, false);
+        ValleyBikeSim.updateCustomerLastRideisReturned(username, false);
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
@@ -700,7 +701,7 @@ public abstract class ValleyBikeController {
      * @throws ClassNotFoundException
      * @throws NoSuchAlgorithmException
      */
-    private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void returnBike(String username, UUID lastRideId) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //get ongoing ride object
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
@@ -745,7 +746,7 @@ public abstract class ValleyBikeController {
 
         // set the same in customer account
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
-        ValleyBikeSim.updateLastRideisReturned(username, true);
+        ValleyBikeSim.updateCustomerLastRideisReturned(username, true);
 
         System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
         System.out.println();
@@ -891,7 +892,7 @@ public abstract class ValleyBikeController {
      * @throws IOException addStation, addBike, equalizeStations and initialMenu throw IOException
      * @throws ParseException addStation, addBike, equalizeStations and initialMenu throw ParseException
      */
-    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    static void internalAccountHome(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //prompt user to pick option from main internal menu
         System.out.print("\n Choose from the following:\n"
                 + "1: Create new internal account\t"
@@ -964,13 +965,13 @@ public abstract class ValleyBikeController {
                 ValleyBikeSim.equalizeStations();
                 break;
             case 10:
-                //TODO view total number of users
+                System.out.println("The total number of customers at ValleyBikes is " + ValleyBikeSim.viewTotalUsers());
                 break;
             case 11:
-                //TODO View total number of maintenance requests
+                System.out.println("The total number of maintenance requests currently from all stations is " + ValleyBikeSim.viewTotalMaintenanceRequests());
                 break;
             case 12:
-                //TODO View most popular station
+                System.out.println("The most popular station is " + ValleyBikeSim.viewMostPopularStation());
                 break;
             case 0:
                 //go to initial menu to log out
@@ -988,7 +989,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void findCustomer(String username) throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
+    private static void findCustomer(String username) throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // view all customers' usernames
         ValleyBikeSim.viewAllCustomers();
 
@@ -997,7 +998,7 @@ public abstract class ValleyBikeController {
         String customerUsername = input.nextLine();
 
         // check for '0' input and return to previous menu
-        //if (customerUsername.contentEquals("0")) { returnToLastMenu(username); }
+        if (Objects.equals(customerUsername, "0")) { returnToLastMenu(username); }
 
         // keep asking for input if it isn't a valid customer username
         while (! ValleyBikeSim.accountMapsContain(customerUsername, 1)){
@@ -1034,7 +1035,7 @@ public abstract class ValleyBikeController {
                 break;
             case 2:
                 //view customer balance
-                //TODO view customer balance
+                System.out.println("Account balance for" + customerUsername + " is "+ ValleyBikeSim.viewAccountBalance(customerUsername));
                 break;
             case 3:
                 // view customer ride data
@@ -1057,7 +1058,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      * @throws IOException
      */
-    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException {
+    private static void viewCustomerActivity() throws InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, ParseException, IOException, SQLException {
         // view all customers' usernames
         ValleyBikeSim.viewAllCustomers();
 
@@ -1119,7 +1120,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
+    private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // use helper function to check input is valid and save it
         int id = getResponseBetween(10, 1000, "Please enter the ID for this station ('111') or '0' to cancel:");
 
@@ -1184,7 +1185,7 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException {
+    static void addBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // get new bike's id
         int id = getResponseBetween(10, 1000, "Please enter the bike's ID ('111')");
 
@@ -1521,7 +1522,7 @@ public abstract class ValleyBikeController {
      * @throws IOException create account, log in, save bike list and save station list methods throw IOException
      * @throws ParseException create account, log in, save bike list and save station list methods throw ParseException
      */
-    private static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void returnToLastMenu(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
     /* We add to the menuPath stack whenever we may need to
     remember a page/method in order to return to it.
 
