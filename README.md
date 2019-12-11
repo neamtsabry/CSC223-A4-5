@@ -64,10 +64,10 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 **password:** csc223 <br/>
 **email address:** agrubb@smith.edu
 
-###CITATIONS
-https://stackoverflow.com/questions/27005861/calculate-days-between-two-dates-in-java-8
-https://www.tutorialspoint.com/java/util/uuid_fromstring.htm
-https://www.w3schools.com/sql/sql_delete.asp
+### CITATIONS
+https://stackoverflow.com/questions/27005861/calculate-days-between-two-dates-in-java-8 <br/>
+https://www.tutorialspoint.com/java/util/uuid_fromstring.htm <br/>
+https://www.w3schools.com/sql/sql_delete.asp <br/>
 https://www.geeksforgeeks.org/instant-parse-method-in-java-with-examples/
 
 ***
