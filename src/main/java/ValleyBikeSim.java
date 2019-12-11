@@ -9,8 +9,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+
 
 /**
  * Class that tracks, updates, edits data involved in the ValleyBike Share system
@@ -99,7 +98,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to customer objects that get stored in data structure
 	 *
-	 * @param stmt
+	 * @param stmt statement necessary to run sql query
 	 * @throws SQLException for database access error
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
@@ -258,10 +257,9 @@ public class ValleyBikeSim {
 	 *
 	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws ParseException
 	 */
-	private static void readRideData(Statement stmt) throws SQLException, ClassNotFoundException, ParseException {
+	private static void readRideData(Statement stmt) throws SQLException, ParseException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Ride");
 		//get each value from each line in table
 		while (rs.next()) {
@@ -328,35 +326,6 @@ public class ValleyBikeSim {
 		}
 		//update station data in map
 		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
-	}
-
-	/**
-	 * Adds a bike to a station
-	 *
-	 * @param stationId the station id that will get updated
-	 * @param bikeId    the bike to be added to the station
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 */
-	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
-		String sql = "UPDATE Station SET bike_string = ? "
-				+ "WHERE id = ?";
-		//add bike to list of bikes at station in station map
-
-		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
-
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			// set the corresponding param
-			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
-			// update
-			pstmt.executeUpdate();
-
-			//add bike to station in database
-			stationsMap.get(stationId).addToBikeList(bikeId);
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
-		}
 	}
 
 	/**
@@ -1659,7 +1628,7 @@ public class ValleyBikeSim {
 	 * Move a bike to a different (or no) station
 	 * Also sets station data to match this move
 	 *
-	 * @param bike
+	 * @param bike bike that is being moved
 	 * @param newStationValue station ID of the station the bike is moving to
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be foun
 	 */
@@ -1886,22 +1855,7 @@ public class ValleyBikeSim {
 		return null;
 	}
 
-	/**
-	 * Helper method for controller class to return a key set
-	 * iterator
-	 *
-	 * @param isBike If true, we're working with a bike object.
-	 *               If not, we're working with a station object.
-	 * @return if isBike is true, we're returning a bikesMap iterator.
-	 * if not, we're returning a stationsMap iterator.
-	 */
-	private static Iterator createIterator(Boolean isBike) {
-		if (isBike) {
-			return bikesMap.keySet().iterator();
-		} else {
-			return stationsMap.keySet().iterator();
-		}
-	}
+
 
 
 
@@ -2030,4 +1984,52 @@ public class ValleyBikeSim {
 	static Boolean bikesMapContains(int key) {
 		return bikesMap.containsKey(key);
 	}
+
+	/*
+	*//**
+	 * Helper method for controller class to return a key set
+	 * iterator
+	 *
+	 * @param isBike If true, we're working with a bike object.
+	 *               If not, we're working with a station object.
+	 * @return if isBike is true, we're returning a bikesMap iterator.
+	 * if not, we're returning a stationsMap iterator.
+	 *//*
+	private static Iterator createIterator(Boolean isBike) {
+		if (isBike) {
+			return bikesMap.keySet().iterator();
+		} else {
+			return stationsMap.keySet().iterator();
+		}
+	}*/
+
+	/**
+	 * Adds a bike to a station
+	 *
+	 * @param stationId the station id that will get updated
+	 * @param bikeId    the bike to be added to the station
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 */
+	/*
+	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
+		String sql = "UPDATE Station SET bike_string = ? "
+				+ "WHERE id = ?";
+		//add bike to list of bikes at station in station map
+
+		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
+
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			// set the corresponding param
+			pstmt.setString(1, bikeIdsString);
+			pstmt.setInt(2, bikeId);
+			// update
+			pstmt.executeUpdate();
+
+			//add bike to station in database
+			stationsMap.get(stationId).addToBikeList(bikeId);
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
+		}
+	}*/
 }
