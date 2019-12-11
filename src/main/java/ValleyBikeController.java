@@ -239,7 +239,7 @@ public abstract class ValleyBikeController {
                 + "5: Report a problem\n"
                 + "6: View total number of rides\t"
                 + "7: View average ride time\t"
-                + "8: View your most popular ride time\t"
+                + "8: View longest ride\t"
                 + "9: Delete account\t"
                 + "0: Log out");
 
@@ -285,8 +285,12 @@ public abstract class ValleyBikeController {
                 break;
             case 8:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
-                System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
-                System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
+                if (ride == null){
+                    System.out.println("You have not taken any rides yet.");
+                } else {
+                    System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
+                    System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
+                }
                 break;
             case 9:
                 ValleyBikeSim.disableCustomerAccount(username);
@@ -395,7 +399,7 @@ public abstract class ValleyBikeController {
 
         //get and validate user response
         int edit = getResponseBetween(0,5, "Please enter your selection (0-5):");
-
+        input.nextLine();
         switch (edit){
             case 1:
                 //edit username
