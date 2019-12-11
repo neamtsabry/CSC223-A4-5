@@ -275,7 +275,7 @@ public abstract class ValleyBikeController {
                 } // if customer has ongoing rental, help user return bike
                 break;
             case 5:
-                reportProblem();
+                reportProblem(username);
                 break;
             case 6:
                 viewCustomerInfo(customer);
@@ -290,9 +290,9 @@ public abstract class ValleyBikeController {
             case 9:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
                 if (ride == null){
-                    System.out.println("You have not taken any rides yet.");
+                    System.out.println("You have not completed any rides yet.");
                 } else {
-                    System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
+                    System.out.println("Your longest ride was " + ride.getRideLength() + " minutes long.");
                     System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 }
                 break;
@@ -869,7 +869,7 @@ public abstract class ValleyBikeController {
             }
         }
         //inform customer of the charge
-        System.out.println("You have been charged " + paymentDue + "for your ride." );
+        System.out.println("You have been charged $" + paymentDue + " for your ride." );
     }
 
 
@@ -1218,7 +1218,6 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      *
-     * @param username - internal account who is adding the bike
      */
     static void addNewBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // check if there's any open slots in total of all stations
