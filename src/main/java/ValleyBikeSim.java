@@ -279,16 +279,9 @@ public class ValleyBikeSim {
 				is_returned_bool = true;
 			}
 
-<<<<<<< HEAD
-			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
-
-			Instant end_time_stamp_instant = Instant.parse(end_time_stamp);
-=======
 			//parse time stamps as readable instants
 			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
 			Instant end_time_stamp_instant = Instant.parse(end_time_stamp);
-
->>>>>>> 38b5e76cfa541af570f9afc6e88b7cef1f0ef46c
 
 			// create new ride object with fields
 			Ride ride = new Ride(uuid_id, bike_id, username,

@@ -39,6 +39,7 @@ public abstract class ValleyBikeController {
             case 1:
                 //create a new customer account
                 createCustomerAccount();
+//                reportProblem("graciegracie");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -843,8 +844,10 @@ public abstract class ValleyBikeController {
             bikeId = getResponse("Please enter bike ID ('###') or '0' to cancel:");
             if (Objects.equals(bikeId, 0)){
                 System.out.println("Report problem has been canceled.");
-                return; } // if user entered 0, return to menu
+                return;
+            } // if user entered 0, return to menu
         }
+
         input.nextLine();
         // prompt user for report detailing what's wrong
         String mntReport = getUserString(50, "Please tell us what is wrong with this bike or enter '0' to cancel:");
