@@ -323,7 +323,7 @@ public abstract class ValleyBikeController {
 
         //add createInternalAccount index to our stack in case we need to return to this method
         menuPath.push(2);
-
+        input.nextLine();
         //each field has its own method which calls itself until a valid input is entered
         String newUsername = enterUsername();
         if (Objects.equals(newUsername, "0")){
