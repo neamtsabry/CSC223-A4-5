@@ -1273,15 +1273,13 @@ public abstract class ValleyBikeController {
                 mnt,
                 mntReport
         );
+
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 
         //TODO delete
         //move bike to the corresponding station
-        //ValleyBikeSim.moveStation(bikeOb, stationId);
-
-        // update database and station object with bike list
-        ValleyBikeSim.addBikeToStation(stationId, id);
+        ValleyBikeSim.moveStation(bikeOb, stationId);
 
         // update station's number of bikes in database
         ValleyBikeSim.updateStationBikesNum(stationId, ValleyBikeSim.getStationObj(stationId).getBikes());
