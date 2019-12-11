@@ -651,7 +651,7 @@ public class ValleyBikeSim {
 
 		//update customer email address in customer map
 		customerAccountMap.get(username).setEmailAddress(newEmailAddress);
-		System.out.println("Your email address has been successfully updated to " + newEmailAddress);
+		//System.out.println("Your email address has been successfully updated to " + newEmailAddress);
 	}
 
 	/**
@@ -775,7 +775,7 @@ public class ValleyBikeSim {
 		customerAccount.setUsername(newUsername);
 		customerAccountMap.remove(username);
 		customerAccountMap.put(newUsername, customerAccount);
-		System.out.println("Your username has been successfully updated to " + newUsername);
+		//System.out.println("Your username has been successfully updated to " + newUsername);
 		updateRideUsername(username, newUsername);
 		updateMembershipUsername(username, newUsername);
 	}
@@ -909,7 +909,7 @@ public class ValleyBikeSim {
 
 		//update customer password in customer map
 		customerAccountMap.get(username).setPassword(newPassword);
-		System.out.println("Your password has been successfully updated to " + newPassword);
+		//System.out.println("Your password has been successfully updated to " + newPassword);
 	}
 
 	/**

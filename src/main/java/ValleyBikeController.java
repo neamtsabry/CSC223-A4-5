@@ -407,6 +407,7 @@ public abstract class ValleyBikeController {
                 String newUsername = enterUsername(1); // 1 specifies a customer account for validation
                 if (! Objects.equals(newUsername, "0")) { // check for cancel key
                     ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                    System.out.println("Your username has been successfully updated to " + newUsername);
                     username = newUsername;
                 }
                 else { // if 0 was entered, cancel and return to menu
@@ -418,6 +419,7 @@ public abstract class ValleyBikeController {
                 String newPassword = enterPassword();
                 if (! Objects.equals(newPassword, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerPassword(username, newPassword);
+                    System.out.println("Your password has been successfully updated to " + newPassword);
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -428,6 +430,7 @@ public abstract class ValleyBikeController {
                 String newEmail = enterEmail();
                 if (! Objects.equals(newEmail, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
+                    System.out.println("Your email address has been successfully updated to " + newEmail);
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -847,8 +850,10 @@ public abstract class ValleyBikeController {
             bikeId = getResponse("Please enter bike ID ('###') or '0' to cancel:");
             if (Objects.equals(bikeId, 0)){
                 System.out.println("Report problem has been canceled.");
-                return; } // if user entered 0, return to menu
+                return;
+            } // if user entered 0, return to menu
         }
+
         input.nextLine();
         // prompt user for report detailing what's wrong
         String mntReport = getUserString(50, "Please tell us what is wrong with this bike or enter '0' to cancel:");
@@ -892,9 +897,12 @@ public abstract class ValleyBikeController {
         // bike is now out of commission until fixed
         ValleyBikeSim.updateBikeLocation(bikeId, 1);
 
-        // increase maintenance requests for the station
-        Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
-        ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+        // if the station is not live with customer
+        if(! Objects.equals(bike.getStation(), 0)){
+            // increase maintenance requests for the station
+            Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
+            ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+        }
 
         // let user know the process is done
         System.out.println("Maintenance report has been successfully filed!");
