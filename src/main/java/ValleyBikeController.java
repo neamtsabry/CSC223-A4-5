@@ -155,8 +155,8 @@ public abstract class ValleyBikeController {
 
         // if logging into a customer account (logIn == 1), check that the customer account map contains the username
         // if logging into an internal account (logIn == 2), check that the internal account map contains the username
-        while ((logIn == 1) && (!ValleyBikeSim.accountMapsContain(username, 1)) ||
-                (logIn == 2) && (!ValleyBikeSim.accountMapsContain(username, 2))){
+        while (((logIn == 1) && (!ValleyBikeSim.accountMapsContain(username, 1))) ||
+                ((logIn == 2) && (!ValleyBikeSim.accountMapsContain(username, 2)))){
             System.out.println("Username does not exist. Please try again.");
             System.out.println("Enter your username or '0' to cancel:");
             username = input.nextLine();
