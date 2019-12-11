@@ -321,10 +321,10 @@ public abstract class ValleyBikeController {
         // Assumption: a new internal account cannot be created by a user who is not logged into an internal account
         // i.e. only internal staff can create new internal accounts
 
-        // add createInternalAccount index to our stack in case we need to return to this method
+        //add createInternalAccount index to our stack in case we need to return to this method
         // menuPath.push(2);
-
-        // each field has its own method which calls itself until a valid input is entered
+        input.nextLine();
+        //each field has its own method which calls itself until a valid input is entered
         String newUsername = enterUsername();
         if (Objects.equals(newUsername, "0")){
             System.out.println("Account creation canceled.");
