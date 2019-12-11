@@ -490,7 +490,7 @@ public abstract class ValleyBikeController {
         //TODO handle edge case of not entering int
         //TODO Grace
 
-        //prompt user to choose which field they want to edit
+        //prompt user to choose which they want to edit
         System.out.println("\nPlease choose from one of the following menu options:\n" +
                 "1: Edit username\t" +
                 "2: Edit password\t" +
@@ -591,7 +591,9 @@ public abstract class ValleyBikeController {
                 0);
 
         // add ride to map as well as database
-        ValleyBikeSim.addRide(ride);
+        if(!ValleyBikeSim.addRide(ride)){
+            customerAccountHome(username);
+        }
 
         // Add ride to customer account
         // assume username is always valid
@@ -1275,12 +1277,13 @@ public abstract class ValleyBikeController {
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 
-        //TODO delete
         //move bike to the corresponding station
         ValleyBikeSim.moveStation(bikeOb, stationId);
 
         // update station's number of bikes in database
         ValleyBikeSim.updateStationBikesNum(stationId, ValleyBikeSim.getStationObj(stationId).getBikes());
+
+        System.out.println("Bike has been successfully added!");
     }
 
     /**
