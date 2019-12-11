@@ -547,6 +547,7 @@ public abstract class ValleyBikeController {
      * @throws ParseException
      */
     private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
+        //TODO somewhere says something went wrong with adding new customer account to database
         //validate credit card before allowing rental- to make sure they can pay
         //check validity of credit card, send them back to home menu if not valid
         if (!isValidCreditCard(ValleyBikeSim.viewCreditCard(username))) { // if cc isn't valid
@@ -557,7 +558,6 @@ public abstract class ValleyBikeController {
 
         // View stations
         ValleyBikeSim.viewStationList(); // view station list
-        System.out.println("Please pick a station from which to rent a bike.");
 
         // choose station to rent from or go back
         int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
@@ -678,7 +678,6 @@ public abstract class ValleyBikeController {
         Ride rideObj = ValleyBikeSim.getRideObj(lastRideId);
 
         // View stations
-        System.out.println("STATION LIST:");
         ValleyBikeSim.viewStationList(); // view station list
 
         // choose station to return to
@@ -947,7 +946,11 @@ public abstract class ValleyBikeController {
                 System.out.println("The total number of maintenance requests currently from all stations is " + ValleyBikeSim.viewTotalMaintenanceRequests());
                 break;
             case 12:
-                System.out.println("The most popular station is " + ValleyBikeSim.viewMostPopularStation());
+                if (ValleyBikeSim.viewMostPopularStation() == null){
+                    System.out.println("No rides have been taken yet, so there is no most popular station.");
+                } else {
+                    System.out.println("The most popular station is " + ValleyBikeSim.viewMostPopularStation().getKey());
+                }
                 break;
             case 0:
                 //go to initial menu to log out
@@ -1260,8 +1263,9 @@ public abstract class ValleyBikeController {
         // add to bike tree structure
         ValleyBikeSim.addBike(bikeOb);
 
-        // move bike to the corresponding station
-        ValleyBikeSim.moveStation(bikeOb, stationId);
+        //TODO delete
+        //move bike to the corresponding station
+        //ValleyBikeSim.moveStation(bikeOb, stationId);
 
         // update database and station object with bike list
         ValleyBikeSim.addBikeToStation(stationId, id);

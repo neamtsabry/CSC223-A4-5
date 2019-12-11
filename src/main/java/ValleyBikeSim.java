@@ -95,7 +95,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to customer objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 */
 	private static void readCustomerAccountData(Statement stmt) throws SQLException, ClassNotFoundException {
@@ -129,6 +129,13 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * reads in membership data from database
+	 * @param username username who has membership
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
 	private static Membership readMembershipData(String username) throws ClassNotFoundException, SQLException{
 		String sql = "SELECT * FROM Membership WHERE username = ?";
 
@@ -155,7 +162,7 @@ public class ValleyBikeSim {
 		/**
 	 * Reads in info from database and converts to internal account objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 */
 	private static void readInternalAccountData(Statement stmt) throws SQLException {
@@ -176,7 +183,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to station objects that get stored in data structure
 	 *
-	 * @param stmt
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 */
 	private static void readStationData(Statement stmt) throws SQLException {
@@ -211,7 +218,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to bike objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 */
@@ -243,7 +250,7 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to ride objects that get stored in data structure
 	 *
-	 * @param stmt //TODO
+	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 * @throws ParseException
@@ -354,10 +361,17 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * updae number of bikes at station
+	 * @param stationId station to update
+	 * @param bikes number of bikes at station
+	 * @throws ClassNotFoundException
+	 */
 	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bikes = ? "
 				+ "WHERE id = ?";
 
+		//update station in database
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -372,6 +386,12 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * update actual bike object at station
+	 * @param stationId station to update
+	 * @param bikeId bike id to add
+	 * @throws ClassNotFoundException
+	 */
 	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
 				+ "WHERE id = ?";
@@ -388,6 +408,7 @@ public class ValleyBikeSim {
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update station's bike list in database");
 		}
+		//adds bike to station map
 		stationsMap.get(stationId).addToBikeList(bikeId);
 	}
 
@@ -1194,7 +1215,7 @@ public class ValleyBikeSim {
 		return total;
 	}
 
-	static int viewMostPopularStation() throws SQLException, ClassNotFoundException {
+	static Map.Entry<Integer, Integer> viewMostPopularStation() throws SQLException, ClassNotFoundException {
 		HashMap<Integer, Integer> stationCountMap = new HashMap<>();
 		Connection conn = connectToDatabase();
 		//read in data from database to data structures
@@ -1225,7 +1246,7 @@ public class ValleyBikeSim {
 				maxEntry = entry;
 			}
 		}
-		return maxEntry.getKey();
+		return maxEntry;
 	}
 
 	/**
@@ -1400,7 +1421,7 @@ public class ValleyBikeSim {
 			pstmt.setDouble(5, membership.getMembershipInt());
 			pstmt.executeUpdate();
 		} catch (SQLException | ClassNotFoundException e) {
-			System.out.println("Sorry, something went wrong with adding new customer account to database.");
+			System.out.println("Sorry, something went wrong with adding new membership to database.");
 		}
 	}
 
@@ -1465,7 +1486,7 @@ public class ValleyBikeSim {
                 pstmt.setString(9, "");
                 pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new station to database.");
 			}
 			//add station to station map
 			stationsMap.put(id, station);
@@ -1501,7 +1522,7 @@ public class ValleyBikeSim {
 				pstmt.setString(5, bike.getMntReport());
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new bike to database.");
 			}
 
 			//add bike to bike map
@@ -1552,7 +1573,7 @@ public class ValleyBikeSim {
 
 				pstmt.executeUpdate();
 			} catch (SQLException e) {
-				System.out.println("Sorry, something went wrong with adding new customer account to database.");
+				System.out.println("Sorry, something went wrong with adding new ride to database.");
 			}
 
 			//add ride to ride map
