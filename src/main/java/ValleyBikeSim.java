@@ -360,6 +360,8 @@ public class ValleyBikeSim {
 			PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			pstmt.setInt(1, ridesLeft);
 			pstmt.setString(2, username);
+
+			pstmt.executeUpdate();
 		} catch (SQLException e) {
 			System.out.println("Sorry, could not update rides left in database at this time.");
 		}
