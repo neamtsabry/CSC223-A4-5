@@ -7,8 +7,6 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,8 +52,15 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in the stations csv file data and parses it into station objects
 	 * mapped by id for easy access and manipulation throughout program
-	 * <p>
+	 *
 	 * Then outputs welcome message and menu selector
+	 * @param args
+	 * @throws IOException
+	 * @throws ParseException
+	 * @throws InterruptedException
+	 * @throws SQLException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 * @throws NoSuchAlgorithmException
 	 */
 	public static void main(String[] args) throws IOException, ParseException, InterruptedException, SQLException, ClassNotFoundException, NoSuchAlgorithmException {
 		// connect to sqlite database and read all required tables
@@ -82,8 +87,8 @@ public class ValleyBikeSim {
 	 * Method to create connection to SQL database
 	 *
 	 * @return connection to SQL database
-	 * @throws SQLException
-	 * @throws ClassNotFoundException
+	 * @throws SQLException for database access error
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	private static Connection connectToDatabase() throws SQLException, ClassNotFoundException {
 		Class.forName("org.sqlite.JDBC");
@@ -94,8 +99,9 @@ public class ValleyBikeSim {
 	/**
 	 * Reads in info from database and converts to customer objects that get stored in data structure
 	 *
-	 * @param stmt allows execution of SQL queries
-	 * @throws SQLException
+	 * @param stmt
+	 * @throws SQLException for database access error
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	private static void readCustomerAccountData(Statement stmt) throws SQLException, ClassNotFoundException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Customer_Account");
@@ -132,7 +138,7 @@ public class ValleyBikeSim {
 	 * reads in membership data from database
 	 * @param username username who has membership
 	 * @return
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws SQLException
 	 */
 	private static Membership readMembershipData(String username) throws ClassNotFoundException, SQLException{
@@ -219,7 +225,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	private static void readBikeData(Statement stmt) throws SQLException, ClassNotFoundException {
 		ResultSet rs = stmt.executeQuery("SELECT * FROM Bike");
@@ -251,7 +257,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param stmt allows execution of SQL queries
 	 * @throws SQLException
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws ParseException
 	 */
 	private static void readRideData(Statement stmt) throws SQLException, ClassNotFoundException, ParseException {
@@ -289,19 +295,20 @@ public class ValleyBikeSim {
 					end_time_stamp_instant, station_from, station_to);
 
 			ride.setRideLength(rideLength);
-			updateRidePayment(uuid_id, payment);
+			ride.setPayment(payment);
+			//updateRidePayment(uuid_id, payment);
 
 			// add to the bike tree
 			rideMap.put(uuid_id, ride);
 		}
 	}
 
-	/*
+	/**
 	 * Updates the number of maintenance requests at a station
 	 *
 	 * @param stationId the station id that will get updated
 	 * @param mntRqsts  the number of maintenance requests the station should have
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateStationMntRqsts(int stationId, int mntRqsts) throws ClassNotFoundException {
 		String sql = "UPDATE Station SET trq_mnt = ? "
@@ -327,7 +334,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param stationId the station id that will get updated
 	 * @param bikeId    the bike to be added to the station
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
 		String sql = "UPDATE Station SET bike_string = ? "
@@ -355,7 +362,7 @@ public class ValleyBikeSim {
 	 * updae number of bikes at station
 	 * @param stationId station to update
 	 * @param bikes number of bikes at station
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateStationBikesNum(int stationId, int bikes) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bikes = ? "
@@ -380,7 +387,7 @@ public class ValleyBikeSim {
 	 * update actual bike object at station
 	 * @param stationId station to update
 	 * @param bikeId bike id to add
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateStationBikeList(int stationId, int bikeId) throws ClassNotFoundException{
 		String sql = "UPDATE Station SET bike_string = ? "
@@ -408,7 +415,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param bikeId       the bike to update
 	 * @param newStationId the station id to assign to the bike
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateBikeStationId(int bikeId, int newStationId) throws ClassNotFoundException {
 		String sql = "UPDATE Bike SET station_id = ? "
@@ -434,7 +441,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param bikeId          the bike to receive a new location
 	 * @param newBikeLocation integer representing bike location
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateBikeLocation(int bikeId, int newBikeLocation) throws ClassNotFoundException {
 		String sql = "UPDATE Bike SET location = ? "
@@ -464,7 +471,7 @@ public class ValleyBikeSim {
 	 * @param bikeId  bike id to  update
 	 * @param req_mnt boolean whether bike has a maintenance request
 	 * @param new_mnt_report the maintenance report if bike requires maintenance
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateBikeRqMnt(int bikeId, boolean req_mnt, String new_mnt_report) throws ClassNotFoundException {
 		String sql = "UPDATE Bike SET req_mnt = ?, mnt_report = ?"
@@ -504,7 +511,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param rideId     the ride object being updated
 	 * @param isReturned boolean representing whether the ride has been returned
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateRideIsReturned(UUID rideId, Boolean isReturned) throws ClassNotFoundException {
 		String sql = "UPDATE Ride SET is_returned = ? "
@@ -535,7 +542,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param rideId         the ride object being updated
 	 * @param end_time_stamp the ride end time
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateRideEndTimeStamp(UUID rideId, Instant end_time_stamp) throws ClassNotFoundException {
 		String sql = "UPDATE Ride SET end_time_stamp = ? "
@@ -565,7 +572,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param rideId  ride being updated
 	 * @param payment cost of ride
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateRidePayment(UUID rideId, double payment) throws ClassNotFoundException {
 		String sql = "UPDATE Ride SET payment = ? "
@@ -594,7 +601,7 @@ public class ValleyBikeSim {
 	 * Updates cost of ride
 	 *
 	 * @param rideId  ride being updated
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateRideStationTo(UUID rideId, int station_to) throws ClassNotFoundException {
 		String sql = "UPDATE Ride SET station_to = ? "
@@ -623,7 +630,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username        username of account to be updated
 	 * @param newEmailAddress new email address
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET email_address = ? "
@@ -652,7 +659,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username username of account to disable
 	 * @throws NoSuchAlgorithmException
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void disableCustomerAccount(String username) throws NoSuchAlgorithmException, ClassNotFoundException {
 		CustomerAccount customerAccount = customerAccountMap.get(username);
@@ -686,7 +693,7 @@ public class ValleyBikeSim {
 	 * Set account to disabled to customer cannot log in
 	 *
 	 * @param username username of account to be disabled
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerDisabled(String username) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET enabled = ? "
@@ -715,7 +722,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username        username of account to be updated
 	 * @param newEmailAddress new email address for account
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateInternalEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException {
 		String sql = "UPDATE Internal_Account SET email_address = ? "
@@ -744,7 +751,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username of account to be updated
 	 * @param newUsername new username for account
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerUsername(String username, String newUsername) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET username = ? "
@@ -819,7 +826,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username username of account to be updated
 	 * @param rideId   new ride to add to list
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateRideIdList(String username, UUID rideId) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET ride_id_string = ? "
@@ -849,7 +856,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username           username of account to update
 	 * @param lastRideisReturned boolean representing whether last bike was returned
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET last_ride_is_returned = ? "
@@ -881,7 +888,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username of account to update
 	 * @param newPassword new password for account
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET password = ? "
@@ -910,7 +917,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username      username of account to update
 	 * @param newCreditCard new credit card
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerCreditCard(String username, String newCreditCard) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET credit_card = ? "
@@ -939,7 +946,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username      username of account to update
 	 * @param newMembership new membership type for account
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateCustomerMembership(String username, int newMembership) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET membership = ? "
@@ -984,7 +991,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username of account to update
 	 * @param newUsername new internal username
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateInternalUsername(String username, String newUsername) throws ClassNotFoundException {
 		String sql = "UPDATE Internal_Account SET username = ? "
@@ -1016,7 +1023,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username for internal account to update
 	 * @param newPassword new password for account
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void updateInternalPassword(String username, String newPassword) throws ClassNotFoundException {
 		String sql = "UPDATE Internal_Account SET password = ? "
@@ -1104,12 +1111,14 @@ public class ValleyBikeSim {
         return false;
     }
 
-	/**
+    /**
 	 * Method to check whether customer already has a bike rented and whether the rental has
 	 * gone on for too long (in which case they are charged)
 	 * Credit card was validated when bike was rented so does not need to be validated again to charge them
-	 *
 	 * @param username is the unique username associated with the customer account
+	 * @throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void checkBikeRented(String username) throws ParseException, InterruptedException, ClassNotFoundException {
 		// get customer object
@@ -1145,6 +1154,7 @@ public class ValleyBikeSim {
 	/**
 	 * Whenever the program is running and no one is logged in, check to see whether time to renew memberships
 	 * If it is time, renew memberships (charge card, refill rides, reset last paid date)
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static void checkMembershipRenewalTime() throws ClassNotFoundException {
 		//check each user's membership to find whether their payment is due
@@ -1171,6 +1181,12 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 */
 	static int viewTotalUsers() throws SQLException, ClassNotFoundException {
 		Connection conn = connectToDatabase();
 		int count = 0;
@@ -1186,6 +1202,12 @@ public class ValleyBikeSim {
 		return count;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 */
 	static int viewTotalMaintenanceRequests() throws SQLException, ClassNotFoundException {
 		Connection conn = connectToDatabase();
 		int total = 0;
@@ -1201,6 +1223,12 @@ public class ValleyBikeSim {
 		return total;
 	}
 
+	/**
+	 *
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 */
 	static Map.Entry<Integer, Integer> viewMostPopularStation() throws SQLException, ClassNotFoundException {
 		HashMap<Integer, Integer> stationCountMap = new HashMap<>();
 		Connection conn = connectToDatabase();
@@ -1328,8 +1356,12 @@ public class ValleyBikeSim {
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
 	 *
 	 * @param customerAccount this is the new customer account object to be added to the map
-	 * @throws IOException    the initial menu in the controller throws IOException
+	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 * @throws NoSuchAlgorithmException
+	 * @throws SQLException
 	 */
 	public static void addCustomerAccount(CustomerAccount customerAccount) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
@@ -1375,12 +1407,17 @@ public class ValleyBikeSim {
 		return true;
 	}
 
-
 	/**
 	 * Adds new customer account to customer account map or asks the user to reenter information if account already exists.
 	 *
-	 * @throws IOException    the initial menu in the controller throws IOException
+	 * @param internalAccount
+	 * @param username
+	 * @throws IOException the initial menu in the controller throws IOException
 	 * @throws ParseException the initial menu in the controller throws ParseException
+	 * @throws InterruptedException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 * @throws NoSuchAlgorithmException
+	 * @throws SQLException
 	 */
 	public static void addInternalAccount(InternalAccount internalAccount, String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
 		//if the username for the new customer account is already in the customer account map
@@ -1421,7 +1458,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 * @throws InterruptedException
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void createCustomerAccount(String username, String password, String emailAddress, String creditCard, int membership) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
@@ -1487,7 +1524,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 * @throws InterruptedException
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws NoSuchAlgorithmException
 	 */
 	static void addStation(Station station, Integer id) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
@@ -1526,13 +1563,9 @@ public class ValleyBikeSim {
 	 * add new bike to system
 	 *
 	 * @param bike new bike object to add to system
-	 * @throws IOException
-	 * @throws ParseException
-	 * @throws InterruptedException
-	 * @throws ClassNotFoundException
-	 * @throws NoSuchAlgorithmException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
-	static void addBike(Bike bike) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
+	static void addBike(Bike bike) throws ClassNotFoundException{
 		String sql = "INSERT INTO Bike(id, location, station_id, req_mnt, mnt_report) " +
 				"VALUES(?,?,?,?,?)";
 
@@ -1561,7 +1594,7 @@ public class ValleyBikeSim {
 	 * @throws IOException
 	 * @throws ParseException
 	 * @throws InterruptedException
-	 * @throws ClassNotFoundException
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 * @throws NoSuchAlgorithmException
 	 */
 	static Boolean addRide(Ride ride) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
@@ -1614,7 +1647,9 @@ public class ValleyBikeSim {
 	 * Move a bike to a different (or no) station
 	 * Also sets station data to match this move
 	 *
-	 * @param newStationValue - station ID of the station the bike is moving to
+	 * @param bike
+	 * @param newStationValue station ID of the station the bike is moving to
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be foun
 	 */
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
 		//move bike from last station
@@ -1647,14 +1682,15 @@ public class ValleyBikeSim {
 	/**
 	 * Iterates through stations to determine ideal percentage of vehicles to capacity
 	 * for the stations, and maps station ids to their actual percentages
-	 * <p>
+	 *
 	 * Then goes through and pulls extra vehicles from stations with percentages over ideal
 	 * and sequentially adds those extra vehicles to stations with percentages
 	 * under ideal until both have as close as possible to the ideal percentage
-	 * <p>
+	 *
 	 * This method prioritizes easily moving vehicles in order to get as many
 	 * stations within the ideal percentage as possible
 	 * However it does not prioritize stations further from the ideal percentage first
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be foun
 	 */
 	static void equalizeStations() throws ClassNotFoundException {
 		Map<Integer, Integer> stationsCapacity = new TreeMap<>();
