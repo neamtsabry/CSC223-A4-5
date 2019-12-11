@@ -407,7 +407,9 @@ public abstract class ValleyBikeController {
                 //edit username
                 String newUsername = enterUsername(1); // 1 specifies a customer account for validation
                 if (! Objects.equals(newUsername, "0")) { // check for cancel key
-                    ValleyBikeSim.updateCustomerUsername(username, newUsername);
+                    if(!ValleyBikeSim.updateCustomerUsername(username, newUsername)){
+                        customerAccountHome(username);
+                    }
                     System.out.println("Your username has been successfully updated to " + newUsername);
                     username = newUsername;
                 }
@@ -419,7 +421,9 @@ public abstract class ValleyBikeController {
                 //edit password
                 String newPassword = enterPassword();
                 if (! Objects.equals(newPassword, "0")){ //check for cancel key
-                    ValleyBikeSim.updateCustomerPassword(username, newPassword);
+                    if(!ValleyBikeSim.updateCustomerPassword(username, newPassword)){
+                        customerAccountHome(username);
+                    }
                     System.out.println("Your password has been successfully updated to " + newPassword);
                 }
                 else { // if 0 was entered, cancel and return to menu
@@ -430,7 +434,9 @@ public abstract class ValleyBikeController {
                 //edit email address
                 String newEmail = enterEmail();
                 if (! Objects.equals(newEmail, "0")){ //check for cancel key
-                    ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
+                    if(!ValleyBikeSim.updateCustomerEmailAddress(username, newEmail)){
+                        customerAccountHome(username);
+                    }
                     System.out.println("Your email address has been successfully updated to " + newEmail);
                 }
                 else { // if 0 was entered, cancel and return to menu
@@ -442,7 +448,9 @@ public abstract class ValleyBikeController {
                 String newCreditCard = enterCreditCard();
 
                 if (! Objects.equals(newCreditCard, "0")){ //check for cancel key
-                    ValleyBikeSim.updateCustomerCreditCard(username, newCreditCard);
+                    if(!ValleyBikeSim.updateCustomerCreditCard(username, newCreditCard)){
+                        customerAccountHome(username);
+                    }
                 }
                 else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
@@ -467,12 +475,16 @@ public abstract class ValleyBikeController {
                                 "Please ensure your credit card information is updated and try again. ");
                     } else {
                         //if credit card is valid, switch memberships
-                        ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                        if(!ValleyBikeSim.updateCustomerMembership(username, newMembership)){
+                            customerAccountHome(username);
+                        }
                     }
                 }
 
                 if (newMembership == 1){
-                    ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                    if(!ValleyBikeSim.updateCustomerMembership(username, newMembership)){
+                        customerAccountHome(username);
+                    }
                 }
                 break;
             case 0:
@@ -498,7 +510,7 @@ public abstract class ValleyBikeController {
      * @throws ClassNotFoundException
      * @throws NoSuchAlgorithmException
      */
-    private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static void editInternalAccount(String username) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //TODO handle edge case of not entering int
         //TODO Grace
 
@@ -516,7 +528,9 @@ public abstract class ValleyBikeController {
                 //edit username
                 String newUsername = enterUsername(2); // 2 specifies an internal account for validation
                 if (! Objects.equals(newUsername, "0")) {
-                    ValleyBikeSim.updateInternalUsername(username, newUsername);
+                    if(!ValleyBikeSim.updateInternalUsername(username, newUsername)){
+                        internalAccountHome(username);
+                    }
                 }
                 else {
                     System.out.println("Account revision canceled.");
@@ -526,7 +540,9 @@ public abstract class ValleyBikeController {
                 //edit password
                 String newPassword = enterPassword();
                 if (! Objects.equals(newPassword, "0")) {
-                    ValleyBikeSim.updateInternalPassword(username, newPassword);
+                    if(!ValleyBikeSim.updateInternalPassword(username, newPassword)){
+                        internalAccountHome(username);
+                    }
                 }
                 else {
                     System.out.println("Account revision canceled.");
@@ -536,7 +552,9 @@ public abstract class ValleyBikeController {
                 //edit email address
                 String newEmail = enterEmail();
                 if (! Objects.equals(newEmail, "0")) {
-                    ValleyBikeSim.updateInternalEmailAddress(username, newEmail);
+                    if(!ValleyBikeSim.updateInternalEmailAddress(username, newEmail)){
+                        internalAccountHome(username);
+                    }
                 }
                 else {
                     System.out.println("Account revision canceled.");
@@ -610,8 +628,13 @@ public abstract class ValleyBikeController {
         // Add ride to customer account
         // assume username is always valid
         CustomerAccount customer = ValleyBikeSim.getCustomerObj(username); // get customer account object
-        ValleyBikeSim.updateRideIdList(username, rideId);
-        ValleyBikeSim.updateCustomerLastRideisReturned(username, false);
+        if(!ValleyBikeSim.updateRideIdList(username, rideId)){
+            customerAccountHome(username);
+        }
+
+        if(!ValleyBikeSim.updateCustomerLastRideisReturned(username, false)){
+            customerAccountHome(username);
+        }
 
         // now bike is fully rented
         // bikeRented(username, b, ride.getRideId());
@@ -758,11 +781,17 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.moveStation(someBike, statId);
 
         // update ride to be returned and set its end time stamp
-        ValleyBikeSim.updateRideIsReturned(lastRideId, true);
-        ValleyBikeSim.updateRideEndTimeStamp(lastRideId, Instant.now());
+        if(!ValleyBikeSim.updateRideIsReturned(lastRideId, true)){
+            customerAccountHome(username);
+        }
+        if(!ValleyBikeSim.updateRideEndTimeStamp(lastRideId, Instant.now())){
+            customerAccountHome(username);
+        }
 
         // set the same in customer account
-        ValleyBikeSim.updateCustomerLastRideisReturned(username, true);
+        if(!ValleyBikeSim.updateCustomerLastRideisReturned(username, true)){
+            customerAccountHome(username);
+        }
 
         System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ".");
         System.out.println();
@@ -794,7 +823,7 @@ public abstract class ValleyBikeController {
      * @param lastRideId id of the ride object
      * @throws ClassNotFoundException
      */
-    private static void calculateRentalCharge(String username, Ride rideObj, UUID lastRideId) throws ClassNotFoundException {
+    private static void calculateRentalCharge(String username, Ride rideObj, UUID lastRideId) throws ClassNotFoundException, InterruptedException, SQLException, NoSuchAlgorithmException, ParseException, IOException {
         //check how many included rides remain in account to determine how to charge for rental
         int ridesLeft = ValleyBikeSim.viewMembershipType(username).getTotalRidesLeft();
         long rideLength = rideObj.getRideLength();
@@ -808,7 +837,10 @@ public abstract class ValleyBikeController {
             double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             //update ride payment in ride object
-            ValleyBikeSim.updateRidePayment(lastRideId, paymentDue);
+
+            if(!ValleyBikeSim.updateRidePayment(lastRideId, paymentDue)){
+                customerAccountHome(username);
+            }
 
         } else {
             //otherwise decrement rides remaining in membership
@@ -825,7 +857,10 @@ public abstract class ValleyBikeController {
             } else {
                 //ride is free if under 1hr
                 paymentDue = 0L;
-                ValleyBikeSim.updateRidePayment(lastRideId, 0.00);
+
+                if(!ValleyBikeSim.updateRidePayment(lastRideId, 0.00)){
+                    customerAccountHome(username);
+                }
             }
         }
         //inform customer of the charge
@@ -840,7 +875,7 @@ public abstract class ValleyBikeController {
      * @param username for user
      * user reports a problem with the bike they checked out
      */
-    private static void reportProblem(String username) throws ClassNotFoundException {
+    private static void reportProblem(String username) throws ClassNotFoundException, InterruptedException, SQLException, NoSuchAlgorithmException, ParseException, IOException {
         int bikeId = getResponse("Please enter the ID of the bike you" +
                 " are experiencing problems with ('###') or '0' to return to the menu:");
 
@@ -869,24 +904,6 @@ public abstract class ValleyBikeController {
             System.out.println("Report problem has been canceled.");
             return;
         }
-/*
-        // keep prompting user while input is empty
-        while(mntReport.isEmpty()){
-            System.out.println("You must enter some string. Please try again.");
-
-            // prompt user for report detailing what's wrong
-            System.out.println("Please tell us what is wrong with this bike or enter '0' to cancel:");
-            input.nextLine();
-            mntReport = input.nextLine();
-
-            // if user entered 0, return to menu
-            if (mntReport.contentEquals("0")){
-                System.out.println("Report problem has been canceled.");
-                return;
-            }
-        }
-
- */
 
         // add to maintenance requests
         ValleyBikeSim.addToMntRqs(bikeId, mntReport);
@@ -895,16 +912,22 @@ public abstract class ValleyBikeController {
         Bike bike = ValleyBikeSim.getBikeObj(bikeId);
 
         // set bike's maintenance report and maintenance to true
-        ValleyBikeSim.updateBikeRqMnt(bikeId, true, mntReport);
+        if(!ValleyBikeSim.updateBikeRqMnt(bikeId, true, mntReport)){
+            customerAccountHome(username);
+        }
 
         // bike is now out of commission until fixed
-        ValleyBikeSim.updateBikeLocation(bikeId, 1);
+        if(!ValleyBikeSim.updateBikeLocation(bikeId, 1)){
+            customerAccountHome(username);
+        }
 
         // if the station is not live with customer
         if(! Objects.equals(bike.getStation(), 0)){
             // increase maintenance requests for the station
             Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
-            ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+            if(!ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1)){
+                customerAccountHome(username);
+            }
         }
 
         // let user know the process is done
@@ -958,7 +981,7 @@ public abstract class ValleyBikeController {
                 break;
             case 5:
                 //add bike to bike list
-                addNewBike(username);
+                addNewBike();
                 break;
             case 6:
                 //view station list
@@ -1187,10 +1210,11 @@ public abstract class ValleyBikeController {
                 address);
 
         // add new station to database and tree
-        ValleyBikeSim.addStation(stationOb, id);
+        if(!ValleyBikeSim.addStation(stationOb, id)){
+            return;
+        }
 
         System.out.println("Station has been added!");
-
     }
 
     /**
@@ -1198,12 +1222,12 @@ public abstract class ValleyBikeController {
      * @throws IOException
      * @throws ParseException
      */
-    static void addNewBike(String username) throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
+    static void addNewBike() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // check if there's any open slots in total of all stations
         if(ValleyBikeSim.viewTotalStationsCapacity() - ValleyBikeSim.viewTotalBikesCount() < 5){
             System.out.println("There's not enough space in total stations" +
                     "to add a new bike. Please try adding a new station");
-            internalAccountHome(username);
+            return;
         }
 
         // get new bike's id
@@ -1278,13 +1302,17 @@ public abstract class ValleyBikeController {
         );
 
         // add to bike tree structure
-        ValleyBikeSim.addBike(bikeOb);
+        if(!ValleyBikeSim.addBike(bikeOb)){
+            return;
+        };
 
         //move bike to the corresponding station
         ValleyBikeSim.moveStation(bikeOb, stationId);
 
         // update station's number of bikes in database
-        ValleyBikeSim.updateStationBikesNum(stationId, ValleyBikeSim.getStationObj(stationId).getBikes());
+        if(!ValleyBikeSim.updateStationBikesNum(stationId, ValleyBikeSim.getStationObj(stationId).getBikes())){
+            return;
+        }
 
         System.out.println("Bike has been successfully added!");
     }
