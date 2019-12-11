@@ -155,8 +155,8 @@ public abstract class ValleyBikeController {
 
         // if logging into a customer account (logIn == 1), check that the customer account map contains the username
         // if logging into an internal account (logIn == 2), check that the internal account map contains the username
-        while ((logIn == 1) && (!ValleyBikeSim.accountMapsContain(username, 1)) ||
-                (logIn == 2) && (!ValleyBikeSim.accountMapsContain(username, 2))){
+        while ( (logIn == 1 && !ValleyBikeSim.accountMapsContain(username, 1) ) ||
+                (logIn == 2 && !ValleyBikeSim.accountMapsContain(username, 2)) ){
             System.out.println("Username does not exist. Please try again.");
             System.out.println("Enter your username or '0' to cancel:");
             username = input.nextLine();
@@ -285,11 +285,13 @@ public abstract class ValleyBikeController {
                 break;
             case 8:
                 Ride ride = ValleyBikeSim.viewLongestRide(username);
+                //TODO NG - null pointer exception happening here!
                 System.out.println("Your longest ride was " + ride.getRideLength() + " hours long.");
                 System.out.print("It was from " + ride.getStartTimeStamp() + " to " + ride.getEndTimeStamp() + ".");
                 break;
             case 9:
                 ValleyBikeSim.disableCustomerAccount(username);
+                System.out.println("Your account has been deleted. Have a great day!");
                 break;
             case 0:
                 //return to homepage to log out
@@ -368,7 +370,6 @@ public abstract class ValleyBikeController {
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
                 "\nCredit Card: ************" + customer.getCreditCard().substring(12) +
-                //TODO returns a null pointer exception AG
                 "\nMembership: " + customer.getMembership().getMembershipString());
     }
 
@@ -400,52 +401,50 @@ public abstract class ValleyBikeController {
             case 1:
                 //edit username
                 String newUsername = enterUsername();
-
-                if (! Objects.equals(username, "0")) {
+                if (! Objects.equals(newUsername, "0")) { // check for cancel key
                     ValleyBikeSim.updateCustomerUsername(username, newUsername);
                 }
-                else {
+                else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
                 }
                 break;
             case 2:
                 //edit password
                 String newPassword = enterPassword();
-                if (! Objects.equals(newPassword, "0")){
+                if (! Objects.equals(newPassword, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerPassword(username, newPassword);
                 }
-                else {
+                else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
                 }
                 break;
             case 3:
                 //edit email address
                 String newEmail = enterEmail();
-                if (! Objects.equals(newEmail, "0")){
+                if (! Objects.equals(newEmail, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerEmailAddress(username, newEmail);
                 }
-                else {
+                else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
                 }
                 break;
             case 4:
                 //edit credit card number
                 String newCreditCard = enterCreditCard();
-                if (! Objects.equals(newCreditCard, "0")){
+
+                if (! Objects.equals(newCreditCard, "0")){ //check for cancel key
                     ValleyBikeSim.updateCustomerCreditCard(username, newCreditCard);
                 }
-                else {
+                else { // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
                 }
                 break;
             case 5:
-                //remember this menu so we can return later
-                // menuPath.push(21);
                 //edit membership type
                 int newMembership = enterMembership();
 
-
-                if (newMembership==0){
+                //check for cancel key
+                if (newMembership==0){  // if 0 was entered, cancel and return to menu
                     System.out.println("Account revision canceled.");
                     break;
                 }
@@ -464,8 +463,8 @@ public abstract class ValleyBikeController {
                 }
                 break;
             case 0:
-                //TODO GRACE check on this-- it returns to initial menu not customer home
-                // if there is a master string, return to an internal account; else, return to a customer account
+                // if there is a master string, we are returning to an internal account, so we will use the master username
+                // else, we are returning to a customer account, so we will use the customer username
                 if (master == null){
                 returnToLastMenu(username);}
                 else returnToLastMenu(master);
@@ -549,21 +548,20 @@ public abstract class ValleyBikeController {
      */
     private static void rentBike(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
         //validate credit card before allowing rental- to make sure they can pay
-        String creditCard = ValleyBikeSim.viewCreditCard(username);
         //check validity of credit card, send them back to home menu if not valid
-        if (!isValidCreditCard(creditCard)) {
-            System.out.println("Sorry, your credit card is not valid. You cannot rent a bike without a valid credit card. \n" +
+        if (!isValidCreditCard(ValleyBikeSim.viewCreditCard(username))) { // if cc isn't valid
+            System.out.println("You cannot rent a bike without a valid credit card. \n" +
                     "Please make sure the credit card saved in your account is correct, then try again.");
             return; // return to customerAccountHome
         }
 
         // View stations
-        System.out.println("STATION LIST:");
         ValleyBikeSim.viewStationList(); // view station list
+        System.out.println("Please pick a station from which to rent a bike.");
 
         // choose station to rent from or go back
         int statId = getResponse("Please pick a station from the above list to rent a bike from.\n" +
-                "Enter the station ID ('11') or '0' to return to menu: ");
+                "Enter the station ID ('###') or '0' to return to menu: ");
         Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
 
         //keep running while loop until input valid station with available bikes
@@ -581,38 +579,12 @@ public abstract class ValleyBikeController {
             }
             //because station not valid, have user re-input and then validate
             statId = getResponse("Please pick a station to rent a bike from.\n" +
-                    "Enter the station ID ('11') or '0' to return to menu: ");
+                    "Enter the station ID ('###') or '0' to return to menu: ");
             stationFrom = ValleyBikeSim.getStationObj(statId);
         }
 
         // if user entered 0, return to menu
         if (Objects.equals(statId, 0)){ return; }
-
-        /*// Validate user input for station ID
-        // keep prompting user until input matches the ID of an available station
-        Station stationFrom = ValleyBikeSim.getStationObj(statId); // get station obj (or null) from input
-
-        // if station doesn't exist or doesn't have any bikes
-        while((stationFrom == null)||(Objects.equals(stationFrom.getBikes(), 0))) {
-            if (stationFrom == null) System.out.println("The station ID entered does not exist in our system.");
-
-            //if station doesn't have bikes, equalize stations and have user re-select station
-            else if (Objects.equals(stationFrom.getBikes(), 0)) {
-                System.out.println("The station entered does not have any bikes.\n" +
-                        "We are notifying maintenance worker to resolve this, but in the meantime please " +
-                        "choose another station");
-                //mocking notification to maintenance worker who immediately goes and equalizes stations
-                ValleyBikeSim.equalizeStations();
-            }
-
-            ValleyBikeSim.viewStationList();
-            statId = getResponse("Please pick a station to rent a bike from.\n" +
-                    "Enter the station ID ('11') or '0' to return to menu: ");
-            stationFrom = ValleyBikeSim.getStationObj(statId);
-
-            // if user entered 0, return to menu
-            if (Objects.equals(stationFrom, 0)){ return; }
-        }*/
 
         // View available bike ids at station
         System.out.println("Here's a list of bike IDs at Station #" + statId);
@@ -1122,7 +1094,7 @@ public abstract class ValleyBikeController {
      */
     private static void addStation() throws IOException, ParseException, ClassNotFoundException, InterruptedException, NoSuchAlgorithmException, SQLException {
         // use helper function to check input is valid and save it
-        int id = getResponseBetween(0, 1000, "Please enter the ID for this station ('111') or '0' to cancel:");
+        int id = getResponseBetween(0, 1000, "Please enter the ID for this station ('###') or '0' to cancel:");
 
         //check for 0 input and return
         if (id==0){
@@ -1167,9 +1139,11 @@ public abstract class ValleyBikeController {
 
         // number of kiosks
         Integer kiosk = getResponseBetween(0, 5, "How many kiosks (0-5)?");
+        // since 0 is a valid option for number of kiosks, we chose to have a cancel key for this input
+        // instead we give the user the ability to cancel on the next step
 
         // prompt for the station's address
-        System.out.println("Please enter station address: ");
+        System.out.println("Please enter station address or '0' to cancel: ");
         input.nextLine();
         String address = input.nextLine();
 

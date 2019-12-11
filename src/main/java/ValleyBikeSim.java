@@ -1230,6 +1230,8 @@ public class ValleyBikeSim {
 	 * @throws ParseException
 	 */
 	static void viewStationList() {
+		System.out.println("STATION LIST:");
+
 		// format table view
 		System.out.format("%-10s%-10s%-10s%-10s%-10s%-10s%-20s\n", "ID", "Bikes",
 				"AvDocs", "MainReq", "Capacity", "Kiosk", "Name - Address");
