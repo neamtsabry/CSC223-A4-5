@@ -43,7 +43,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                createCustomerAccount();
+//                createCustomerAccount();
+                findCustomer("graciem");
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -658,6 +659,12 @@ public abstract class ValleyBikeController {
             customerAccountHome(username);
         }
 
+        // update the ride length as well, which is set to the length
+        // from the time it was rented to now if the ride was not returned
+        if(!ValleyBikeSim.updateRideLength(rideId, ride.getRideLength())){
+            customerAccountHome(username);
+        }
+
         // Add ride to customer account
         // assume username is always valid
 
@@ -817,6 +824,7 @@ public abstract class ValleyBikeController {
             stationTo = ValleyBikeSim.getStationObj(statId);
         }
 
+        // set the station to for the ride
         rideObj.setStationTo(statId);
 
         // get rented bike
@@ -830,7 +838,14 @@ public abstract class ValleyBikeController {
         if(!ValleyBikeSim.updateRideIsReturned(lastRideId, true)){
             customerAccountHome(username);
         }
+
+        // update the time stamp it was returned in database
         if(!ValleyBikeSim.updateRideEndTimeStamp(lastRideId, Instant.now())){
+            customerAccountHome(username);
+        }
+
+        // update the ride length in database
+        if(!ValleyBikeSim.updateRideLength(lastRideId, rideObj.getRideLength())){
             customerAccountHome(username);
         }
 

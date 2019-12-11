@@ -708,6 +708,37 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * Updates cost of ride
+	 *
+	 * @param rideId ride being updated
+	 * @param station_to is the station id for the station the ride is being returned to
+	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
+	 */
+	static Boolean updateRideLength(UUID rideId, long ride_length) throws ClassNotFoundException {
+		String sql = "UPDATE Ride SET ride_length = ? "
+				+ "WHERE ride_id = ?";
+
+		//update ride payment in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			pstmt.setLong(1, ride_length);
+			pstmt.setString(2, rideId.toString());
+
+			// update
+			pstmt.executeUpdate();
+
+			//update payment for ride in ride map
+			rideMap.get(rideId).setRideLength(ride_length);
+
+			return true;
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update email address in database at this time.");
+			return false;
+		}
+	}
+
 
 	/**
 	 * update customer's email address
