@@ -1014,6 +1014,7 @@ public abstract class ValleyBikeController {
                 editInternalAccount(username);
                 break;
             case 3:
+                input.nextLine();
                 menuPath.push(3); // add this menu to stack in case we want to return
                 findCustomer(username);
                 menuPath.pop();
@@ -1087,13 +1088,13 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.viewAllCustomers();
 
         // ask user to input customer username
-        input.nextLine();
+        // input.nextLine();
         System.out.println("Please enter a customer's username to view their account or '0' to cancel:");
         String customerUsername = input.nextLine();
 
         // check for '0' input and return to previous menu
         if (Objects.equals(customerUsername, "0")) {
-            return;
+            internalAccountHome(username);
         }
 
         // keep asking for input if it isn't a valid customer username
@@ -1106,7 +1107,7 @@ public abstract class ValleyBikeController {
 
             // check for '0' input and return to previous menu
             if (customerUsername.contentEquals("0")) {
-                return;
+                internalAccountHome(username);
             }
         }
         //view customer account info (sensitive information is censored)
@@ -1142,9 +1143,6 @@ public abstract class ValleyBikeController {
             //get and validate user response
             int num = getResponseBetween(0,3, "Please enter your selection (0-3):");
 
-            //check for cancel key and return
-            if (num==0){returnToLastMenu(username);}
-
             switch(num) {
                 case 1:
                     //edit customer account
@@ -1159,7 +1157,8 @@ public abstract class ValleyBikeController {
                     viewCustomerInfo(customer);
                     break;
                 case 0:
-                    returnToLastMenu(username);
+                    input.nextLine();
+                    findCustomer(username);
             }
             //if we get through the switch, revisit the beginning of menu
             editCustomerMenu(username, customerUsername);
