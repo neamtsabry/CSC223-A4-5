@@ -899,16 +899,17 @@ public abstract class ValleyBikeController {
             //TODO update balance in database
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             //update ride payment in ride object
+            ValleyBikeSim.updateBalanceInDB(username, balance + paymentDue);
 
             if(!ValleyBikeSim.updateRidePayment(lastRideId, paymentDue)){
                 customerAccountHome(username);
             }
 
         } else {
-            //TODO decrement rides remaining in membership database
             //otherwise decrement rides remaining in membership
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
 
+            //TODO decrement rides remaining in membership database
             ValleyBikeSim.updateMembershipRidesLeft(username, ridesLeft - 1);
 
             //calculate whether there is an overtime charge (for a ride longer than 1hr)
@@ -921,6 +922,7 @@ public abstract class ValleyBikeController {
                 double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
                 //TODO update balance in database
                 ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
+                ValleyBikeSim.updateBalanceInDB(username, balance);
             } else {
                 //ride is free if under 1hr
                 paymentDue = 0L;
