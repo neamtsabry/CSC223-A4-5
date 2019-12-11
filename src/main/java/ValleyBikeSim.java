@@ -70,11 +70,12 @@ public class ValleyBikeSim {
 		//read in data from database to data structures
 		if (conn != null) {
 			Statement stmt = conn.createStatement();
+			readRideData(stmt);
 			readCustomerAccountData(stmt);
 			readInternalAccountData(stmt);
 			readStationData(stmt);
 			readBikeData(stmt);
-			readRideData(stmt);
+
 			conn.close();
 		} else {
 			System.out.println("Sorry, something went wrong connecting to the ValleyBike Database.");
@@ -126,6 +127,8 @@ public class ValleyBikeSim {
 				for (String ride : rideIdString.split(",")) {
 					UUID uuid = UUID.fromString(ride.replaceAll(" ", ""));
 					rideIdList.add(uuid);
+					//TODO
+					//System.out.println("CAD"+rideMap.get(uuid).getStationFrom()+" "+rideMap.get(uuid).getStationTo()+" "+rideMap.size());
 				}
 			}
 			//create customer account from info
@@ -285,8 +288,8 @@ public class ValleyBikeSim {
 			String start_time_stamp = rs.getString("start_time_stamp");
 			String end_time_stamp = rs.getString("end_time_stamp");
 			double payment = rs.getDouble("payment");
-			int station_from = rs.getInt("station_from");
 			int station_to = rs.getInt("station_to");
+			int station_from = rs.getInt("station_from");
 
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
@@ -307,8 +310,11 @@ public class ValleyBikeSim {
 			ride.setRideLength(rideLength);
 			ride.setPayment(payment);
 
-			// add to the bike tree
+			// add to the ride tree
 			rideMap.put(uuid_id, ride);
+			//TODO
+			//System.out.println("RRD"+rideMap.get(uuid_id).getStationFrom()+" "+rideMap.get(uuid_id).getStationTo()+rideMap.size());
+
 		}
 	}
 
@@ -350,10 +356,9 @@ public class ValleyBikeSim {
 	 * updates membership rides left
 	 * @param username username of account membership to update
 	 * @param ridesLeft number of rides left to set membership to
-	 * @throws SQLException
 	 * @throws ClassNotFoundException
 	 */
-	static void updateMembershipRidesLeft(String username, int ridesLeft) throws SQLException, ClassNotFoundException {
+	static void updateMembershipRidesLeft(String username, int ridesLeft) throws ClassNotFoundException {
 		String sql = "UPDATE Membership SET total_rides_left = ? WHERE username = ?";
 		System.out.println("updating ridesleft to" + ridesLeft);
 		try(Connection conn = connectToDatabase();
@@ -366,6 +371,29 @@ public class ValleyBikeSim {
 			System.out.println("Sorry, could not update rides left in database at this time.");
 		}
 	}
+
+	//TODO balance
+	/**
+	 * update balance in db
+	 * @param username username of account
+	 * @param balance new balance
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	static void updateBalanceInDB(String username, double balance) throws SQLException, ClassNotFoundException {
+		String sql = "UPDATE Customer_Account SET balance = ? WHERE username = ?";
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setDouble(1, balance);
+			pstmt.setString(2, username);
+
+			System.out.println("I TRIED" + balance);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Sorry, could not update balance in database at this time.");
+		}
+	}
+
 
 	/**
 	 * Adds a bike to a station
@@ -591,11 +619,11 @@ public class ValleyBikeSim {
 		try (Connection conn = connectToDatabase();
 			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-			// set the corresponding param
-			pstmt.setString(1, rideId.toString());
+			if (isReturned) pstmt.setInt(1, 1);
+			else pstmt.setInt(1, 0);
 
-			if (isReturned) pstmt.setInt(2, 1);
-			else pstmt.setInt(2, 0);
+			// set the corresponding param
+			pstmt.setString(2, rideId.toString());
 
 			// update
 			pstmt.executeUpdate();
@@ -714,7 +742,7 @@ public class ValleyBikeSim {
 	 * Updates cost of ride
 	 *
 	 * @param rideId ride being updated
-	 * @param station_to is the station id for the station the ride is being returned to
+	 * @param
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateRideLength(UUID rideId, long ride_length) throws ClassNotFoundException {
@@ -1013,9 +1041,6 @@ public class ValleyBikeSim {
 			pstmt.setString(2, username);
 			// update
 			pstmt.executeUpdate();
-
-			//add new ride to customer's ride list
-			customerAccountMap.get(username).addNewRide(rideId);
 
 			return true;
 		} catch (SQLException e) {
@@ -1904,8 +1929,8 @@ public class ValleyBikeSim {
 				pstmt.setString(6, ride.getStartTimeStamp().toString());
 				pstmt.setString(7, ride.getEndTimeStamp().toString());
 				pstmt.setDouble(8, ride.getPayment());
-				pstmt.setInt(9, ride.getStationFrom());
-				pstmt.setInt(10, ride.getStationTo());
+				pstmt.setInt(9, ride.getStationTo());
+				pstmt.setInt(10, ride.getStationFrom());
 
 				pstmt.executeUpdate();
 

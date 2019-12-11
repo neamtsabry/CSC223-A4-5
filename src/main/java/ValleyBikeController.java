@@ -43,8 +43,7 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-//                createCustomerAccount();
-                findCustomer("graciem");
+                createCustomerAccount();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -849,6 +848,8 @@ public abstract class ValleyBikeController {
             customerAccountHome(username);
         }
 
+        ValleyBikeSim.updateRideStationTo(lastRideId, statId);
+
         // set the same in customer account
         if(!ValleyBikeSim.updateCustomerLastRideisReturned(username, true)){
             customerAccountHome(username);
@@ -899,16 +900,17 @@ public abstract class ValleyBikeController {
             //TODO update balance in database
             ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
             //update ride payment in ride object
+            ValleyBikeSim.updateBalanceInDB(username, balance + paymentDue);
 
             if(!ValleyBikeSim.updateRidePayment(lastRideId, paymentDue)){
                 customerAccountHome(username);
             }
 
         } else {
-            //TODO decrement rides remaining in membership database
             //otherwise decrement rides remaining in membership
             ValleyBikeSim.viewMembershipType(username).setTotalRidesLeft(ridesLeft - 1);
 
+            //TODO decrement rides remaining in membership database
             ValleyBikeSim.updateMembershipRidesLeft(username, ridesLeft - 1);
 
             //calculate whether there is an overtime charge (for a ride longer than 1hr)
@@ -921,6 +923,7 @@ public abstract class ValleyBikeController {
                 double balance = ValleyBikeSim.getCustomerObj(username).getBalance();
                 //TODO update balance in database
                 ValleyBikeSim.getCustomerObj(username).setBalance(balance + paymentDue);
+                ValleyBikeSim.updateBalanceInDB(username, balance);
             } else {
                 //ride is free if under 1hr
                 paymentDue = 0L;
@@ -1196,14 +1199,16 @@ public abstract class ValleyBikeController {
 
         //display rides the selected user has taken
         if(rideList.size() > 0){
-            System.out.format("%-10s%-10s%-13s%-20s%-10s%-10s%-10s\n", "Bike ID", "Is returned? ",
-                    "Start Timestamp ", "End Timestamp ", "RideLength ", "Station from ", "Station to ");
+            System.out.format("%-10s%-15s%-35s%-35s%-10s%-12s%-10s\n",
+                    "Bike ID ", "Is returned? ",
+                    "Start Timestamp ", "End Timestamp ",
+                    "RideLen ", "Stat. from ", "Stat. to ");
 
             //format out printing of whole ride list
             for(UUID rideId : rideList){
                 Ride rideObj = ValleyBikeSim.getRideObj(rideId);
 
-                System.out.format("%-10d%-10b%-20s%-20s%-10d%-10d%-10d\n",
+                System.out.format("%-10d%-15b%-35s%-35s%-10d%-12d%-10d\n",
                         rideObj.getBikeId(),
                         rideObj.getIsReturned(),
                         rideObj.getStartTimeStamp(),
