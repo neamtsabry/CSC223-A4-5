@@ -607,7 +607,7 @@ public abstract class ValleyBikeController {
 
         // Choose bike to rent
         int bikeID = getResponse("Please enter the ID number of the bike you" +
-                " would like to rent ('11') or '0' to return to menu: ");
+                " would like to rent ('##') or '0' to return to menu: ");
 
         // if user entered 0, return to menu
         if (Objects.equals(bikeID, 0)){ return; }
@@ -617,7 +617,7 @@ public abstract class ValleyBikeController {
         while (!bikeList.contains(bikeID)){
             System.out.println("The bike ID entered is not at this station.");
             bikeID = getResponse("Please enter the ID number of the bike you" +
-                    " would like to rent ('11') or '0' to return to menu: ");
+                    " would like to rent ('##') or '0' to return to menu: ");
 
             // if user entered 0, return to menu
             if (Objects.equals(bikeID, 0)){ return; }
@@ -690,7 +690,9 @@ public abstract class ValleyBikeController {
                 "or '0' to return to the menu");
 
         // if user entered 0, return to menu
-        if (Objects.equals(statId, 0)){ return; }
+        if (Objects.equals(statId, 0)){
+            System.out.println("Bike return canceled.");
+            return; }
 
         // designated station, whether bike returned to or bike rented from
         Station stationTo = ValleyBikeSim.getStationObj(statId);
@@ -702,7 +704,9 @@ public abstract class ValleyBikeController {
                     "or '0' to return to the menu");
 
             // if user entered 0, return to menu
-            if (Objects.equals(statId, 0)){ return; }
+            if (Objects.equals(statId, 0)){
+                System.out.println("Bike return canceled.");
+                return; }
 
             stationTo = ValleyBikeSim.getStationObj(statId);
         }
@@ -721,10 +725,9 @@ public abstract class ValleyBikeController {
         ValleyBikeSim.updateRideEndTimeStamp(lastRideId, Instant.now());
 
         // set the same in customer account
-        CustomerAccount customer = ValleyBikeSim.getCustomerObj(username);
         ValleyBikeSim.updateCustomerLastRideisReturned(username, true);
 
-        System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ". Thank you!");
+        System.out.println("Bike #" + bikeId + " has been returned to station #" + statId + ".");
         System.out.println();
 
         if (stationTo.getAvailableDocks() <= 1){
