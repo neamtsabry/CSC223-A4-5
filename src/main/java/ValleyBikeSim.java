@@ -758,8 +758,49 @@ public class ValleyBikeSim {
 		customerAccountMap.remove(username);
 		customerAccountMap.put(newUsername, customerAccount);
 		System.out.println("Your username has been successfully updated to " + newUsername);
-		//TODO do existing ride objects associated with user get their username updated? AG or NS
+		updateRideUsername(username, newUsername);
+		updateMembershipUsername(username, newUsername);
+	}
 
+	private static void updateRideUsername(String username, String newUsername){
+		String sql = "UPDATE Ride SET username = ? "
+				+ "WHERE username = ?";
+
+		//update customer username in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newUsername);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException | ClassNotFoundException e) {
+			System.out.println("Sorry, could not update username in database at this time.");
+		}
+		for (Map.Entry<UUID, Ride> ride: rideMap.entrySet()){
+			if (ride.getValue().getUsername().equals(username)){
+				ride.getValue().setUsername(newUsername);
+			}
+		}
+	}
+
+	private static void updateMembershipUsername(String username, String newUsername){
+		String sql = "UPDATE Membership SET username = ? "
+				+ "WHERE username = ?";
+
+		//update customer username in database
+		try (Connection conn = connectToDatabase();
+			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+			// set the corresponding param
+			pstmt.setString(1, newUsername);
+			pstmt.setString(2, username);
+			// update
+			pstmt.executeUpdate();
+		} catch (SQLException | ClassNotFoundException e) {
+			System.out.println("Sorry, could not update username in database at this time.");
+		}
 	}
 
 	/**

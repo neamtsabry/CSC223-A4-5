@@ -372,7 +372,6 @@ public abstract class ValleyBikeController {
                 "\nPassword: " + passwordStars +
                 "\nEmail Address: " + customer.getEmailAddress() +
                 "\nCredit Card: ************" + customer.getCreditCard().substring(12) +
-                //TODO returns a null pointer exception AG
                 "\nMembership: " + customer.getMembership().getMembershipString());
     }
 
@@ -502,7 +501,7 @@ public abstract class ValleyBikeController {
                 "0: Return to account home");
 
         int edit = getResponseBetween(0, 3, "Please enter your selection (0-5):");
-
+        input.nextLine();
         switch (edit){
             case 1:
                 //edit username
