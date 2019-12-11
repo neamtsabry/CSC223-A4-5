@@ -2,7 +2,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.Assert;
 
 
-class RideTest {
+class jUnitTest {
 //    @Test
 //    public void testIs24Hours() throws Exception {
 //       Assert.assertEquals(Ride.is24hours(), false);
