@@ -70,7 +70,7 @@ public abstract class ValleyBikeController {
         //i.e. only internal staff can create new internal accounts
 
         //each field has its own method which calls itself until a valid input is entered
-        String username = enterUsername();
+        String username = enterUsername(1); // 1 specifies a customer username for validation
         if (Objects.equals(username, "0")){
             System.out.println("Account creation canceled.");
             initialMenu();
@@ -158,6 +158,7 @@ public abstract class ValleyBikeController {
         while ( (logIn == 1 && !ValleyBikeSim.accountMapsContain(username, 1) ) ||
                 (logIn == 2 && !ValleyBikeSim.accountMapsContain(username, 2)) ){
             System.out.println("Username does not exist. Please try again.");
+            // System.out.println();
             System.out.println("Enter your username or '0' to cancel:");
             username = input.nextLine();
 
@@ -294,7 +295,6 @@ public abstract class ValleyBikeController {
                 break;
             case 9:
                 ValleyBikeSim.disableCustomerAccount(username);
-                System.out.println("Congratulations, your account has been deleted. Have a great day!");
                 initialMenu();
                 break;
             case 0:
@@ -324,7 +324,7 @@ public abstract class ValleyBikeController {
 
         input.nextLine();
         //each field has its own method which calls itself until a valid input is entered
-        String newUsername = enterUsername();
+        String newUsername = enterUsername(2); //2 specifies an internal account for validation
         if (Objects.equals(newUsername, "0")){ // check for cancel key
             System.out.println("Account creation canceled.");
             return;
@@ -400,7 +400,7 @@ public abstract class ValleyBikeController {
         switch (edit){
             case 1:
                 //edit username
-                String newUsername = enterUsername();
+                String newUsername = enterUsername(1); // 1 specifies a customer account for validation
                 if (! Objects.equals(newUsername, "0")) { // check for cancel key
                     ValleyBikeSim.updateCustomerUsername(username, newUsername);
                     username = newUsername;
@@ -502,7 +502,7 @@ public abstract class ValleyBikeController {
         switch (edit){
             case 1:
                 //edit username
-                String newUsername = enterUsername();
+                String newUsername = enterUsername(2); // 2 specifies an internal account for validation
                 if (! Objects.equals(newUsername, "0")) {
                     ValleyBikeSim.updateInternalUsername(username, newUsername);
                 }
@@ -1115,10 +1115,13 @@ public abstract class ValleyBikeController {
                 return; }
         }
 
+        //TODO come back to here Grace!
         // prompt user for station name
-        System.out.println("Please enter station name or '0' to cancel: ");
+
+        //System.out.println("Please enter station name or '0' to cancel: ");
         input.nextLine();
-        String name = input.nextLine();
+        String name = getUserString(20, "Please enter station name or '0' to cancel: ");
+        //String name = input.nextLine();
 
         //check for 0 input and return
         if (Objects.equals(name, "0")){
@@ -1295,6 +1298,31 @@ public abstract class ValleyBikeController {
         return num;
     }
 
+    /**
+     * Helper method to ensure string is a valid length
+     *
+     * @param a - maximum length of string input
+     * @param request what should be asked of the user
+     * @return return the validated input string
+     */
+    public static String getUserString(int a, String request){
+        System.out.println(request);
+        String response = input.nextLine();
+        int stringLen = response.length();
+        while((stringLen > a)||(stringLen==0)){ //keep requesting new input until one in specified range is entered
+            if (stringLen==0){
+                System.out.println("Must enter a string. Please try again. ");
+            }
+            else{
+                System.out.println("This input is too long! Please try again " +
+                        "with a string that contains " + a + " characters or less.");
+            }
+            response = input.nextLine();
+            stringLen = response.length();
+        }
+        return response;
+    }
+
 
 
 
@@ -1306,7 +1334,7 @@ public abstract class ValleyBikeController {
      * Loops until valid username input by user
      * @return valid username input by user
      */
-    private static String enterUsername() throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
+    private static String enterUsername(int accountType) throws ParseException, InterruptedException, IOException, ClassNotFoundException, NoSuchAlgorithmException {
         String username;
         do {//loops until user inputs 0 or valid username
             //prompts user to input username
@@ -1318,7 +1346,7 @@ public abstract class ValleyBikeController {
 
                 return username;
             }
-        } while (!isValidUsername(username)); //validates that username is between 6-14 characters and unique in our system
+        } while (!isValidUsername(username, accountType)); //validates that username is between 6-14 characters and unique in our system
 
         //return valid username input by user
         return username;
@@ -1427,10 +1455,11 @@ public abstract class ValleyBikeController {
     /**
      * Validates if username is between 6 and 14 characters
      * @param username is the username input by the user
+     * @param accountType - either 1 or 2, specifies if username
+     *                    is for customer or internal account
      * @return true if username is valid and false otherwise
      */
-    public static boolean isValidUsername(String username){
-
+    public static boolean isValidUsername(String username, int accountType){
 
         if((username==null)||(username.length()<6)||(username.length()>14)){
             System.out.println("Username is not the correct length. " +
@@ -1438,9 +1467,7 @@ public abstract class ValleyBikeController {
                     "Please try again.");
             return false;
         }
-        else if(ValleyBikeSim.accountMapsContain(username, 3)){
-            // we chose to demand unique usernames within our system as a whole;
-            // no usernames can match, even between customer and internal accounts
+        else if(ValleyBikeSim.accountMapsContain(username, accountType)){ //check if username exists in account map
             System.out.println("This username already exists within our system. Please try again.");
             return false;
         }

@@ -43,10 +43,10 @@ class RideTest {
 
     @Test
     public void testIsValidUsername(){
-        Assert.assertEquals(ValleyBikeController.isValidUsername("asdfgh"),true);
-        Assert.assertEquals(ValleyBikeController.isValidUsername("123"),false);
-        Assert.assertEquals(ValleyBikeController.isValidUsername(""), false);
-        Assert.assertEquals(ValleyBikeController.isValidUsername(null), false);
+        Assert.assertEquals(ValleyBikeController.isValidUsername("asdfgh", 1),true);
+        Assert.assertEquals(ValleyBikeController.isValidUsername("123", 2),false);
+        Assert.assertEquals(ValleyBikeController.isValidUsername("", 1), false);
+        Assert.assertEquals(ValleyBikeController.isValidUsername(null, 2), false);
     }
 
     @Test
