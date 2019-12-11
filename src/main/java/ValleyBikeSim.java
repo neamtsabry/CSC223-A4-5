@@ -267,7 +267,7 @@ public class ValleyBikeSim {
 			String end_time_stamp = rs.getString("end_time_stamp");
 			double payment = rs.getDouble("payment");
 			int station_from = rs.getInt("station_from");
-			int station_to = rs.getInt("station_ti");
+			int station_to = rs.getInt("station_to");
 
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
@@ -279,9 +279,16 @@ public class ValleyBikeSim {
 				is_returned_bool = true;
 			}
 
+<<<<<<< HEAD
 			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
 
 			Instant end_time_stamp_instant = Instant.parse(end_time_stamp);
+=======
+			//parse time stamps as readable instants
+			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
+			Instant end_time_stamp_instant = Instant.parse(end_time_stamp);
+
+>>>>>>> 38b5e76cfa541af570f9afc6e88b7cef1f0ef46c
 
 			// create new ride object with fields
 			Ride ride = new Ride(uuid_id, bike_id, username,
@@ -1154,10 +1161,8 @@ public class ValleyBikeSim {
 			if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(user.getCreditCard())) {
 					if (user.getMembership().getMembershipInt() == 2) {
-						//TODO monthly things
 						user.getMembership().setTotalRidesLeft(20);
 					} else if (user.getMembership().getMembershipInt() == 3) {
-						//TODO yearly things
 						user.getMembership().setTotalRidesLeft(260);
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
@@ -1498,7 +1503,7 @@ public class ValleyBikeSim {
 			ValleyBikeController.initialMenu();
 		} else { //if station is valid, add to system
 			String sql = "INSERT INTO Station(id, name, bikes, available_docks, req_mnt, " +
-					"capacity, kioskBoolean, address, bike_string) " +
+					"capacity, kiosk, address, bike_string) " +
 					"VALUES(?,?,?,?,?,?,?,?,?)";
 
 			//add station to database
@@ -1512,13 +1517,14 @@ public class ValleyBikeSim {
 				pstmt.setInt(6, station.getCapacity());
 				pstmt.setInt(7, booleanToInt(station.getKioskBoolean()));
 				pstmt.setString(8, station.getAddress());
-                pstmt.setString(9, "");
+                pstmt.setString(9, station.getBikeListToString());
                 pstmt.executeUpdate();
 
 				//add station to station map
 				stationsMap.put(id, station);
 			} catch (SQLException e) {
 				System.out.println("Sorry, something went wrong with adding new station to database.");
+				System.out.println(e);
 			}
 		}
 	}
@@ -1543,7 +1549,7 @@ public class ValleyBikeSim {
 			pstmt.setInt(1, bike.getId());
 			pstmt.setInt(2, bike.getBikeLocation());
 			pstmt.setInt(3, bike.getStation());
-			pstmt.setBoolean(4, bike.getMnt());
+			pstmt.setInt(4, booleanToInt(bike.getMnt()));
 			pstmt.setString(5, bike.getMntReport());
 			pstmt.executeUpdate();
 
@@ -1618,25 +1624,28 @@ public class ValleyBikeSim {
 	 * @param newStationValue - station ID of the station the bike is moving to
 	 */
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
-	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
+		//move bike from last station
+
+		// check if bike has a current station
+		// if bike's station is 0, that means that the bike is out with a customer
+	    if (! Objects.equals(bike.getStation(),0)) { // if bike is at a station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
 			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
-
-			// update to database
+			// update new station bike list to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 		}
 
+	    //update station id registered to bike
         updateBikeStationId(bike.getId(), newStationValue);
 
-		if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
+		// check if new station is a '0,' which is a placeholder station
+		if (! Objects.equals(newStationValue, 0)) {
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
-
+			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 			updateBikeLocation(bike.getId(), 0);
-			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 		}
-
 		else {
 			updateBikeLocation(bike.getId(), 2);
 		}
