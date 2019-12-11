@@ -15,8 +15,6 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
 
 ## How to import this project into Eclipse
 
-There are a lot of steps here! Don't try to memorize them, just practice. Whenever you click next, or open a menu, see if you can read it, guess what you should do next, and confirm with these steps.
-
 1. Go to the "File" menu and choose "Import"
 2. Expand the Git Folder and choose "Projects from Git"
 3. Click "Next"
@@ -66,13 +64,10 @@ There are a lot of steps here! Don't try to memorize them, just practice. Whenev
 **password:** csc223 <br/>
 **email address:** agrubb@smith.edu
 
-
-
-
 ###CITATIONS
 https://stackoverflow.com/questions/27005861/calculate-days-between-two-dates-in-java-8
-https://stackoverflow.com/questions/50299639/converting-string-to-instant
 https://www.tutorialspoint.com/java/util/uuid_fromstring.htm
 https://www.w3schools.com/sql/sql_delete.asp
+https://www.geeksforgeeks.org/instant-parse-method-in-java-with-examples/
 
 ***
