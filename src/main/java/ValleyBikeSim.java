@@ -243,6 +243,8 @@ public class ValleyBikeSim {
 			// if it does require maintenance, set to y
 			if (reqMnt == 1) {
 				maintenance = "y";
+
+				addToMntRqs(id, rs.getString("mnt_report"));
 			}
 
 			String mntReport = rs.getString("mnt_report");
@@ -280,13 +282,9 @@ public class ValleyBikeSim {
 
 			// change string to unique UUID
 			UUID uuid_id = UUID.fromString(id);
-			// initiate boolean value to false
-			boolean is_returned_bool = false;
 
-			// if found 1 then set it to true
-			if (is_returned == 1) {
-				is_returned_bool = true;
-			}
+			// change binary to boolean
+			boolean is_returned_bool = intToBoolean(is_returned);
 
 			//parse time stamps as readable instants
 			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
@@ -315,11 +313,8 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateStationMntRqsts(int stationId, int mntRqsts) throws ClassNotFoundException {
-		String sql = "UPDATE Station SET trq_mnt = ? "
+		String sql = "UPDATE Station SET req_mnt = ? "
 		+ "WHERE id = ?";
-
-		//update station data in map
-		stationsMap.get(stationId).setMaintenanceRequest(mntRqsts);
 
 		//update sql database
 		try (Connection conn = connectToDatabase();
@@ -510,6 +505,7 @@ public class ValleyBikeSim {
 	 * @param bikeId  bike id to  update
 	 * @param req_mnt boolean whether bike has a maintenance request
 	 * @param new_mnt_report the maintenance report if bike requires maintenance
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateBikeRqMnt(int bikeId, boolean req_mnt, String new_mnt_report) throws ClassNotFoundException {
@@ -554,6 +550,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param rideId     the ride object being updated
 	 * @param isReturned boolean representing whether the ride has been returned
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateRideIsReturned(UUID rideId, Boolean isReturned) throws ClassNotFoundException {
@@ -588,6 +585,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param rideId         the ride object being updated
 	 * @param end_time_stamp the ride end time
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateRideEndTimeStamp(UUID rideId, Instant end_time_stamp) throws ClassNotFoundException {
@@ -621,6 +619,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param rideId  ride being updated
 	 * @param payment cost of ride
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateRidePayment(UUID rideId, double payment) throws ClassNotFoundException {
@@ -654,6 +653,7 @@ public class ValleyBikeSim {
 	 * Updates cost of ride
 	 *
 	 * @param rideId  ride being updated
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateRideStationTo(UUID rideId, int station_to) throws ClassNotFoundException {
@@ -686,6 +686,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username        username of account to be updated
 	 * @param newEmailAddress new email address
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateCustomerEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException {
@@ -765,6 +766,7 @@ public class ValleyBikeSim {
 	 * Set account to disabled to customer cannot log in
 	 *
 	 * @param username username of account to be disabled
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateCustomerDisabled(String username) throws ClassNotFoundException {
@@ -797,6 +799,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username        username of account to be updated
 	 * @param newEmailAddress new email address for account
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateInternalEmailAddress(String username, String newEmailAddress) throws ClassNotFoundException {
@@ -829,6 +832,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username of account to be updated
 	 * @param newUsername new username for account
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateCustomerUsername(String username, String newUsername) throws ClassNotFoundException {
@@ -861,6 +865,13 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * updates the user's username in the ride table in the database
+	 * @param username user's username
+	 * @param newUsername new username we want to change it to
+	 * @return false if database updating failed
+	 * @return
+	 */
 	static Boolean updateRideUsername(String username, String newUsername){
 		String sql = "UPDATE Ride SET username = ? "
 				+ "WHERE username = ?";
@@ -888,6 +899,12 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * updates username in the membership table in the database
+	 * @param username original username
+	 * @param newUsername new username
+	 * @return false if database updating failed
+	 */
 	private static Boolean updateMembershipUsername(String username, String newUsername){
 		String sql = "UPDATE Membership SET username = ? "
 				+ "WHERE username = ?";
@@ -914,6 +931,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username username of account to be updated
 	 * @param rideId   new ride to add to list
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateRideIdList(String username, UUID rideId) throws ClassNotFoundException {
@@ -950,12 +968,14 @@ public class ValleyBikeSim {
 	 *
 	 * @param username           username of account to update
 	 * @param lastRideisReturned boolean representing whether last bike was returned
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateCustomerLastRideisReturned(String username, boolean lastRideisReturned) throws ClassNotFoundException {
 		String sql = "UPDATE Customer_Account SET last_ride_is_returned = ? "
 				+ "WHERE username = ?";
 
+		// change boolean to binary, where 0 is false and 1 is true
 		int lastRideReturnedInt = 0;
 		if (lastRideisReturned) {
 			lastRideReturnedInt = 1;
@@ -986,6 +1006,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username of account to update
 	 * @param newPassword new password for account
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateCustomerPassword(String username, String newPassword) throws ClassNotFoundException {
@@ -1018,6 +1039,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username      username of account to update
 	 * @param newCreditCard new credit card
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateCustomerCreditCard(String username, String newCreditCard) throws ClassNotFoundException {
@@ -1050,6 +1072,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username      username of account to update
 	 * @param newMembership new membership type for account
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	//TODO neamat fix
@@ -1078,6 +1101,7 @@ public class ValleyBikeSim {
 				//update membership type associated with user and date representing start of membership
 				customerAccountMap.get(username).setMembership(checkMembershipType(newMembership));
 				System.out.println("Your membership has been successfully updated to " + Objects.requireNonNull(checkMembershipType(newMembership)).getMembershipString());
+
 				//inform user of the charge for their new membership
 				if (newMembership == 2) {
 					System.out.println("You have been charged $20 for your monthly membership. Your membership will auto-renew each month, \n" +
@@ -1105,6 +1129,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username of account to update
 	 * @param newUsername new internal username
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateInternalUsername(String username, String newUsername) throws ClassNotFoundException {
@@ -1124,6 +1149,8 @@ public class ValleyBikeSim {
 			//update internal account username in internal account map
 			InternalAccount internalAccount = internalAccountMap.get(username);
 			internalAccount.setUsername(newUsername);
+
+			// remove the old username and add new username
 			internalAccountMap.remove(username);
 			internalAccountMap.put(newUsername, internalAccount);
 			System.out.println("Your username has been successfully updated to " + newUsername);
@@ -1141,6 +1168,7 @@ public class ValleyBikeSim {
 	 *
 	 * @param username    username for internal account to update
 	 * @param newPassword new password for account
+	 * @return false if database updating failed
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
 	static Boolean updateInternalPassword(String username, String newPassword) throws ClassNotFoundException {
@@ -1259,6 +1287,10 @@ public class ValleyBikeSim {
 				//ASSUMPTION: if bike has been rented over 24 hours, it is probably lost or stolen forever
 				//so proceed like ride has been returned, to "station 0" (the checked-out station)
 				//this allows user to rent bikes again, and prevents them from being fined again for same bike
+
+				// if statements check for if the updating failed and thus exits
+				// before any changes can be made
+
 				if(!updateRideIsReturned(ride, true)){
 					return;
 				}
@@ -1300,7 +1332,9 @@ public class ValleyBikeSim {
 					} else if (user.getMembership().getMembershipInt() == 3) {
 						user.getMembership().setTotalRidesLeft(260);
 					}
+
 					user.getMembership().setLastPayment(LocalDate.now());
+
 					//ASSUMPTION: In a real system, here emails would be sent out to all members whose memberships
 					// have just been renewed, letting them know their card was charged
 				} else {
@@ -1338,8 +1372,8 @@ public class ValleyBikeSim {
 	}
 
 	/**
-	 *
-	 * @return
+	 * Returns total number of maintenance requests in our stations
+	 * @return total maintenance requests
 	 * @throws SQLException
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
 	 */
@@ -1414,8 +1448,12 @@ public class ValleyBikeSim {
 			// use that key to find bike object in bike tree
 			Bike bike = bikesMap.get(key);
 
+			// initialize string as empty
 			String locString = " ";
+
+			// get bike location and change to string description of that location
 			int loc = bike.getBikeLocation();
+
 			if (loc == 0) {
 				locString = "available at station  ";
 			} else if (loc == 1) {
@@ -1473,8 +1511,11 @@ public class ValleyBikeSim {
 		}
 	}
 
+	/**
+	 * returns total capacity of all stations
+	 * @return total stations capacity
+	 */
 	static int viewTotalStationsCapacity(){
-		//TODO comment method
 		int total = 0;
 		for (int key : stationsMap.keySet()){
 			Station station = stationsMap.get(key);
@@ -1483,8 +1524,11 @@ public class ValleyBikeSim {
 		return total;
 	}
 
+	/**
+	 * Returns the total count of bikes in all available stations
+	 * @return total number of bikes in all stations
+	 */
 	static int viewTotalBikesCount(){
-		//TODO comment method
 		return bikesMap.size();
 	}
 
@@ -1530,11 +1574,24 @@ public class ValleyBikeSim {
 			}
 		}
 	}
-//TODO comment methods
+
+	/**
+	 * Changes a boolean to an int
+	 * if true, return 1 and if false, return 0
+	 *
+	 * @param myBoolean boolean to be changed to int
+	 * @return int from boolean
+	 */
 	private static int booleanToInt(boolean myBoolean) {
 		return myBoolean ? 1 : 0;
 	}
 
+	/**
+	 * Changes an int to a boolean
+	 * if 0, returns false and if 1, returns true
+	 * @param myInt
+	 * @return
+	 */
 	private static boolean intToBoolean(int myInt) {
 		if (Objects.equals(myInt, 0)){
 			return false;
@@ -1606,6 +1663,7 @@ public class ValleyBikeSim {
 		addMembership(membershipType, username);
 	}
 
+	//TODO comment method
 	static void addMembership(Membership membership, String username){
 		String sql = "INSERT INTO Membership(username, total_rides_left, last_payment, membership_since, type) " +
 				"VALUES(?,?,?,?,?)";
@@ -1624,6 +1682,7 @@ public class ValleyBikeSim {
 		}
 	}
 
+	//TODO comment method
 	static Membership checkMembershipType(int membership,  int totalRidesLeft, LocalDate lastPayment, LocalDate memberSince){
 		if (membership == 1){
 			return new PayAsYouGoMembership(totalRidesLeft, lastPayment, memberSince);
@@ -1752,16 +1811,14 @@ public class ValleyBikeSim {
 			//add ride to database
 			try (Connection conn = connectToDatabase();
 				 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
 				String ride_id = ride.getRideId().toString();
 				pstmt.setString(1, ride_id);
 				pstmt.setInt(2, ride.getBikeId());
 				pstmt.setString(3, ride.getUsername());
 
-				int is_returned_int = 0;
-
-				if (ride.getIsReturned()) {
-					is_returned_int = 1;
-				}
+				// change int binary to boolean
+				int is_returned_int = booleanToInt(ride.getIsReturned());
 
 				pstmt.setInt(4, is_returned_int);
 				pstmt.setLong(5, ride.getRideLength());
@@ -1970,8 +2027,9 @@ public class ValleyBikeSim {
 	 */
 	static void resolveMntReqs() throws ClassNotFoundException {
 		// if there are maintenance requests
-		if (mntReqs != null) {
-			System.out.println("Here's a list of bike iDs in need of maintenance and their reports.");
+		if (mntReqs.size() > 0) {
+			System.out.println("Here's a list of bike iDs in need of maintenance and their reports:");
+
 			// loop through all the bike ids in need of maintenance
 			for (Map.Entry<Integer, String> entry : mntReqs.entrySet()) {
 				// view each id
@@ -2162,52 +2220,4 @@ public class ValleyBikeSim {
 	static Boolean bikesMapContains(int key) {
 		return bikesMap.containsKey(key);
 	}
-
-	/*
-	*//**
-	 * Helper method for controller class to return a key set
-	 * iterator
-	 *
-	 * @param isBike If true, we're working with a bike object.
-	 *               If not, we're working with a station object.
-	 * @return if isBike is true, we're returning a bikesMap iterator.
-	 * if not, we're returning a stationsMap iterator.
-	 *//*
-	private static Iterator createIterator(Boolean isBike) {
-		if (isBike) {
-			return bikesMap.keySet().iterator();
-		} else {
-			return stationsMap.keySet().iterator();
-		}
-	}*/
-
-	/**
-	 * Adds a bike to a station
-	 *
-	 * @param stationId the station id that will get updated
-	 * @param bikeId    the bike to be added to the station
-	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be found
-	 */
-	/*
-	static void addBikeToStation(int stationId, int bikeId) throws ClassNotFoundException {
-		String sql = "UPDATE Station SET bike_string = ? "
-				+ "WHERE id = ?";
-		//add bike to list of bikes at station in station map
-
-		String bikeIdsString = stationsMap.get(stationId).getBikeListToString();
-
-		try (Connection conn = connectToDatabase();
-			 PreparedStatement pstmt = conn.prepareStatement(sql)) {
-			// set the corresponding param
-			pstmt.setString(1, bikeIdsString);
-			pstmt.setInt(2, bikeId);
-			// update
-			pstmt.executeUpdate();
-
-			//add bike to station in database
-			stationsMap.get(stationId).addToBikeList(bikeId);
-		} catch (SQLException e) {
-			System.out.println("Sorry, could not increment number of bikes in station in database at this time.");
-		}
-	}*/
 }

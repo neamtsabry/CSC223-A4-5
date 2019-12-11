@@ -38,7 +38,8 @@ public abstract class ValleyBikeController {
         switch(num) {
             case 1:
                 //create a new customer account
-                createCustomerAccount();
+//                createCustomerAccount();
+                ValleyBikeSim.resolveMntReqs();
                 break;
             case 2:
                 //log in to existing customer or internal account
@@ -680,6 +681,7 @@ public abstract class ValleyBikeController {
             bikeID = getResponse("Please enter the ID number of the bike you" +
                     " would like to rent ('##') or '0' to return to menu: ");
 
+            //TODO why did we comment this out?
             // if user entered 0, return to menu
             //if (Objects.equals(bikeID, 0)){ return; }
             //someBike = ValleyBikeSim.getBikeObj(bikeID);
@@ -1339,7 +1341,10 @@ public abstract class ValleyBikeController {
      * @return the validated integer inputted by user
      */
     private static Integer getResponse(String request){
+        // print the needed request
         System.out.println(request);
+
+        // loop while it's not an int
         while (!input.hasNextInt()){ //keep requesting new input until valid int
             System.out.println("That is not a valid number. Please try again.");
             System.out.println(request);
@@ -1390,11 +1395,6 @@ public abstract class ValleyBikeController {
         }
         return response;
     }
-
-
-
-
-
 
     /**
      * Prompts user to input username
