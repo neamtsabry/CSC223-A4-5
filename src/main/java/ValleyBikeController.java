@@ -318,13 +318,13 @@ public abstract class ValleyBikeController {
      * @throws NoSuchAlgorithmException
      */
     private static void createInternalAccount(String username) throws IOException, ParseException, InterruptedException, ClassNotFoundException, NoSuchAlgorithmException, SQLException {
-        //Assumption: a new internal account cannot be created by a user who is not logged into an internal account
-        //i.e. only internal staff can create new internal accounts
+        // Assumption: a new internal account cannot be created by a user who is not logged into an internal account
+        // i.e. only internal staff can create new internal accounts
 
-        //add createInternalAccount index to our stack in case we need to return to this method
-        menuPath.push(2);
+        // add createInternalAccount index to our stack in case we need to return to this method
+        // menuPath.push(2);
 
-        //each field has its own method which calls itself until a valid input is entered
+        // each field has its own method which calls itself until a valid input is entered
         String newUsername = enterUsername();
         if (Objects.equals(newUsername, "0")){
             System.out.println("Account creation canceled.");
@@ -342,14 +342,14 @@ public abstract class ValleyBikeController {
             returnToLastMenu(username);
         }
 
-        //create new internal account object from inputs
+        // create new internal account object from inputs
         InternalAccount internalAccount = new InternalAccount(newUsername, password, emailAddress);
         ValleyBikeSim.addInternalAccount(internalAccount, newUsername);
 
-        //Let the user know the account has been successfully created
+        // Let the user know the account has been successfully created
         System.out.println("Internal account successfully created!");
 
-        menuPath.pop();// we no longer need to remember this menu
+        // menuPath.pop();// we no longer need to remember this menu
     }
 
     /**
@@ -892,6 +892,7 @@ public abstract class ValleyBikeController {
 
         //get and validate user response
         int num = getResponseBetween(0,12, "Please enter your selection (0-12):");
+
 
         switch(num) {
             case 1:
