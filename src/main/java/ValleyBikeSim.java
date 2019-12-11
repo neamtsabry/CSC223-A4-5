@@ -5,12 +5,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -289,20 +287,10 @@ public class ValleyBikeSim {
 				is_returned_bool = true;
 			}
 
-			// change starting time stamp string to instant
-			Instant start_time_stamp_instant = LocalDateTime.parse(start_time_stamp,
-					DateTimeFormatter.ofPattern("hh:mm a, MM/dd/yyy", Locale.US)
-			).atZone(ZoneId.of("America/New_York")).toInstant();
+			//parse time stamps as readable instants
+			Instant start_time_stamp_instant = Instant.parse(start_time_stamp);
+			Instant end_time_stamp_instant = Instant.parse(end_time_stamp);
 
-			// initialize end time stamp as nul since the ride could not have been returned
-			Instant end_time_stamp_instant = null;
-
-			// if it was returned, set ending time stamp too
-			if (is_returned_bool) {
-				end_time_stamp_instant = LocalDateTime.parse(end_time_stamp,
-						DateTimeFormatter.ofPattern("hh:mm a, MM/dd/yyy", Locale.US)
-				).atZone(ZoneId.of("America/New_York")).toInstant();
-			}
 
 			// create new ride object with fields
 			Ride ride = new Ride(uuid_id, bike_id, username,
@@ -1178,10 +1166,8 @@ public class ValleyBikeSim {
 			if (user.getMembership().checkPaymentDue()) {
 				if (ValleyBikeController.isValidCreditCard(user.getCreditCard())) {
 					if (user.getMembership().getMembershipInt() == 2) {
-						//TODO monthly things
 						user.getMembership().setTotalRidesLeft(20);
 					} else if (user.getMembership().getMembershipInt() == 3) {
-						//TODO yearly things
 						user.getMembership().setTotalRidesLeft(260);
 					}
 					user.getMembership().setLastPayment(LocalDate.now());
@@ -1667,25 +1653,28 @@ public class ValleyBikeSim {
 	 * @throws ClassNotFoundException tries to load a class through its string name, but no definition for the specified class name could be foun
 	 */
 	static void moveStation(Bike bike, int newStationValue) throws ClassNotFoundException {
-	    if (! Objects.equals(bike.getStation(),0)) { // check if bike had an old station; '0' represents a bike without a current station
+		//move bike from last station
+
+		// check if bike has a current station
+		// if bike's station is 0, that means that the bike is out with a customer
+	    if (! Objects.equals(bike.getStation(),0)) { // if bike is at a station
 	        Station oldStation = stationsMap.get(bike.getStation()); // get old station object
 			oldStation.removeFromBikeList(bike.getId()); // remove bike from station's bike list
-
-			// update to database
+			// update new station bike list to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 		}
 
+	    //update station id registered to bike
         updateBikeStationId(bike.getId(), newStationValue);
 
-		if (! Objects.equals(newStationValue, 0)) { // check if new station is a '0,' which is a placeholder station
+		// check if new station is a '0,' which is a placeholder station
+		if (! Objects.equals(newStationValue, 0)) {
 			Station newStation = stationsMap.get(bike.getStation()); // get new station object
-
+			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 			// update to database
 			updateStationBikeList(bike.getStation(), bike.getId());
 			updateBikeLocation(bike.getId(), 0);
-			newStation.addToBikeList(bike.getId()); //add to new station's bike list
 		}
-
 		else {
 			updateBikeLocation(bike.getId(), 2);
 		}
