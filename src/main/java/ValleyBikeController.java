@@ -466,6 +466,10 @@ public abstract class ValleyBikeController {
                         ValleyBikeSim.updateCustomerMembership(username, newMembership);
                     }
                 }
+
+                if (newMembership == 1){
+                    ValleyBikeSim.updateCustomerMembership(username, newMembership);
+                }
                 break;
             case 0:
                 // if there is a master string, we are returning to an internal account, so we will use the master username
