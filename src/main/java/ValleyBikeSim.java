@@ -127,7 +127,8 @@ public class ValleyBikeSim {
 				for (String ride : rideIdString.split(",")) {
 					UUID uuid = UUID.fromString(ride.replaceAll(" ", ""));
 					rideIdList.add(uuid);
-					System.out.println("CAD"+rideMap.get(uuid).getStationFrom()+" "+rideMap.get(uuid).getStationTo()+" "+rideMap.size());
+					//TODO
+					//System.out.println("CAD"+rideMap.get(uuid).getStationFrom()+" "+rideMap.get(uuid).getStationTo()+" "+rideMap.size());
 				}
 			}
 			//create customer account from info
@@ -311,7 +312,8 @@ public class ValleyBikeSim {
 
 			// add to the ride tree
 			rideMap.put(uuid_id, ride);
-			System.out.println("RRD"+rideMap.get(uuid_id).getStationFrom()+" "+rideMap.get(uuid_id).getStationTo()+rideMap.size());
+			//TODO
+			//System.out.println("RRD"+rideMap.get(uuid_id).getStationFrom()+" "+rideMap.get(uuid_id).getStationTo()+rideMap.size());
 
 		}
 	}
