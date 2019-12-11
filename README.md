@@ -49,6 +49,18 @@ Grace Bratzel, Asmita Gautam, Annika Miller, and Neamat Sabry
     - Use the Run menu at the top and select Run.
     - Right-Click and choose "Run As > Java Application"
 18. The "Console" tab on the bottom should show you the output of the program. 
+
+## Test the code!
+
+We've made some minor JUnit tests that helped with testing this code. Here's how you can run it:
+
+1. Expand the "ValleyBikeSim" folder, expand the "src/main/java" and "(default package)" folders.
+16. Double-Click on ``jUnitTest.java``
+17. Run the code. Do one of:
+    - Press the Green Run button at the top.
+    - Use the Run menu at the top and select Run.
+    - Right-Click and choose "Run As > Java Application"
+18. The "Console" tab on the bottom should show you the output of the program. 
     
 ## Instructions for how to run project
 
