@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 
-class RideTest {
+class Test {
 //    @Test
 //    public void testIs24Hours() throws Exception {
 //       Assert.assertEquals(Ride.is24hours(), false);
@@ -24,7 +24,7 @@ class RideTest {
 //        System.out.println(ZonedDateTime.now());
 //    }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testIsValidEmailAdress(){
         Assert.assertEquals(ValleyBikeController.isValidEmail("1"), false);
         Assert.assertEquals(ValleyBikeController.isValidEmail("abcd"), false);
@@ -33,7 +33,7 @@ class RideTest {
         Assert.assertEquals(ValleyBikeController.isValidEmail(null), false);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testIsValidPassword(){
         Assert.assertEquals(ValleyBikeController.isValidPassword("1234567"), true);
         Assert.assertEquals(ValleyBikeController.isValidPassword("123"), false);
@@ -41,7 +41,7 @@ class RideTest {
         Assert.assertEquals(ValleyBikeController.isValidPassword(""), false);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testIsValidUsername(){
         Assert.assertEquals(ValleyBikeController.isValidUsername("asdfgh", 1),true);
         Assert.assertEquals(ValleyBikeController.isValidUsername("123", 2),false);
@@ -49,7 +49,7 @@ class RideTest {
         Assert.assertEquals(ValleyBikeController.isValidUsername(null, 2), false);
     }
 
-    @Test
+    @org.junit.jupiter.api.Test
     public void testMapContains(){
 //        Assert.assertEquals(ValleyBikeSim.bikesMapContains(123456789), false);
 //        Assert.assertEquals(ValleyBikeSim.stationsMapContains(123456789), false);
