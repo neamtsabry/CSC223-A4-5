@@ -846,8 +846,10 @@ public abstract class ValleyBikeController {
             bikeId = getResponse("Please enter bike ID ('###') or '0' to cancel:");
             if (Objects.equals(bikeId, 0)){
                 System.out.println("Report problem has been canceled.");
-                return; } // if user entered 0, return to menu
+                return;
+            } // if user entered 0, return to menu
         }
+
         input.nextLine();
         // prompt user for report detailing what's wrong
         String mntReport = getUserString(50, "Please tell us what is wrong with this bike or enter '0' to cancel:");
@@ -891,9 +893,12 @@ public abstract class ValleyBikeController {
         // bike is now out of commission until fixed
         ValleyBikeSim.updateBikeLocation(bikeId, 1);
 
-        // increase maintenance requests for the station
-        Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
-        ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+        // if the station is not live with customer
+        if(! Objects.equals(bike.getStation(), 0)){
+            // increase maintenance requests for the station
+            Station statObj = ValleyBikeSim.getStationObj(bike.getStation());
+            ValleyBikeSim.updateStationMntRqsts(bike.getStation(), statObj.getMaintenanceRequest()+1);
+        }
 
         // let user know the process is done
         System.out.println("Maintenance report has been successfully filed!");
